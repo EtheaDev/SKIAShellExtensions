@@ -16,14 +16,6 @@
 
 - Themes (Dark and Light) according to user preferences of Windows Theme
 
-## Powered by Skia4Delphi
-
-![Skia4Delphi](/Images/logo-gradient.svg)
-
-Many thanks to the project "Skia4Delphi"
-
-**[Skia4Delphi](https://skia4delphi.org)** is a cross-platform 2D graphics API for Delphi based on [Google's Skia](https://skia.org/) graphics library.
-
 ### Setup using the Installer
 
 Click to download the [SKIAShellExtensionsSetup.exe][3] located also in the Release area. The Installer works both for 32 and 64 bit system.
@@ -83,12 +75,20 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 
 Many thanks to **Rodrigo Ruz V.** (author of [theroadtodelphi.com][7] Blog) for his wonderful work on [delphi-preview-handler][8] from which this project has used a lot of code and inspiration.
 
+## Powered by Skia4Delphi
+
+<p><a href="https://www.skia4delphi.org"><img src="./Images/logo-gradient.svg" alt="Logo" height="300" width="360" /></a></p>
+
+Many thanks to the project "Skia4Delphi"
+
+**[Skia4Delphi](https://skia4delphi.org)** is a cross-platform 2D graphics API for Delphi based on [Google's Skia](https://skia.org/) graphics library.
+
 ## License
 
 Licensed under the [Apache License, Version 2.0][9] (the "License");
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-The Initial Developer of the [Original Code][8] is **Rodrigo Ruz V**. Portions created by him are Copyright © 2011-2021 Rodrigo Ruz V.
+The Initial Developer of the [Original Code][8] is **Rodrigo Ruz V**. Portions created by him are Copyright Â© 2011-2021 Rodrigo Ruz V.
 
 Third Party libraries and tools used from Ethea:
 
@@ -119,16 +119,16 @@ Related links: [embarcadero.com][10] - [learndelphi.org][11]
 
 [6]: https://github.com/RRUZ/vcl-styles-utils
 
-[7]: https://theroadtodelphi.com/
+[7]: https://theroadtodelphi.com
 
 [8]: https://github.com/RRUZ/delphi-preview-handler
 
 [9]: https://opensource.org/licenses/Apache-2.0
 
-[10]: https://www.embarcadero.com/
+[10]: https://www.embarcadero.com
 
-[11]: https://learndelphi.org/
+[11]: https://learndelphi.org
 
-[12]: https://github.com/EtheaDev/SVGShellExtensions/wiki/Using-The-Lottie-Text-Editor
+[12]: https://github.com/EtheaDev/SKIAShellExtensions/wiki/Using-The-Lottie-Text-Editor
 
-[13]: https://skia4delphi.org/
+[13]: https://skia4delphi.org
