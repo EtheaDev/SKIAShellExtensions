@@ -1,0 +1,1 @@
+%systemroot%\System32\regsvr32 "D:\ETHEA\SKIAShellExtensions\Bin64\SKIAShellExtensions.dll"

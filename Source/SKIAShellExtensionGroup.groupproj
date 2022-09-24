@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{4F73178F-31F0-4189-979A-9A66BE38E029}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SKIAShellExtensions32.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SKIAShellExtensions.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="LottieTextEditor.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SKIAShellExtensions32">
+        <MSBuild Projects="SKIAShellExtensions32.dproj"/>
+    </Target>
+    <Target Name="SKIAShellExtensions32:Clean">
+        <MSBuild Projects="SKIAShellExtensions32.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SKIAShellExtensions32:Make">
+        <MSBuild Projects="SKIAShellExtensions32.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SKIAShellExtensions">
+        <MSBuild Projects="SKIAShellExtensions.dproj"/>
+    </Target>
+    <Target Name="SKIAShellExtensions:Clean">
+        <MSBuild Projects="SKIAShellExtensions.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SKIAShellExtensions:Make">
+        <MSBuild Projects="SKIAShellExtensions.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="LottieTextEditor">
+        <MSBuild Projects="LottieTextEditor.dproj"/>
+    </Target>
+    <Target Name="LottieTextEditor:Clean">
+        <MSBuild Projects="LottieTextEditor.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LottieTextEditor:Make">
+        <MSBuild Projects="LottieTextEditor.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SKIAShellExtensions32;SKIAShellExtensions;LottieTextEditor"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SKIAShellExtensions32:Clean;SKIAShellExtensions:Clean;LottieTextEditor:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SKIAShellExtensions32:Make;SKIAShellExtensions:Make;LottieTextEditor:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
