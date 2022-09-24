@@ -1,8 +1,8 @@
 inherited FrmPreview: TFrmPreview
   Left = 522
   Top = 286
-  ClientHeight = 617
-  ClientWidth = 617
+  ClientHeight = 616
+  ClientWidth = 613
   DoubleBuffered = True
   Font.Name = 'Segoe UI'
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
@@ -12,15 +12,15 @@ inherited FrmPreview: TFrmPreview
   TextHeight = 13
   inherited Label1: TLabel
     Top = 338
-    Width = 611
-    Height = 217
+    Width = 607
+    Height = 216
     ExplicitTop = 338
     ExplicitWidth = 146
   end
   object Splitter: TSplitter
     Left = 0
     Top = 329
-    Width = 617
+    Width = 613
     Height = 6
     Cursor = crVSplit
     Align = alTop
@@ -32,12 +32,11 @@ inherited FrmPreview: TFrmPreview
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 617
+    Width = 613
     Height = 35
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 613
     object ToolBar: TToolBar
       Left = 0
       Top = 0
@@ -180,7 +179,7 @@ inherited FrmPreview: TFrmPreview
   object PanelEditor: TPanel
     Left = 0
     Top = 35
-    Width = 617
+    Width = 613
     Height = 294
     Align = alTop
     BevelOuter = bvNone
@@ -188,7 +187,6 @@ inherited FrmPreview: TFrmPreview
     ParentBackground = False
     TabOrder = 1
     Visible = False
-    ExplicitWidth = 613
     object SynEdit: TSynEdit
       Left = 0
       Top = 0
@@ -224,8 +222,8 @@ inherited FrmPreview: TFrmPreview
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 598
-    Width = 617
+    Top = 597
+    Width = 613
     Height = 19
     Panels = <>
     ParentFont = True
@@ -234,14 +232,12 @@ inherited FrmPreview: TFrmPreview
       'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2022 Ethea S.r.l' +
       '. - Author: Carlo Barazzetta'
     UseSystemFont = False
-    ExplicitTop = 597
-    ExplicitWidth = 613
   end
   object ImagePanel: TPanel
     Left = 0
     Top = 335
-    Width = 617
-    Height = 223
+    Width = 613
+    Height = 222
     Align = alClient
     BevelOuter = bvNone
     DoubleBuffered = True
@@ -251,6 +247,8 @@ inherited FrmPreview: TFrmPreview
     TabOrder = 3
     StyleElements = []
     ExplicitLeft = 1
+    ExplicitWidth = 617
+    ExplicitHeight = 223
     object panelPreview: TPanel
       Left = 0
       Top = 0
@@ -290,16 +288,14 @@ inherited FrmPreview: TFrmPreview
   end
   object PlayerPanel: TPanel
     Left = 0
-    Top = 558
-    Width = 617
+    Top = 557
+    Width = 613
     Height = 40
     Align = alBottom
     BevelInner = bvLowered
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 4
-    ExplicitTop = 557
-    ExplicitWidth = 613
     object RunLabel: TLabel
       AlignWithMargins = True
       Left = 572

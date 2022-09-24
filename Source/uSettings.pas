@@ -316,7 +316,7 @@ begin
   TLogPreview.Add('ReadSettings '+SettingsFileName);
   FFontSize := FIniFile.ReadInteger('Global', 'FontSize', 10);
   FFontName := FIniFile.ReadString('Global', 'FontName', 'Consolas');
-  FShowEditor := FIniFile.ReadInteger('Global', 'ShowEditor', 1) = 1;
+  FShowEditor := FIniFile.ReadInteger('Global', 'ShowEditor', 0) = 1;
   FSplitterPos := FIniFile.ReadInteger('Global', 'SplitterPos', 33);
   LAutoPlay := FIniFile.ReadInteger('Global', 'AutoPlay', 0);
   AutoPlay := not ((LAutoPlay = 0) or (LAutoPlay = 255));
@@ -415,7 +415,7 @@ constructor TPreviewSettings.CreateSettings(
 begin
   inherited CreateSettings(
     IncludeTrailingPathDelimiter(
-      GetSpecialFolder(CSIDL_APPDATA)) +'LottiePreviewHandler\Settings.ini',
+      GetSpecialFolder(CSIDL_APPDATA)) +'SKIAPreviewHandler\Settings.ini',
     ASynEditHighilighter, nil);
 end;
 

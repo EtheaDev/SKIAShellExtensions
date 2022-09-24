@@ -456,7 +456,7 @@ end;
 
 procedure TFrmPreview.ToolButtonAboutClick(Sender: TObject);
 begin
-  ShowAboutForm(DialogPosRect, Title_LottiePreview);
+  ShowAboutForm(DialogPosRect, Title_SKIAPreview);
 end;
 
 procedure TFrmPreview.ToolButtonMouseEnter(Sender: TObject);
@@ -539,7 +539,7 @@ end;
 
 procedure TFrmPreview.ToolButtonSettingsClick(Sender: TObject);
 begin
-  if ShowSettings(DialogPosRect, Title_LottiePreview, SynEdit, FPreviewSettings, True) then
+  if ShowSettings(DialogPosRect, Title_SKIAPreview, SynEdit, FPreviewSettings, True) then
   begin
     FPreviewSettings.WriteSettings(SynEdit.Highlighter, nil);
     UpdateFromSettings;

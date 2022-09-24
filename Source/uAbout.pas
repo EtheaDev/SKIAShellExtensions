@@ -41,7 +41,7 @@ uses
 
 resourcestring
   Title_LottieTextEditor = 'SKIA/Lottie Text Editor';
-  Title_LottiePreview = 'SKIA Image/Animation Preview';
+  Title_SKIAPreview = 'SKIA Image/Animation Preview';
   FReeware_Caption = ' - Freeware';
 
 type

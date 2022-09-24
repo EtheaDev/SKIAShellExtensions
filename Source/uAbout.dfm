@@ -3,8 +3,8 @@ object FrmAbout: TFrmAbout
   Top = 323
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
-  ClientHeight = 352
-  ClientWidth = 447
+  ClientHeight = 351
+  ClientWidth = 443
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,8 +15,8 @@ object FrmAbout: TFrmAbout
   OnClose = FormClose
   OnCreate = FormCreate
   DesignSize = (
-    447
-    352)
+    443
+    351)
   TextHeight = 13
   object TitleLabel: TLabel
     Left = 190
@@ -122,8 +122,8 @@ object FrmAbout: TFrmAbout
   end
   object Panel1: TPanel
     Left = 0
-    Top = 301
-    Width = 447
+    Top = 300
+    Width = 443
     Height = 51
     Align = alBottom
     BevelOuter = bvNone
@@ -167,17 +167,19 @@ object FrmAbout: TFrmAbout
   object MemoCopyRights: TMemo
     Left = 8
     Top = 83
-    Width = 428
-    Height = 148
+    Width = 420
+    Height = 147
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBtnFace
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 1
+    ExplicitWidth = 428
+    ExplicitHeight = 148
   end
   object SKIALinkLabel: TLinkLabel
     Left = 139
-    Top = 273
+    Top = 272
     Width = 129
     Height = 19
     Anchors = [akLeft, akBottom]
@@ -201,13 +203,14 @@ object FrmAbout: TFrmAbout
   end
   object PweredSKIAPanel: TPanel
     Left = 0
-    Top = 236
-    Width = 447
+    Top = 235
+    Width = 443
     Height = 65
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
     ExplicitTop = 230
+    ExplicitWidth = 447
     object SVGIconImage3: TSVGIconImage
       Left = 8
       Top = 5

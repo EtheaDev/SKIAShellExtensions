@@ -1195,9 +1195,14 @@ begin
   GetMem(LPixels, LStride * Height);
   try
     FlipPixels(Width, Height, ScanLine[Height - 1], LStride, LPixels, LStride);
-    Result := TSkImage.MakeFromRaster(TSkImageInfo.Create(Width, Height), LPixels, LStride);
-  finally
+    Result := TSkImage.MakeFromRaster(TSkImageInfo.Create(Width, Height), LPixels, LStride,
+      procedure (const APixels: Pointer)
+      begin
+        FreeMem(APixels);
+      end);
+  except
     FreeMem(LPixels);
+    raise;
   end;
 end;
 
