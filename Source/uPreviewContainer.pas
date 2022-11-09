@@ -35,11 +35,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Vcl.StdCtrls;
+  Dialogs;
 
 type
   TPreviewContainer = class(TForm)
-    Label1: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private

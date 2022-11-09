@@ -11,12 +11,17 @@ type
   TFrmMain = class(TForm)
     Panel1: TPanel;
     Panel3: TPanel;
-    ShellListView1: TShellListView;
+    ShellListView: TShellListView;
     Splitter1: TSplitter;
-    procedure ShellListView1Change(Sender: TObject; Item: TListItem;
+    Splitter2: TSplitter;
+    ShellTreeView: TShellTreeView;
+    Panel2: TPanel;
+    PathEditor: TEdit;
+    procedure ShellListViewChange(Sender: TObject; Item: TListItem;
       Change: TItemChange);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure PathEditorChange(Sender: TObject);
   private
     FFileName: string;
     { Private declarations }
@@ -70,14 +75,22 @@ begin
   THostPreviewHandlerClass(FPreview).Paint;
 end;
 
-procedure TFrmMain.ShellListView1Change(Sender: TObject; Item: TListItem;
+procedure TFrmMain.PathEditorChange(Sender: TObject);
+begin
+  if DirectoryExists(PathEditor.Text) then
+    ShellTreeView.Root := PathEditor.Text
+  else if PathEditor.Text = '' then
+    ShellTreeView.Root := 'rfDesktop';
+end;
+
+procedure TFrmMain.ShellListViewChange(Sender: TObject; Item: TListItem;
   Change: TItemChange);
 var
   LFileName: string;
 begin
- if (ShellListView1.SelectedFolder<>nil) then
+ if (ShellListView.SelectedFolder<>nil) then
  begin
-   LFileName := ShellListView1.SelectedFolder.PathName;
+   LFileName := ShellListView.SelectedFolder.PathName;
    if (LFileName <> FFileName) and FileExists(LFileName) then
    begin
      LoadPreview(LFileName);

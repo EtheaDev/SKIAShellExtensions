@@ -178,6 +178,7 @@ object frmMain: TfrmMain
         AutoSize = False
         ImageList = VirtualImageList
         ImageIndex = 39
+        ImageName = 'error'
         Align = alLeft
       end
       object StatusStaticText: TStaticText
@@ -401,7 +402,7 @@ object frmMain: TfrmMain
       OnGetHint = catMenuItemsGetHint
       OnMouseLeave = catMenuItemsMouseLeave
       OnMouseMove = catMenuItemsMouseMove
-      ExplicitTop = 3
+      ExplicitHeight = 532
     end
   end
   object panlTop: TPanel

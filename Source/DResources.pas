@@ -234,12 +234,13 @@ begin
       for LExtension in LFormat.Extensions do
         Result := Result + [LExtension];
     end;
-(*
+
   //Add image extensions
+(*
   if not AOnlyTextFormat then
   begin
     //Result := Result + ['.svg'];
-    Result := Result + ['.webp'];
+    //Result := Result + ['.webp']; also an animation extension
     Result := Result + ['.wbmp'];
     Result := Result + ['.arw'];
     Result := Result + ['.cr2'];

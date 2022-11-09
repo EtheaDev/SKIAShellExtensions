@@ -130,14 +130,14 @@ object FrmAbout: TFrmAbout
     Color = clWindow
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 298
-    ExplicitWidth = 442
+    ExplicitTop = 299
+    ExplicitWidth = 439
     object btnOK: TButton
       Left = 360
       Top = 16
       Width = 75
       Height = 25
-      Caption = 'OK'
+      Caption = 'CLOSE'
       Default = True
       TabOrder = 0
       OnClick = btnOKClick
@@ -167,15 +167,15 @@ object FrmAbout: TFrmAbout
   object MemoCopyRights: TMemo
     Left = 8
     Top = 83
-    Width = 420
+    Width = 416
     Height = 147
     Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBtnFace
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 1
-    ExplicitWidth = 428
-    ExplicitHeight = 148
+    ExplicitWidth = 412
+    ExplicitHeight = 146
   end
   object SKIALinkLabel: TLinkLabel
     Left = 139
@@ -209,8 +209,8 @@ object FrmAbout: TFrmAbout
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
-    ExplicitTop = 230
-    ExplicitWidth = 447
+    ExplicitTop = 234
+    ExplicitWidth = 439
     object SVGIconImage3: TSVGIconImage
       Left = 8
       Top = 5

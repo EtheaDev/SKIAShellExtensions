@@ -1,26 +1,18 @@
 inherited FrmPreview: TFrmPreview
   Left = 522
   Top = 286
-  ClientHeight = 616
-  ClientWidth = 613
+  ClientHeight = 615
+  ClientWidth = 609
   DoubleBuffered = True
   Font.Name = 'Segoe UI'
-  OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnResize = FormResize
-  ExplicitWidth = 629
-  ExplicitHeight = 655
+  ExplicitWidth = 621
+  ExplicitHeight = 653
   TextHeight = 13
-  inherited Label1: TLabel
-    Top = 338
-    Width = 607
-    Height = 216
-    ExplicitTop = 338
-    ExplicitWidth = 146
-  end
   object Splitter: TSplitter
     Left = 0
     Top = 329
-    Width = 613
+    Width = 609
     Height = 6
     Cursor = crVSplit
     Align = alTop
@@ -32,15 +24,16 @@ inherited FrmPreview: TFrmPreview
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 613
+    Width = 609
     Height = 35
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 605
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 617
+      Width = 609
       Height = 35
       Align = alClient
       AutoSize = True
@@ -51,7 +44,7 @@ inherited FrmPreview: TFrmPreview
       Images = SVGIconImageList
       List = True
       TabOrder = 0
-      ExplicitWidth = 613
+      ExplicitWidth = 605
       object ToolButtonPlay: TToolButton
         Left = 0
         Top = 0
@@ -179,7 +172,7 @@ inherited FrmPreview: TFrmPreview
   object PanelEditor: TPanel
     Left = 0
     Top = 35
-    Width = 613
+    Width = 609
     Height = 294
     Align = alTop
     BevelOuter = bvNone
@@ -187,10 +180,11 @@ inherited FrmPreview: TFrmPreview
     ParentBackground = False
     TabOrder = 1
     Visible = False
+    ExplicitWidth = 605
     object SynEdit: TSynEdit
       Left = 0
       Top = 0
-      Width = 617
+      Width = 609
       Height = 294
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
@@ -217,13 +211,13 @@ inherited FrmPreview: TFrmPreview
       Gutter.ShowLineNumbers = True
       ReadOnly = True
       FontSmoothing = fsmNone
-      ExplicitWidth = 613
+      ExplicitWidth = 605
     end
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 597
-    Width = 613
+    Top = 596
+    Width = 609
     Height = 19
     Panels = <>
     ParentFont = True
@@ -232,12 +226,14 @@ inherited FrmPreview: TFrmPreview
       'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2022 Ethea S.r.l' +
       '. - Author: Carlo Barazzetta'
     UseSystemFont = False
+    ExplicitTop = 595
+    ExplicitWidth = 605
   end
   object ImagePanel: TPanel
     Left = 0
     Top = 335
-    Width = 613
-    Height = 222
+    Width = 609
+    Height = 221
     Align = alClient
     BevelOuter = bvNone
     DoubleBuffered = True
@@ -246,19 +242,18 @@ inherited FrmPreview: TFrmPreview
     ParentDoubleBuffered = False
     TabOrder = 3
     StyleElements = []
-    ExplicitLeft = 1
-    ExplicitWidth = 617
-    ExplicitHeight = 223
+    ExplicitWidth = 605
+    ExplicitHeight = 220
     object panelPreview: TPanel
       Left = 0
       Top = 0
-      Width = 617
+      Width = 609
       Height = 40
       Align = alTop
       ParentBackground = False
       ShowCaption = False
       TabOrder = 0
-      ExplicitWidth = 613
+      ExplicitWidth = 605
       object BackgroundGrayScaleLabel: TLabel
         Left = 10
         Top = 6
@@ -272,7 +267,7 @@ inherited FrmPreview: TFrmPreview
         AlignWithMargins = True
         Left = 81
         Top = 4
-        Width = 532
+        Width = 524
         Height = 32
         Margins.Left = 80
         Align = alClient
@@ -282,23 +277,25 @@ inherited FrmPreview: TFrmPreview
         TabOrder = 0
         TabStop = False
         OnChange = BackgroundTrackBarChange
-        ExplicitWidth = 528
+        ExplicitWidth = 520
       end
     end
   end
   object PlayerPanel: TPanel
     Left = 0
-    Top = 557
-    Width = 613
+    Top = 556
+    Width = 609
     Height = 40
     Align = alBottom
     BevelInner = bvLowered
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 4
+    ExplicitTop = 555
+    ExplicitWidth = 605
     object RunLabel: TLabel
       AlignWithMargins = True
-      Left = 572
+      Left = 564
       Top = 11
       Width = 38
       Height = 22
@@ -317,14 +314,14 @@ inherited FrmPreview: TFrmPreview
       AlignWithMargins = True
       Left = 124
       Top = 4
-      Width = 435
+      Width = 427
       Height = 32
       Align = alClient
       Max = 100
       Frequency = 5
       TabOrder = 0
       OnChange = TrackBarChange
-      ExplicitWidth = 431
+      ExplicitWidth = 423
     end
     object TogglePanel: TPanel
       Left = 1

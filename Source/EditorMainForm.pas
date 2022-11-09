@@ -53,7 +53,7 @@ uses
   , Vcl.Styles.Utils.StdCtrls
   , Vcl.Styles.Ext
   , uDragDropUtils
-  , Vcl.Skia.ControlsEx
+  , Skia.Vcl.AnimatedImageEx
   ;
 
 const
@@ -295,7 +295,7 @@ type
     FDropTarget: TDropTarget;
     procedure PauseAnimations;
     procedure StopAnimations;
-    procedure StartAnimations;
+    procedure StartAnimations(const AFromBegin: Boolean);
     // implement IDragDrop
     function DropAllowed(const FileNames: array of string): Boolean;
     procedure Drop(const FileNames: array of string);
@@ -329,7 +329,7 @@ type
     function CreateAnimatedImageEx(const AParent: TWinControl; const ALeft,
       ATop, AWidth, AHeight: Integer; const AHint: string): TSkAnimatedImageEx;
     procedure UpdatePlayerControls;
-    procedure SkAnimatedImageAnimationProgress(Sender: TObject);
+    procedure SkAnimatedImageAnimationProcess(Sender: TObject);
     procedure UpdateRunLabel;
     property EditorFontSize: Integer read FFontSize write SetEditorFontSize;
   protected
@@ -668,13 +668,13 @@ begin
   LSkAnimatedImageEx.Hint := Format('%dx%d',[LSize, LSize]);
 end;
 
-procedure TfrmMain.StartAnimations;
+procedure TfrmMain.StartAnimations(const AFromBegin: Boolean);
 begin
-  SkAnimatedImageEx.StartAnimation;
-  SkAnimatedImageEx16.StartAnimation;
-  SkAnimatedImageEx32.StartAnimation;
-  SkAnimatedImageEx48.StartAnimation;
-  SkAnimatedImageEx96.StartAnimation;
+  SkAnimatedImageEx.StartAnimation(AFromBegin);
+  SkAnimatedImageEx16.StartAnimation(AFromBegin);
+  SkAnimatedImageEx32.StartAnimation(AFromBegin);
+  SkAnimatedImageEx48.StartAnimation(AFromBegin);
+  SkAnimatedImageEx96.StartAnimation(AFromBegin);
 end;
 
 procedure TfrmMain.PauseAnimations;
@@ -849,11 +849,11 @@ end;
 
 procedure TfrmMain.LoopToggleSwitchClick(Sender: TObject);
 begin
-  SkAnimatedImageEx.Loop := LoopToggleSwitch.State = tssOn;
-  SkAnimatedImageEx16.Loop := LoopToggleSwitch.State = tssOn;
-  SkAnimatedImageEx32.Loop := LoopToggleSwitch.State = tssOn;
-  SkAnimatedImageEx48.Loop := LoopToggleSwitch.State = tssOn;
-  SkAnimatedImageEx96.Loop := LoopToggleSwitch.State = tssOn;
+  SkAnimatedImageEx.AnimationLoop := LoopToggleSwitch.State = tssOn;
+  SkAnimatedImageEx16.AnimationLoop := LoopToggleSwitch.State = tssOn;
+  SkAnimatedImageEx32.AnimationLoop := LoopToggleSwitch.State = tssOn;
+  SkAnimatedImageEx48.AnimationLoop := LoopToggleSwitch.State = tssOn;
+  SkAnimatedImageEx96.AnimationLoop := LoopToggleSwitch.State = tssOn;
 end;
 
 function TfrmMain.CreateAnimatedImageEx(const AParent: TWinControl;
@@ -885,7 +885,7 @@ begin
 
   //Build animated preview images
   SkAnimatedImageEx   := CreateAnimatedImageEx(ImagePanel, -1,-1,-1,-1,'96x96');
-  SkAnimatedImageEx.OnAnimationProgress := SkAnimatedImageAnimationProgress;
+  SkAnimatedImageEx.OnAnimationProcess := SkAnimatedImageAnimationProcess;
 
   SkAnimatedImageEx16 := CreateAnimatedImageEx(FlowPanel ,  3, 3,24,24,'24x24');
   SkAnimatedImageEx32 := CreateAnimatedImageEx(FlowPanel , 33, 3,36,36,'36x36');
@@ -1052,7 +1052,7 @@ begin
   UpdateRunLabel;
 end;
 
-procedure TfrmMain.SkAnimatedImageAnimationProgress(Sender: TObject);
+procedure TfrmMain.SkAnimatedImageAnimationProcess(Sender: TObject);
 var
   LPos: Integer;
 begin
@@ -1140,7 +1140,7 @@ begin
       SkAnimatedImageEx96.LottieText := LLottieText;
       StatusBar.Panels[STATUSBAR_MESSAGE].Text := CurrentEditFile.FileName;
       if Assigned(FEditorSettings) and FEditorSettings.AutoPlay then
-        StartAnimations;
+        StartAnimations(True);
     end
     else
     begin
@@ -1196,7 +1196,7 @@ end;
 
 procedure TfrmMain.PlayActionExecute(Sender: TObject);
 begin
-  StartAnimations;
+  StartAnimations(False);
 end;
 (*
 procedure TfrmMain.PrintToImage(const AFileName: string);
@@ -1497,7 +1497,7 @@ begin
   BackgroundTrackBar.Position := FEditorSettings.LightBackground;
   LoopToggleSwitch.State := TToggleSwitchState(Ord(FEditorSettings.PlayInLoop));
   if FEditorSettings.AutoPlay and SkAnimatedImageEx.CanPlayAnimation then
-    StartAnimations
+    StartAnimations(False)
   else if not FEditorSettings.AutoPlay and SkAnimatedImageEx.CanStopAnimation then
     StopAnimations;
 end;

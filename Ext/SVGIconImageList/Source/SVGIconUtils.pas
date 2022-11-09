@@ -73,7 +73,7 @@ uses
   System.SysUtils
   , System.Types
   , Vcl.Themes
-  , SVGIconImageCOllection
+  , SVGIconImageCollection
   {$IFDEF D10_3}
   , VirtualImageList
   {$ENDIF}

@@ -43,7 +43,7 @@ uses
   Vcl.Menus, SynEditExport,
   SynExportHTML, SynExportRTF, SynEditMiscClasses,
   uSettings, System.ImageList, SynEditCodeFolding,
-  Vcl.Skia.ControlsEx,
+  Skia.Vcl.AnimatedImageEx,
   Vcl.WinXCtrls,
   SVGIconImageList, SVGIconImageListBase, SVGIconImage, Vcl.VirtualImageList,
   UPreviewContainer;
@@ -88,8 +88,6 @@ type
     procedure ToolButtonMouseEnter(Sender: TObject);
     procedure ToolButtonMouseLeave(Sender: TObject);
     procedure SplitterMoved(Sender: TObject);
-    procedure FormAfterMonitorDpiChanged(Sender: TObject; OldDPI,
-      NewDPI: Integer);
     procedure BackgroundTrackBarChange(Sender: TObject);
     procedure SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure ToolButtonPauseClick(Sender: TObject);
@@ -101,7 +99,6 @@ type
     SkAnimatedImageEx: TSkAnimatedImageEx;
     FFontSize: Integer;
     FSimpleText: string;
-    FFileName: string;
     FPreviewSettings: TPreviewSettings;
 
     class var FExtensions: TDictionary<TSynCustomHighlighterClass, TStrings>;
@@ -115,8 +112,8 @@ type
     procedure SaveSettings;
     procedure SetEditorFontSize(const Value: Integer);
     procedure UpdateHighlighter;
-    procedure SkAnimatedImageAnimationProgress(Sender: TObject);
-    procedure StartAnimation;
+    procedure SkAnimatedImageAnimationProcess(Sender: TObject);
+    procedure StartAnimation(const AFromBegin: Boolean);
     procedure PauseAnimation;
     procedure StopAnimation;
     procedure UpdateAnimButtons;
@@ -164,8 +161,7 @@ uses
 procedure TFrmPreview.AppException(Sender: TObject; E: Exception);
 begin
   // log unhandled exceptions (TSynEdit, etc)
-  TLogPreview.Add('AppException');
-  TLogPreview.Add(E);
+  TLogPreview.Add(Format('Error: AppException: %s',[E.Message]));
 end;
 
 procedure TFrmPreview.BackgroundTrackBarChange(Sender: TObject);
@@ -216,12 +212,20 @@ begin
     ToolButtonShowText.Hint := 'Show content of file';
     ToolButtonShowText.ImageName := 'show-text';
   end;
-  ToolButtonShowText.Visible := True;
   ToolButtonAbout.Visible := True;
   ToolButtonSettings.Visible := True;
-  ToolButtonReformat.Visible := PanelEditor.Visible;
-  ToolButtonZoomIn.Visible := PanelEditor.Visible;
-  ToolButtonZoomOut.Visible := PanelEditor.Visible;
+  if ToolButtonShowText.Visible then
+  begin
+    ToolButtonReformat.Visible := PanelEditor.Visible;
+    ToolButtonZoomIn.Visible := PanelEditor.Visible;
+    ToolButtonZoomOut.Visible := PanelEditor.Visible;
+  end
+  else
+  begin
+    ToolButtonReformat.Visible := False;
+    ToolButtonZoomIn.Visible := False;
+    ToolButtonZoomOut.Visible := False;
+  end;
 end;
 
 procedure TFrmPreview.UpdateHighlighter;
@@ -252,13 +256,6 @@ begin
   RunLabel.Caption := SkAnimatedImageEx.ProgressPercentage.ToString+' %';
 end;
 
-procedure TFrmPreview.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI,
-  NewDPI: Integer);
-begin
-  TLogPreview.Add('TFrmPreview.FormAfterMonitorDpiChanged: '+
-  '- Old: '+OldDPI.ToString+' - New: '+NewDPI.ToString);
-end;
-
 procedure TFrmPreview.FormCreate(Sender: TObject);
 var
   FileVersionStr: string;
@@ -276,7 +273,7 @@ begin
     SkAnimatedImageEx.Parent := ImagePanel;
     SkAnimatedImageEx.Align := alClient;
     SkAnimatedImageEx.OnMouseMove := SkAnimatedImageExMouseMove;
-    SkAnimatedImageEx.OnAnimationProgress := SkAnimatedImageAnimationProgress;
+    SkAnimatedImageEx.OnAnimationProcess := SkAnimatedImageAnimationProcess;
   except
     SkAnimatedImageEx.Free;
     raise;
@@ -287,6 +284,7 @@ end;
 
 procedure TFrmPreview.FormDestroy(Sender: TObject);
 begin
+  StopAnimation;
   HideAboutForm;
   SaveSettings;
   TLogPreview.Add('TFrmPreview.FormDestroy');
@@ -307,31 +305,8 @@ begin
 end;
 
 procedure TFrmPreview.LoadFromFile(const AFileName: string);
-var
-  LFileExt: string;
 begin
-  TLogPreview.Add('TFrmPreview.LoadFromFile Init');
-  LFileExt := ExtractFileExt(AFileName);
-  if SameText(LFileExt, '.lottie') or SameText(LFileExt, '.json') then
-  begin
-    ToolButtonShowText.Visible := True;
-    TLogPreview.Add('TFrmPreview.LoadFromFile a Text File');
-    SynEdit.Lines.LoadFromFile(AFileName);
-    SkAnimatedImageEx.LottieText := SynEdit.Lines.Text;
-    FFileName := AFileName;
-  end
-  else
-  begin
-    PanelEditor.Visible := False;
-    ToolButtonShowText.Visible := False;
-    SkAnimatedImageEx.LoadFromFile(AFileName);
-    PlayerPanel.Visible := not SkAnimatedImageEx.IsStaticImage;
-    FFileName := AFileName;
-  end;
-  TLogPreview.Add('TFrmPreview.LoadFromFile Start Animation');
-  if FPreviewSettings.AutoPlay then
-    StartAnimation;
-  TLogPreview.Add('TFrmPreview.LoadFromFile Done');
+  //Not implemented: using stream!
 end;
 
 procedure TFrmPreview.LoadFromStream(const AStream: TStream);
@@ -339,55 +314,52 @@ begin
   TLogPreview.Add('TFrmPreview.LoadFromStream Init');
 
   SkAnimatedImageEx.LoadFromStream(AStream);
-(*
   if SkAnimatedImageEx.IsAnimationFile then
   begin
-    PanelEditor.Align := alTop;
-    PanelEditor.Height := Self.Height div 2;
-    ImagePanel.Visible := True;
-    PlayerPanel.Visible := True;
-    panelPreview.Visible := True;
-  end
-  else
-  begin
-    PlayerPanel.Visible := False;
-    panelPreview.Visible := False;
-    ToolButtonPlay.Enabled := False;
-  end;
-*)
-  //Load also text content
-  try
-    TLogPreview.Add('TFrmPreview.LoadFromFile Try to load Text File');
-    AStream.Position := 0;
-    SynEdit.Lines.LoadFromStream(AStream);
-  except
-    on Exception do
-    begin
-      ToolButtonShowText.Visible := False;
-      raise;
+    PlayerPanel.Enabled := True;
+    //Load also text content
+    try
+      if SkAnimatedImageEx.IsLottieFile then
+      begin
+        AStream.Position := 0;
+        SynEdit.Lines.LoadFromStream(AStream);
+        ToolButtonPlay.Enabled := True;
+        ToolButtonShowText.Visible := True;
+      end
+      else
+      begin
+        PanelEditor.Visible := False;
+        ToolButtonShowText.Visible := False;
+      end;
+    except
+      on Exception do
+      begin
+        PanelEditor.Visible := False;
+        ToolButtonShowText.Visible := False;
+        raise;
+      end;
     end;
-  end;
-(*
-  if not SkAnimatedImageEx.IsAnimationFile then
-  begin
-    //Is a text file but not an animation (eg. other json files)
-    ImagePanel.Visible := False;
-    PanelEditor.Align := alClient;
-    SynEdit.Visible := True;
   end
   else
   begin
-    PanelEditor.Align := alTop;
+    PlayerPanel.Enabled := False;
+    ToolButtonPlay.Enabled := False;
+    ToolButtonShowText.Enabled := False;
   end;
-*)
-  //if SkAnimatedImageEx.IsAnimationFile and not SkAnimatedImageEx.IsStaticImage then
-  //  StartAnimation;
+  UpdateGUI;
+  if SkAnimatedImageEx.IsAnimationFile and not SkAnimatedImageEx.IsStaticImage then
+  begin
+    if FPreviewSettings.AutoPlay then
+      StartAnimation(True)
+    else
+      StopAnimation;
+  end;
   TLogPreview.Add('TFrmPreview.LoadFromStream Done');
 end;
 
 procedure TFrmPreview.LoopToggleSwitchClick(Sender: TObject);
 begin
-  SkAnimatedImageEx.Loop := LoopToggleSwitch.State = tssOn;
+  SkAnimatedImageEx.AnimationLoop := LoopToggleSwitch.State = tssOn;
 end;
 
 procedure TFrmPreview.SaveSettings;
@@ -487,9 +459,9 @@ begin
   UpdateAnimButtons;
 end;
 
-procedure TFrmPreview.StartAnimation;
+procedure TFrmPreview.StartAnimation(const AFromBegin: Boolean);
 begin
-  SkAnimatedImageEx.StartAnimation;
+  SkAnimatedImageEx.StartAnimation(AFromBegin);
   UpdateAnimButtons;
 end;
 
@@ -501,7 +473,7 @@ end;
 
 procedure TFrmPreview.ToolButtonPlayClick(Sender: TObject);
 begin
-  StartAnimation;
+  StartAnimation(False);
 end;
 
 procedure TFrmPreview.ToolButtonReformatClick(Sender: TObject);
@@ -532,7 +504,7 @@ begin
   UpdateGUI;
   LoopToggleSwitch.State := TToggleSwitchState(Ord(FPreviewSettings.PlayInLoop));
   if FPreviewSettings.AutoPlay and SkAnimatedImageEx.CanPlayAnimation then
-    StartAnimation
+    StartAnimation(False)
   else if not FPreviewSettings.AutoPlay and SkAnimatedImageEx.CanStopAnimation then
     StopAnimation;
 end;
@@ -569,7 +541,7 @@ begin
   UpdateRunLabel;
 end;
 
-procedure TFrmPreview.SkAnimatedImageAnimationProgress(Sender: TObject);
+procedure TFrmPreview.SkAnimatedImageAnimationProcess(Sender: TObject);
 var
   LPos: Integer;
 begin
@@ -577,11 +549,9 @@ begin
   Try
     LPos := SkAnimatedImageEx.ProgressPercentage;
     if LPos <> TrackBar.Position then
-    begin
       TrackBar.Position := LPos;
-      UpdateRunLabel;
-      UpdateAnimButtons;
-    end;
+    UpdateRunLabel;
+    UpdateAnimButtons;
   Finally
     TrackBar.OnChange := TrackBarChange;
   End;

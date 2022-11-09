@@ -85,7 +85,7 @@ begin
 {$IFDEF ENABLELOG}
   try
     InitLogFile;
-    //if (Copy(AMessage,1,25) = 'TComAnimThumbnailProvider') then
+    //if (Copy(AMessage,1,5) = 'Error') or (Copy(AMessage,1,17) = 'TSkAnimatedImage.') then
     AppendAllText(FLogFile, FormatDateTime('hh:nn:ss.zzz', Now) + ' ' + AMessage + sLineBreak);
   except
     on e: EFOpenError do;

@@ -1,20 +1,32 @@
 ﻿# SKIA Shell Extensions and Lottie Editor [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Latest Version 1.0.1 - 24 Sep 2022**
+**Latest Version 1.1.0 - 09 Nov 2022**
 
 **A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (Vista, 7, 8, 10 and 11):**
 
-- A [Preview handler][1]  which allows you to see images and animations files in the "Preview Panel".
+- A [Preview handler][1]  which allows you to see static images and animations files in the "Preview Panel".
  
-- A [Thumbnail handler][2] which allows you to see images and anomations files (the last last frame of animation) into Windows Explorer.
+- A [Thumbnail handler][2] which allows you to see static images and anomations files (the last last frame of animation) into Windows Explorer.
 
 - A [Lottie Text Editor][12] to manually edit and preview the animation of Lottie files.
+
+### Animation and file extensions supported:
+
+.json or .lottie: animated Lottie files [lottiefiles.com](https://lottiefiles.com/)
+
+.gif: static and animated Gif [W3C GIF (tm)](https://www.w3.org/Graphics/GIF/spec-gif87.txt)
+
+.webp: static and animated webp [An image format for the Web](https://developers.google.com/speed/webp)
+
+.tgs: animated telegram stickers [core.telegram.org/stickers](https://core.telegram.org/stickers)
 
 ### Features
 
 - Supports Windows Vista, 7, 8, 10 and 11 (for 32 bits and 64 bits).
 
 - Themes (Dark and Light) according to user preferences of Windows Theme
+
+- AutoPlay and Loop of animation
 
 ### Setup using the Installer
 
@@ -40,6 +52,14 @@ A useful Text editor with preview and animation of Lottie files:
 
 ![Lottie Text Editor Dark](./Images/LottieTextEditorDark.png)
 
+### Settings: Preview page
+
+![Settings: Preview page](./Images/SettingsPreview.png)
+
+### Settings: Theme page
+
+![Settings: Theme page](./Images/SettingsTheme.png)
+
 ### Manual Build and Installation (for Delphi developers) ###
 
 If you have Delphi 11 Alexandria, you can manually build the project:
@@ -60,13 +80,15 @@ To manually install the SKIAShellExtensions.dll follow these steps:
   
 2. If you have already used the installer uninstall the components from system.
      
-3. To install manually the dll run the `Setup\Register64bit.bat` (run-as-administrator).
+3. To Uninstall/Install manually the dll run the `Unregister_Register.cmd` (run-as-administrator).
 
-4. If you wanto to uninstall the dll you use the `Setup\UnRegister64Bit.bat`
-
-5. When it's registered, you can continue to change code and rebuild the dll (beware to close all Explorer instances).
+4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+09 Nov 2022: ver. 1.1.0
+- Updated to Skia4Delphi 4.0.1
+- Fixed settings filename
 
 24 Set 2022: ver. 1.0.1
 - Fixed Setup registering 32bit dll

@@ -39,7 +39,7 @@ uses
   SVGInterfaces,
   SVGCommon,
   Skia.Vcl,
-  Vcl.Skia.ControlsEx,
+  Skia.Vcl.AnimatedBrush,
   ActiveX;
 
 type
@@ -75,7 +75,7 @@ type
     FThumbnailHandlerClass: TThumbnailHandlerClass;
     FIStream: IStream;
     FMode: Cardinal;
-    FAnimatedImageBrush: TSkAnimatedImageBrush;
+    FAnimatedImage: TSkAnimatedImageBrush;
     FLightTheme: Boolean;
   protected
     property Mode: Cardinal read FMode write FMode;
@@ -124,8 +124,8 @@ begin
     AStream := TIStreamAdapter.Create(FIStream);
     try
       TLogPreview.Add('TComAnimThumbnailProvider.GetThumbnail LoadFromStream');
-      FAnimatedImageBrush.LoadFromStream(AStream);
-      if FAnimatedImageBrush.IsAnimationFile then
+      FAnimatedImage.LoadFromStream(AStream);
+      //if not FAnimatedImage.Animation.Enabled then
       begin
         LBitmap := TBitmap.Create;
         LBitmap.PixelFormat := pf32bit;
@@ -135,10 +135,11 @@ begin
           LAntiAliasColor := clWebDarkSlategray;
         LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
         LBitmap.SetSize(cx, cx);
-        TLogPreview.Add('TComAnimThumbnailProvider.PaintTo start');
+        TLogPreview.Add('TSkAnimatedImage.PaintTo start');
         LRect := TRect.Create(0,0,cx,cx);
-        FAnimatedImageBrush.PaintTo(LBitmap.Canvas.Handle, LRect, True, 1);
-        TLogPreview.Add('TComAnimThumbnailProvider.PaintTo end');
+        FAnimatedImage.PaintTo(LBitmap.Canvas, LRect, 1, 1);
+        //FAnimatedImage.PaintTo(LBitmap.Canvas.Handle, LRect, True, 1);
+        TLogPreview.Add('TSkAnimatedImage.PaintTo end');
         hBitmap := LBitmap.Handle;
       end;
     finally
@@ -164,7 +165,7 @@ begin
   Result := S_OK;
   if Result = S_OK then
   begin
-    FAnimatedImageBrush := TSkAnimatedImageBrush.Create;
+    FAnimatedImage := TSkAnimatedImageBrush.Create;
     FLightTheme := IsWindowsAppThemeLight;
   end;
   TLogPreview.Add('TComAnimThumbnailProvider.IInitializeWithStream_Initialize done');

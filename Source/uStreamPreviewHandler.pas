@@ -93,7 +93,7 @@ begin
   try
     CheckContainer;
     Container.LoadFromStream(AStream);
-    Container.Visible := True;
+    Container.Show;
   finally
     AStream.Free;
   end;
