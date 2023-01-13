@@ -2,10 +2,10 @@
 {                                                                              }
 {       LottieTextEditor: Advanced Editor for Lottie files                     }
 {                                                                              }
-{       Copyright (c) 2022 (Ethea S.r.l.)                                      }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
-{       https://github.com/EtheaDev/SKIAShellExtensions                      }
+{       https://github.com/EtheaDev/SKIAShellExtensions                        }
 {                                                                              }
 {******************************************************************************}
 {                                                                              }

@@ -150,13 +150,11 @@ begin
     GetWindowRect(FParentWindow, LRect);
     TLogPreview.Add('CheckContainer'+GetRect(LRect,' - GetWindowRect'));
 
-    //FContainer := TPreviewContainer.Create(nil);
     FContainer := TFrmPreview.Create(nil);
 
     TLogPreview.Add('FContainer created:'+GetRect(FBounds,' FBounds'));
     FContainer.ParentWindow := FParentWindow;
     FContainer.BorderStyle := bsNone;
-//  FContainer.Visible := True;
     UpdateContainerBoundsRect;
     FContainer.PreviewHandler := Self;
     TFrmPreview.AParent := FContainer;

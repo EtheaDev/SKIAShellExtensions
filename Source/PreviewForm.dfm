@@ -6,8 +6,8 @@ inherited FrmPreview: TFrmPreview
   DoubleBuffered = True
   Font.Name = 'Segoe UI'
   OnResize = FormResize
-  ExplicitWidth = 621
-  ExplicitHeight = 653
+  ExplicitWidth = 625
+  ExplicitHeight = 654
   TextHeight = 13
   object Splitter: TSplitter
     Left = 0
@@ -29,7 +29,6 @@ inherited FrmPreview: TFrmPreview
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 605
     object ToolBar: TToolBar
       Left = 0
       Top = 0
@@ -44,7 +43,6 @@ inherited FrmPreview: TFrmPreview
       Images = SVGIconImageList
       List = True
       TabOrder = 0
-      ExplicitWidth = 605
       object ToolButtonPlay: TToolButton
         Left = 0
         Top = 0
@@ -180,7 +178,6 @@ inherited FrmPreview: TFrmPreview
     ParentBackground = False
     TabOrder = 1
     Visible = False
-    ExplicitWidth = 605
     object SynEdit: TSynEdit
       Left = 0
       Top = 0
@@ -211,7 +208,6 @@ inherited FrmPreview: TFrmPreview
       Gutter.ShowLineNumbers = True
       ReadOnly = True
       FontSmoothing = fsmNone
-      ExplicitWidth = 605
     end
   end
   object StatusBar: TStatusBar
@@ -226,8 +222,6 @@ inherited FrmPreview: TFrmPreview
       'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2022 Ethea S.r.l' +
       '. - Author: Carlo Barazzetta'
     UseSystemFont = False
-    ExplicitTop = 595
-    ExplicitWidth = 605
   end
   object ImagePanel: TPanel
     Left = 0
@@ -242,8 +236,6 @@ inherited FrmPreview: TFrmPreview
     ParentDoubleBuffered = False
     TabOrder = 3
     StyleElements = []
-    ExplicitWidth = 605
-    ExplicitHeight = 220
     object panelPreview: TPanel
       Left = 0
       Top = 0
@@ -253,7 +245,6 @@ inherited FrmPreview: TFrmPreview
       ParentBackground = False
       ShowCaption = False
       TabOrder = 0
-      ExplicitWidth = 605
       object BackgroundGrayScaleLabel: TLabel
         Left = 10
         Top = 6
@@ -277,7 +268,6 @@ inherited FrmPreview: TFrmPreview
         TabOrder = 0
         TabStop = False
         OnChange = BackgroundTrackBarChange
-        ExplicitWidth = 520
       end
     end
   end
@@ -291,8 +281,6 @@ inherited FrmPreview: TFrmPreview
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 4
-    ExplicitTop = 555
-    ExplicitWidth = 605
     object RunLabel: TLabel
       AlignWithMargins = True
       Left = 564
@@ -321,7 +309,6 @@ inherited FrmPreview: TFrmPreview
       Frequency = 5
       TabOrder = 0
       OnChange = TrackBarChange
-      ExplicitWidth = 423
     end
     object TogglePanel: TPanel
       Left = 1

@@ -77,8 +77,7 @@ object frmMain: TfrmMain
     Images = VirtualImageList
     TabOrder = 1
     OnChange = PageControlChange
-    ExplicitWidth = 522
-    ExplicitHeight = 532
+    OnMouseMove = PageControlMouseMove
   end
   object ImagePanel: TPanel
     Left = 576

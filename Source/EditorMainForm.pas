@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022 (Ethea S.r.l.)                                      }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -71,7 +71,7 @@ resourcestring
   STATE_INSERT = 'Insert';
   STATE_OVERWRITE = 'OverWrite';
   CLOSING_PROBLEMS = 'Closing problems!';
-  CONFIRM_ABANDON = '%s not saved! Abandon Changes?';
+  CONFIRM_CHANGES = 'ATTENTION: the content of file "%s" is changed: do you want to save the file?';
   LOTTIE_PARSING_OK = 'Lottie Parsing is correct.';
 
 type
@@ -268,7 +268,10 @@ type
     procedure LoopToggleSwitchClick(Sender: TObject);
     procedure SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure PauseActionExecute(Sender: TObject);
+    procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
   private
+    FirstAction: Boolean;
     SkAnimatedImageEx: TSkAnimatedImageEx;
     SkAnimatedImageEx16: TSkAnimatedImageEx;
     SkAnimatedImageEx32: TSkAnimatedImageEx;
@@ -329,6 +332,7 @@ type
     function CreateAnimatedImageEx(const AParent: TWinControl; const ALeft,
       ATop, AWidth, AHeight: Integer; const AHint: string): TSkAnimatedImageEx;
     procedure UpdatePlayerControls;
+    procedure ConfirmChanges(EditingFile: TEditingFile);
     procedure SkAnimatedImageAnimationProcess(Sender: TObject);
     procedure UpdateRunLabel;
     property EditorFontSize: Integer read FFontSize write SetEditorFontSize;
@@ -427,7 +431,10 @@ begin
   Ext := ExtractFileExt(FFileName);
   EditFileType := dmResources.GetEditFileType(Ext);
   if TabSheet <> nil then
+  begin
     TabSheet.Caption := Name;
+    TabSheet.Hint := FFileName;
+  end;
 end;
 
 destructor TEditingFile.Destroy;
@@ -812,10 +819,8 @@ begin
     for I := 0 to EditFileList.Count -1 do
     begin
       LEditingFile := TEditingFile(EditFileList.Items[I]);
-      if LEditingFile.SynEditor.Modified and
-        (MessageDlg(Format(CONFIRM_ABANDON,[LEditingFile.FileName]),
-          mtWarning, [mbYes, mbNo], 0) = mrNo) then
-          Abort;
+      //Confirm save changes
+      ConfirmChanges(LEditingFile);
       LFileList.Add(LEditingFile.FileName);
     end;
     if CurrentEditFile <> nil then
@@ -834,12 +839,14 @@ var
   I: Integer;
   LFileName: string;
   LIndex: Integer;
+  LCurrentFileName: string;
 begin
   LIndex := -1;
   for I := 0 to FEditorSettings.OpenedFileList.Count-1 do
   begin
+    LCurrentFileName := FEditorSettings.CurrentFileName;
     LFileName := FEditorSettings.OpenedFileList.Strings[I];
-    if OpenFile(LFileName, False) and SameText(LFileName, FEditorSettings.CurrentFileName) then
+    if OpenFile(LFileName, False) and SameText(LFileName, LCurrentFileName) then
       LIndex := I;
   end;
   if LIndex <> -1 then
@@ -878,7 +885,6 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
-  InitialDir : string;
   FileVersionStr: string;
 begin
   OpenDialog.Filter := GetOpenDialogFilter(True);
@@ -926,23 +932,6 @@ begin
   //Initialize print output
   InitSynEditPrint;
 
-  //Load previous opened-files
-  LoadOpenedFiles;
-
-  //Initialize Open and Save Dialog with application path
-  if ParamStr(1) <> '' then
-  begin
-    //Load file passed at command line
-    InitialDir := ParamStr(1);
-    OpenFile(ParamStr(1));
-    AssignLottieTextToImage;
-  end
-  else
-    InitialDir := '.';
-
-  OpenDialog.InitialDir := InitialDir;
-  SaveDialog.InitialDir := InitialDir;
-
   //Update all editor options
   UpdateEditorsOptions;
 end;
@@ -975,11 +964,13 @@ end;
 
 procedure TfrmMain.acReplaceUpdate(Sender: TObject);
 begin
-  acReplace.Enabled := (CurrentEditor <> nil) and (CurrentEditor.Text <> '');
+  acReplace.Enabled := (CurrentEditor <> nil) and (CurrentEditor.Text <> '')
+    and not CurrentEditor.ReadOnly;
 end;
 
 procedure TfrmMain.acCloseExecute(Sender: TObject);
 begin
+  //Remove editing file
   RemoveEditingFile(CurrentEditFile);
 end;
 
@@ -1085,6 +1076,7 @@ begin
     //Use TAG of tabsheet to store the object pointer
     LTabSheet.Tag := NativeInt(EditingFile);
     LTabSheet.Caption := EditingFile.Name;
+    LTabSheet.Hint := EditingFile.FileName;
     LTabSheet.Imagename := 'lottie-logo-gray';
     LTabSheet.Parent := PageControl;
     LTabSheet.TabVisible := True;
@@ -1099,12 +1091,14 @@ begin
     LEditor.Parent := LTabSheet;
     LEditor.SearchEngine := SynEditSearch;
     LEditor.PopupMenu := popEditor;
+
     //Assign user preferences to the editor
     FEditorOptions.AssignTo(LEditor);
     LEditor.MaxScrollWidth := 3000;
     EditingFile.SynEditor := LEditor;
     UpdateFromSettings(LEditor);
     UpdateHighlighter(LEditor);
+
     LEditor.Visible := True;
 
     //Show the tabsheet
@@ -1140,7 +1134,9 @@ begin
       SkAnimatedImageEx96.LottieText := LLottieText;
       StatusBar.Panels[STATUSBAR_MESSAGE].Text := CurrentEditFile.FileName;
       if Assigned(FEditorSettings) and FEditorSettings.AutoPlay then
-        StartAnimations(True);
+        StartAnimations(True)
+      else
+        StopAnimations;
     end
     else
     begin
@@ -1184,6 +1180,29 @@ begin
   AssignLottieTextToImage;
 end;
 
+procedure TfrmMain.PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+var
+  LhintPause: Integer;
+  LTabIndex: Integer;
+begin
+  LTabIndex := PageControl.IndexOfTabAt(X, Y);
+  if (LTabIndex >= 0) and (PageControl.Hint <> PageControl.Pages[LTabIndex].Hint) then
+  begin
+    LHintPause := Application.HintPause;
+    try
+      if PageControl.Hint <> '' then
+        Application.HintPause := 0;
+      Application.CancelHint;
+      PageControl.Hint := PageControl.Pages[LTabIndex].Hint;
+      PageControl.ShowHint := true;
+      Application.ProcessMessages; // force hint to appear
+    finally
+      Application.HintPause := LHintPause;
+    end;
+  end;
+end;
+
 procedure TfrmMain.StopActionExecute(Sender: TObject);
 begin
   StopAnimations;
@@ -1198,35 +1217,7 @@ procedure TfrmMain.PlayActionExecute(Sender: TObject);
 begin
   StartAnimations(False);
 end;
-(*
-procedure TfrmMain.PrintToImage(const AFileName: string);
-var
-  LBitmap: TBitmap;
-  LAntiAliasColor: TColor;
-  LAnimatedImageBrush: TSkAnimatedImageBrush;
-  LRect: TRect;
-begin
-  LBitmap := TBitmap.Create;
-  try
-    LBitmap.PixelFormat := pf32bit;
-    LAntiAliasColor := clWebDarkSlategray;
-    LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
-    LBitmap.SetSize(156, 156);
 
-    LAnimatedImageBrush := TSkAnimatedImageBrush.Create;
-    try
-      LAnimatedImageBrush.LoadFromFile(AFileName);
-      LRect := TRect.Create(0,0,156,156);
-      LAnimatedImageBrush.PaintTo(LBitmap.Canvas.Handle, LRect, True, 1);
-      Image.Picture.Bitmap.Assign(LBitmap);
-    finally
-      LAnimatedImageBrush.Free;
-    end;
-  finally
-    LBitmap.Free;
-  end;
-end;
-*)
 procedure TfrmMain.acSaveUpdate(Sender: TObject);
 begin
   acSave.Enabled := (CurrentEditor <> nil) and (CurrentEditor.Modified);
@@ -1259,6 +1250,23 @@ begin
     Result := nil;
 end;
 
+procedure TfrmMain.ConfirmChanges(EditingFile: TEditingFile);
+var
+  LConfirm: integer;
+begin
+  //Confirm save changes
+  if EditingFile.SynEditor.Modified then
+  begin
+    LConfirm := MessageDlg(Format(CONFIRM_CHANGES,[EditingFile.FileName]),
+      mtWarning, [mbYes, mbNo], 0);
+    if LConfirm = mrYes then
+      EditingFile.SaveToFile
+    else if LConfirm = mrCancel then
+      Abort;
+    //if LConfirm = mrNo continue without saving
+  end;
+end;
+
 procedure TfrmMain.RemoveEditingFile(EditingFile: TEditingFile);
 var
   i : integer;
@@ -1276,13 +1284,8 @@ begin
   if pos = -1 then
     raise EComponentError.Create(CLOSING_PROBLEMS);
 
-  //Confirm abandon changes
-  if EditingFile.SynEditor.Modified then
-  begin
-    if MessageDlg(Format(CONFIRM_ABANDON,[EditingFile.FileName]),
-      mtWarning, [mbYes, mbNo], 0) = mrNo then
-      Abort;
-  end;
+  //Confirm save changes
+  ConfirmChanges(EditingFile);
 
   //Delete the file from the Opened-List
   EditFileList.Delete(pos);
@@ -1679,9 +1682,33 @@ end;
 
 procedure TfrmMain.ActionListUpdate(Action: TBasicAction;
   var Handled: Boolean);
+var
+  InitialDir : string;
+  LFileName: string;
 begin
   UpdateStatusBarPanels;
   UpdatePlayerControls;
+  if not FirstAction then
+  begin
+    FirstAction := True;
+    //Initialize Open and Save Dialog with application path
+    LFileName := ParamStr(1);
+    if LFileName <> '' then
+    begin
+      //Load file passed at command line
+      InitialDir := ExtractFilePath(LFileName);
+      OpenFile(LFileName);
+      AssignLottieTextToImage;
+    end
+    else
+      InitialDir := '.';
+
+    OpenDialog.InitialDir := InitialDir;
+    SaveDialog.InitialDir := InitialDir;
+
+    //Load previous opened-files
+    LoadOpenedFiles;
+  end;
 end;
 
 procedure TfrmMain.actMenuExecute(Sender: TObject);

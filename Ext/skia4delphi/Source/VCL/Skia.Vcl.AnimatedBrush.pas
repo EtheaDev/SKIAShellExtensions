@@ -3,7 +3,7 @@
 {       Skia.Vcl.AnimatedBrush: Brush Control for Animation of Skia4Delphi/VCL }
 {       to simplify use animations                                             }
 {                                                                              }
-{       Copyright (c) 2022 (Ethea S.r.l.)                                      }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SkiaImageList                              }

@@ -130,8 +130,6 @@ object FrmAbout: TFrmAbout
     Color = clWindow
     ParentBackground = False
     TabOrder = 0
-    ExplicitTop = 299
-    ExplicitWidth = 439
     object btnOK: TButton
       Left = 360
       Top = 16
@@ -174,8 +172,6 @@ object FrmAbout: TFrmAbout
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 1
-    ExplicitWidth = 412
-    ExplicitHeight = 146
   end
   object SKIALinkLabel: TLinkLabel
     Left = 139
@@ -187,7 +183,6 @@ object FrmAbout: TFrmAbout
     TabOrder = 2
     UseVisualStyle = True
     OnLinkClick = LinkLabelLinkClick
-    ExplicitTop = 271
   end
   object SKIAShellExtLinkLabel: TLinkLabel
     Left = 8
@@ -209,8 +204,6 @@ object FrmAbout: TFrmAbout
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
-    ExplicitTop = 234
-    ExplicitWidth = 439
     object SVGIconImage3: TSVGIconImage
       Left = 8
       Top = 5

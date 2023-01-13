@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, SVG Editor)                            }
 {                                                                              }
-{       Copyright (c) 2021 (Ethea S.r.l.)                                      }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }

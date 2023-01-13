@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022 (Ethea S.r.l.)                                      }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -182,7 +182,7 @@ begin
   MemoCopyRights.Lines.Add('Author: Carlo Barazzetta - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('Custom icons: Ariel Montes - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('https://github.com/EtheaDev/SKIAShellExtensions');
-  MemoCopyRights.Lines.Add('Copyright © 2022 all rights reserved.');
+  MemoCopyRights.Lines.Add('Copyright © 2022-2023 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Ethea''s libraries and tools used:');
   MemoCopyRights.Lines.Add('SVGIconImageList https://github.com/EtheaDev/SVGIconImageList/');
@@ -193,12 +193,12 @@ begin
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Third Party libraries and tools used');
   MemoCopyRights.Lines.Add('SKIA4Delphi - https://skia4delphi.org/');
-  MemoCopyRights.Lines.Add('2021 - 2022 © Skia4Delphi. All rights reserved.');
+  MemoCopyRights.Lines.Add('2021 - 2023 © Skia4Delphi. All rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Image32 Library - http://www.angusj.com/delphi/image32/Docs/_Body.htm');
-  MemoCopyRights.Lines.Add('Copyright ©2019-2022 Angus Johnson.');
+  MemoCopyRights.Lines.Add('Copyright ©2019-2023 Angus Johnson.');
   MemoCopyRights.Lines.Add('');
 end;
 

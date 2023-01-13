@@ -3,7 +3,7 @@
 {       Vcl.Skia.ControlsEx: extended Controls of Skia4Delphi/VCL              }
 {       to simplify use animations                                             }
 {                                                                              }
-{       Copyright (c) 2022 (Ethea S.r.l.)                                      }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SkiaImageList                              }
@@ -305,8 +305,7 @@ function TSkAnimatedImageEx.IsAnimationFile: Boolean;
 var
   LFormat: TSkAnimatedImage.TFormatInfo;
 begin
-  Result := GetFormatInfo(LFormat) and
-    CanPlayAnimation;
+  Result := GetFormatInfo(LFormat) and AnimationLoaded;
 end;
 
 function TSkAnimatedImageEx.IsLottieFile: Boolean;
