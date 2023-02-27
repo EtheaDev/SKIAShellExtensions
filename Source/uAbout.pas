@@ -70,6 +70,8 @@ type
   private
     FTitle: string;
     procedure SetTitle(const Value: string);
+  protected
+    procedure Loaded; override;
   public
     procedure DisableButtons;
     property Title: string read FTitle write SetTitle;
@@ -170,9 +172,6 @@ procedure TFrmAbout.FormCreate(Sender: TObject);
 var
   FileVersionStr: string;
 begin
-  TitleLabel.Font.Height := Round(TitleLabel.Font.Height * 1.6);
-  PoweredLabel.Font.Height := Round(PoweredLabel.Font.Height * 1.6);
-
   FileVersionStr:=uMisc.GetFileVersion(GetModuleLocation());
   {$IFDEF WIN32}
   LabelVersion.Caption := Format('Version %s (32bit)', [FileVersionStr]);
@@ -188,7 +187,7 @@ begin
   MemoCopyRights.Lines.Add('SVGIconImageList https://github.com/EtheaDev/SVGIconImageList/');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('The Initial Developer of the Original Code is Rodrigo Ruz V.');
-  MemoCopyRights.Lines.Add('Portions created by Rodrigo Ruz V. are Copyright © 2011-2022 Rodrigo Ruz V.');
+  MemoCopyRights.Lines.Add('Portions created by Rodrigo Ruz V. are Copyright © 2011-2023 Rodrigo Ruz V.');
   MemoCopyRights.Lines.Add('https://github.com/RRUZ/delphi-preview-handler');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Third Party libraries and tools used');
@@ -206,6 +205,14 @@ procedure TFrmAbout.LinkLabelLinkClick(Sender: TObject;
   const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Handle, 'open', PChar(Link), nil, nil, SW_SHOW);
+end;
+
+procedure TFrmAbout.Loaded;
+begin
+  TitleLabel.Font.Height := Round(TitleLabel.Font.Height * 1.6);
+  PoweredLabel.Font.Height := Round(PoweredLabel.Font.Height * 1.6);
+
+  inherited;
 end;
 
 procedure TFrmAbout.SetTitle(const Value: string);

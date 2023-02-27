@@ -219,7 +219,7 @@ inherited FrmPreview: TFrmPreview
     ParentFont = True
     SimplePanel = True
     SimpleText = 
-      'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2022 Ethea S.r.l' +
+      'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2023 Ethea S.r.l' +
       '. - Author: Carlo Barazzetta'
     UseSystemFont = False
   end
