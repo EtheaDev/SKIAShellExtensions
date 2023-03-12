@@ -96,7 +96,7 @@ var
 begin
   //format JSON text
   LJSONObject := TJSONObject.ParseJSONValue(AJSONText, True, True) as TJSONObject;
-  Result := TJSON.Format(LJSONObject);
+  Result := LJSONObject.Format(2);
 end;
 
 procedure TdmResources.DataModuleCreate(Sender: TObject);

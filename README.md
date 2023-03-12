@@ -1,6 +1,6 @@
 ﻿# SKIA Shell Extensions and Lottie Editor [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Latest Version 1.3.0 - 27 Feb 2023**
+**Latest Version 1.4.0 - 12 Mar 2023**
 
 **A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (Vista, 7, 8, 10 and 11):**
 
@@ -85,6 +85,9 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+12 Mar 2023: ver. 1.4.0
+- Added "inverse" animation to Preview and Editor
 
 27 Feb 2023: ver. 1.3.0
 - Updated to Skia4Delphi 4.1.1

@@ -204,9 +204,9 @@ object frmMain: TfrmMain
       ExplicitTop = 410
       object RunLabel: TLabel
         AlignWithMargins = True
-        Left = 121
+        Left = 157
         Top = 13
-        Width = 85
+        Width = 49
         Height = 19
         Margins.Left = 6
         Margins.Top = 12
@@ -226,7 +226,7 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 4
         Top = 4
-        Width = 108
+        Width = 144
         Height = 37
         Align = alLeft
         AutoSize = True
@@ -245,13 +245,18 @@ object frmMain: TfrmMain
           Top = 0
           Action = PlayAction
         end
-        object ToolButtonPause: TToolButton
+        object ToolButtonPlayInverse: TToolButton
           Left = 36
+          Top = 0
+          Action = PlayInverseAction
+        end
+        object ToolButtonPause: TToolButton
+          Left = 72
           Top = 0
           Action = PauseAction
         end
         object ToolButtonStop: TToolButton
-          Left = 72
+          Left = 108
           Top = 0
           Action = StopAction
         end
@@ -343,6 +348,7 @@ object frmMain: TfrmMain
             end
             item
               Action = acQuit
+              ImageName = 'Exit'
             end>
         end
         item
@@ -376,6 +382,7 @@ object frmMain: TfrmMain
             end
             item
               Action = acReplace
+              ImageName = 'Replace'
             end>
         end
         item
@@ -388,6 +395,7 @@ object frmMain: TfrmMain
             end
             item
               Action = actnPrintPreview
+              ImageName = 'Print-preview'
             end>
         end>
       Color = clBtnFace
@@ -808,6 +816,13 @@ object frmMain: TfrmMain
       ImageName = 'pause'
       OnExecute = PauseActionExecute
     end
+    object PlayInverseAction: TAction
+      Category = 'Player'
+      Caption = 'Play Inverse'
+      ImageIndex = 47
+      ImageName = 'PlayInverse'
+      OnExecute = PlayInverseActionExecute
+    end
   end
   object SaveDialog: TSaveDialog
     Filter = 
@@ -1149,6 +1164,11 @@ object frmMain: TfrmMain
         CollectionIndex = 52
         CollectionName = 'stop'
         Name = 'stop'
+      end
+      item
+        CollectionIndex = 53
+        CollectionName = 'PlayInverse'
+        Name = 'PlayInverse'
       end>
     ImageCollection = dmResources.SVGIconImageCollection
     Width = 24

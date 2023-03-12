@@ -57,7 +57,7 @@ object FrmMain: TFrmMain
       Width = 415
       Height = 522
       ObjectTypes = [otFolders, otNonFolders]
-      Root = 'rfDesktop'
+      Root = 'D:\ETHEA\Icone\LottieFiles'
       ShellTreeView = ShellTreeView
       Sorted = True
       Align = alClient
@@ -73,7 +73,7 @@ object FrmMain: TFrmMain
     Width = 121
     Height = 524
     ObjectTypes = [otFolders]
-    Root = 'rfDesktop'
+    Root = 'D:\ETHEA\Icone\LottieFiles'
     ShellListView = ShellListView
     UseShellImages = True
     Align = alLeft
@@ -83,7 +83,6 @@ object FrmMain: TFrmMain
     RightClickSelect = True
     ShowRoot = False
     TabOrder = 2
-    ExplicitHeight = 523
   end
   object Panel2: TPanel
     Left = 0

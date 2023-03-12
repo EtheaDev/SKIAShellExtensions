@@ -68,6 +68,7 @@ type
     BackgroundGrayScaleLabel: TLabel;
     BackgroundTrackBar: TTrackBar;
     ToolButtonPlay: TToolButton;
+    ToolButtonInversePlay: TToolButton;
     ToolButtonPause: TToolButton;
     PlayerPanel: TPanel;
     RunLabel: TLabel;
@@ -92,6 +93,7 @@ type
     procedure SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure ToolButtonPauseClick(Sender: TObject);
     procedure ToolButtonPlayClick(Sender: TObject);
+    procedure ToolButtonInversePlayClick(Sender: TObject);
     procedure TrackBarChange(Sender: TObject);
     procedure LoopToggleSwitchClick(Sender: TObject);
     procedure ToolButtonStopClick(Sender: TObject);
@@ -113,7 +115,8 @@ type
     procedure SetEditorFontSize(const Value: Integer);
     procedure UpdateHighlighter;
     procedure SkAnimatedImageAnimationProcess(Sender: TObject);
-    procedure StartAnimation(const AFromBegin: Boolean);
+    procedure StartAnimation(const AFromBegin: Boolean;
+      AInverse: Boolean = False);
     procedure PauseAnimation;
     procedure StopAnimation;
     procedure UpdateAnimButtons;
@@ -324,6 +327,7 @@ begin
         AStream.Position := 0;
         SynEdit.Lines.LoadFromStream(AStream);
         ToolButtonPlay.Enabled := True;
+        ToolButtonInversePlay.Enabled := True;
         ToolButtonShowText.Visible := True;
       end
       else
@@ -344,6 +348,7 @@ begin
   begin
     PlayerPanel.Enabled := False;
     ToolButtonPlay.Enabled := False;
+    ToolButtonInversePlay.Enabled := False;
     ToolButtonShowText.Enabled := False;
   end;
   UpdateGUI;
@@ -426,6 +431,12 @@ begin
   StopAnimation;
 end;
 
+procedure TFrmPreview.ToolButtonInversePlayClick(Sender: TObject);
+begin
+  inherited;
+  StartAnimation(False, True);
+end;
+
 procedure TFrmPreview.ToolButtonAboutClick(Sender: TObject);
 begin
   ShowAboutForm(DialogPosRect, Title_SKIAPreview);
@@ -448,7 +459,10 @@ end;
 
 procedure TFrmPreview.UpdateAnimButtons;
 begin
-  ToolButtonPlay.Enabled := SkAnimatedImageEx.CanPlayAnimation;
+  ToolButtonPlay.Enabled := SkAnimatedImageEx.CanPlayAnimation or
+    SkAnimatedImageEx.AnimationRunningInverse;
+  ToolButtonInversePlay.Enabled := SkAnimatedImageEx.CanPlayAnimation or
+    not SkAnimatedImageEx.AnimationRunningInverse;
   ToolButtonPause.Enabled := SkAnimatedImageEx.CanPauseAnimation;
   ToolButtonStop.Enabled := SkAnimatedImageEx.CanStopAnimation;
 end;
@@ -459,9 +473,10 @@ begin
   UpdateAnimButtons;
 end;
 
-procedure TFrmPreview.StartAnimation(const AFromBegin: Boolean);
+procedure TFrmPreview.StartAnimation(const AFromBegin: Boolean;
+  AInverse: Boolean = False);
 begin
-  SkAnimatedImageEx.StartAnimation(AFromBegin);
+  SkAnimatedImageEx.StartAnimation(AFromBegin, AInverse);
   UpdateAnimButtons;
 end;
 

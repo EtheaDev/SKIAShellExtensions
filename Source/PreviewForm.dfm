@@ -6,8 +6,8 @@ inherited FrmPreview: TFrmPreview
   DoubleBuffered = True
   Font.Name = 'Segoe UI'
   OnResize = FormResize
-  ExplicitWidth = 625
-  ExplicitHeight = 654
+  ExplicitWidth = 621
+  ExplicitHeight = 653
   TextHeight = 13
   object Splitter: TSplitter
     Left = 0
@@ -24,7 +24,7 @@ inherited FrmPreview: TFrmPreview
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 609
+    Width = 605
     Height = 35
     Align = alTop
     BevelOuter = bvNone
@@ -32,7 +32,7 @@ inherited FrmPreview: TFrmPreview
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 609
+      Width = 605
       Height = 35
       Align = alClient
       AutoSize = True
@@ -56,8 +56,19 @@ inherited FrmPreview: TFrmPreview
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
       end
-      object ToolButtonPause: TToolButton
+      object ToolButtonInversePlay: TToolButton
         Left = 35
+        Top = 0
+        Hint = 'Inverse Play/Restart animation'
+        Caption = 'Play inverse'
+        ImageIndex = 15
+        ImageName = 'PlayInverse'
+        OnClick = ToolButtonInversePlayClick
+        OnMouseEnter = ToolButtonMouseEnter
+        OnMouseLeave = ToolButtonMouseLeave
+      end
+      object ToolButtonPause: TToolButton
+        Left = 70
         Top = 0
         Cursor = crHandPoint
         Hint = 'Pause animation'
@@ -71,7 +82,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonStop: TToolButton
-        Left = 70
+        Left = 105
         Top = 0
         Hint = 'Stop animation'
         AutoSize = True
@@ -84,7 +95,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonSettings: TToolButton
-        Left = 105
+        Left = 140
         Top = 0
         Cursor = crHandPoint
         Hint = 'Preview settings...'
@@ -98,7 +109,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonAbout: TToolButton
-        Left = 140
+        Left = 175
         Top = 0
         Cursor = crHandPoint
         Hint = 'Show about...'
@@ -112,7 +123,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonShowText: TToolButton
-        Left = 175
+        Left = 210
         Top = 0
         Cursor = crHandPoint
         AutoSize = True
@@ -125,7 +136,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonReformat: TToolButton
-        Left = 210
+        Left = 245
         Top = 0
         Cursor = crHandPoint
         Hint = 'Reformat JSON text'
@@ -138,7 +149,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonZoomOut: TToolButton
-        Left = 245
+        Left = 280
         Top = 0
         Cursor = crHandPoint
         Hint = 'Zoom out (decrease font size)'
@@ -152,7 +163,7 @@ inherited FrmPreview: TFrmPreview
         OnMouseLeave = ToolButtonMouseLeave
       end
       object ToolButtonZoomIn: TToolButton
-        Left = 280
+        Left = 315
         Top = 0
         Cursor = crHandPoint
         Hint = 'Zoom in (increase font size)'
@@ -170,7 +181,7 @@ inherited FrmPreview: TFrmPreview
   object PanelEditor: TPanel
     Left = 0
     Top = 35
-    Width = 609
+    Width = 605
     Height = 294
     Align = alTop
     BevelOuter = bvNone
@@ -181,7 +192,7 @@ inherited FrmPreview: TFrmPreview
     object SynEdit: TSynEdit
       Left = 0
       Top = 0
-      Width = 609
+      Width = 605
       Height = 294
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
@@ -212,8 +223,8 @@ inherited FrmPreview: TFrmPreview
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 596
-    Width = 609
+    Top = 595
+    Width = 605
     Height = 19
     Panels = <>
     ParentFont = True
@@ -226,8 +237,8 @@ inherited FrmPreview: TFrmPreview
   object ImagePanel: TPanel
     Left = 0
     Top = 335
-    Width = 609
-    Height = 221
+    Width = 605
+    Height = 220
     Align = alClient
     BevelOuter = bvNone
     DoubleBuffered = True
@@ -239,7 +250,7 @@ inherited FrmPreview: TFrmPreview
     object panelPreview: TPanel
       Left = 0
       Top = 0
-      Width = 609
+      Width = 605
       Height = 40
       Align = alTop
       ParentBackground = False
@@ -258,7 +269,7 @@ inherited FrmPreview: TFrmPreview
         AlignWithMargins = True
         Left = 81
         Top = 4
-        Width = 524
+        Width = 520
         Height = 32
         Margins.Left = 80
         Align = alClient
@@ -273,8 +284,8 @@ inherited FrmPreview: TFrmPreview
   end
   object PlayerPanel: TPanel
     Left = 0
-    Top = 556
-    Width = 609
+    Top = 555
+    Width = 605
     Height = 40
     Align = alBottom
     BevelInner = bvLowered
@@ -302,12 +313,13 @@ inherited FrmPreview: TFrmPreview
       AlignWithMargins = True
       Left = 124
       Top = 4
-      Width = 427
+      Width = 423
       Height = 32
       Align = alClient
       Max = 100
       Frequency = 5
       TabOrder = 0
+      TabStop = False
       OnChange = TrackBarChange
     end
     object TogglePanel: TPanel
@@ -409,6 +421,11 @@ inherited FrmPreview: TFrmPreview
         CollectionIndex = 52
         CollectionName = 'stop'
         Name = 'stop'
+      end
+      item
+        CollectionIndex = 53
+        CollectionName = 'PlayInverse'
+        Name = 'PlayInverse'
       end>
     ImageCollection = dmResources.SVGIconImageCollection
     Width = 24

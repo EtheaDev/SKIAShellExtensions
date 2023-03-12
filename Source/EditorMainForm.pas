@@ -180,6 +180,7 @@ type
     StatusSplitter: TSplitter;
     CloseAll1: TMenuItem;
     PlayAction: TAction;
+    PlayInverseAction: TAction;
     StopAction: TAction;
     PlayerPanel: TPanel;
     PlayerToolBar: TToolBar;
@@ -190,6 +191,7 @@ type
     RunLabel: TLabel;
     PauseAction: TAction;
     ToolButtonStop: TToolButton;
+    ToolButtonPlayInverse: TToolButton;
     procedure PlayActionExecute(Sender: TObject);
     procedure StopActionExecute(Sender: TObject);
     procedure WMGetMinMaxInfo(var Message: TWMGetMinMaxInfo); message WM_GETMINMAXINFO;
@@ -270,6 +272,7 @@ type
     procedure PauseActionExecute(Sender: TObject);
     procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
+    procedure PlayInverseActionExecute(Sender: TObject);
   private
     FirstAction: Boolean;
     SkAnimatedImageEx: TSkAnimatedImageEx;
@@ -298,7 +301,8 @@ type
     FDropTarget: TDropTarget;
     procedure PauseAnimations;
     procedure StopAnimations;
-    procedure StartAnimations(const AFromBegin: Boolean);
+    procedure StartAnimations(const AFromBegin: Boolean;
+      APlayInverse: Boolean = False);
     // implement IDragDrop
     function DropAllowed(const FileNames: array of string): Boolean;
     procedure Drop(const FileNames: array of string);
@@ -675,13 +679,14 @@ begin
   LSkAnimatedImageEx.Hint := Format('%dx%d',[LSize, LSize]);
 end;
 
-procedure TfrmMain.StartAnimations(const AFromBegin: Boolean);
+procedure TfrmMain.StartAnimations(const AFromBegin: Boolean;
+  APlayInverse: Boolean = False);
 begin
-  SkAnimatedImageEx.StartAnimation(AFromBegin);
-  SkAnimatedImageEx16.StartAnimation(AFromBegin);
-  SkAnimatedImageEx32.StartAnimation(AFromBegin);
-  SkAnimatedImageEx48.StartAnimation(AFromBegin);
-  SkAnimatedImageEx96.StartAnimation(AFromBegin);
+  SkAnimatedImageEx.StartAnimation(AFromBegin, APlayInverse);
+  SkAnimatedImageEx16.StartAnimation(AFromBegin, APlayInverse);
+  SkAnimatedImageEx32.StartAnimation(AFromBegin, APlayInverse);
+  SkAnimatedImageEx48.StartAnimation(AFromBegin, APlayInverse);
+  SkAnimatedImageEx96.StartAnimation(AFromBegin, APlayInverse);
 end;
 
 procedure TfrmMain.PauseAnimations;
@@ -1218,6 +1223,11 @@ begin
   StartAnimations(False);
 end;
 
+procedure TfrmMain.PlayInverseActionExecute(Sender: TObject);
+begin
+  StartAnimations(False, True);
+end;
+
 procedure TfrmMain.acSaveUpdate(Sender: TObject);
 begin
   acSave.Enabled := (CurrentEditor <> nil) and (CurrentEditor.Modified);
@@ -1672,7 +1682,10 @@ end;
 
 procedure TfrmMain.UpdatePlayerControls;
 begin
-  PlayAction.Enabled := SkAnimatedImageEx.CanPlayAnimation;
+  PlayAction.Enabled := SkAnimatedImageEx.CanPlayAnimation or
+    SkAnimatedImageEx.AnimationRunningInverse;
+  PlayInverseAction.Enabled := SkAnimatedImageEx.CanPlayAnimation or
+    not SkAnimatedImageEx.AnimationRunningInverse;
   PauseAction.Enabled := SkAnimatedImageEx.CanPauseAnimation;
   StopAction.Enabled := SkAnimatedImageEx.CanStopAnimation;
   LoopToggleSwitch.Enabled := SkAnimatedImageEx.AnimationLoaded;
