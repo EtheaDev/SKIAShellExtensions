@@ -3,11 +3,8 @@ inherited FrmPreview: TFrmPreview
   Top = 286
   ClientHeight = 615
   ClientWidth = 609
-  DoubleBuffered = True
   Font.Name = 'Segoe UI'
   OnResize = FormResize
-  ExplicitWidth = 621
-  ExplicitHeight = 653
   TextHeight = 13
   object Splitter: TSplitter
     Left = 0
@@ -19,12 +16,11 @@ inherited FrmPreview: TFrmPreview
     AutoSnap = False
     MinSize = 100
     OnMoved = SplitterMoved
-    ExplicitWidth = 888
   end
   object PanelTop: TPanel
     Left = 0
     Top = 0
-    Width = 605
+    Width = 609
     Height = 35
     Align = alTop
     BevelOuter = bvNone
@@ -32,7 +28,7 @@ inherited FrmPreview: TFrmPreview
     object ToolBar: TToolBar
       Left = 0
       Top = 0
-      Width = 605
+      Width = 609
       Height = 35
       Align = alClient
       AutoSize = True
@@ -61,6 +57,7 @@ inherited FrmPreview: TFrmPreview
         Top = 0
         Hint = 'Inverse Play/Restart animation'
         Caption = 'Play inverse'
+        Enabled = False
         ImageIndex = 15
         ImageName = 'PlayInverse'
         OnClick = ToolButtonInversePlayClick
@@ -181,7 +178,7 @@ inherited FrmPreview: TFrmPreview
   object PanelEditor: TPanel
     Left = 0
     Top = 35
-    Width = 605
+    Width = 609
     Height = 294
     Align = alTop
     BevelOuter = bvNone
@@ -192,7 +189,7 @@ inherited FrmPreview: TFrmPreview
     object SynEdit: TSynEdit
       Left = 0
       Top = 0
-      Width = 605
+      Width = 609
       Height = 294
       Align = alClient
       Font.Charset = DEFAULT_CHARSET
@@ -223,8 +220,8 @@ inherited FrmPreview: TFrmPreview
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 595
-    Width = 605
+    Top = 596
+    Width = 609
     Height = 19
     Panels = <>
     ParentFont = True
@@ -237,8 +234,8 @@ inherited FrmPreview: TFrmPreview
   object ImagePanel: TPanel
     Left = 0
     Top = 335
-    Width = 605
-    Height = 220
+    Width = 609
+    Height = 221
     Align = alClient
     BevelOuter = bvNone
     DoubleBuffered = True
@@ -250,7 +247,7 @@ inherited FrmPreview: TFrmPreview
     object panelPreview: TPanel
       Left = 0
       Top = 0
-      Width = 605
+      Width = 609
       Height = 40
       Align = alTop
       ParentBackground = False
@@ -269,8 +266,9 @@ inherited FrmPreview: TFrmPreview
         AlignWithMargins = True
         Left = 81
         Top = 4
-        Width = 520
+        Width = 524
         Height = 32
+        Cursor = crHandPoint
         Margins.Left = 80
         Align = alClient
         Max = 255
@@ -284,8 +282,8 @@ inherited FrmPreview: TFrmPreview
   end
   object PlayerPanel: TPanel
     Left = 0
-    Top = 555
-    Width = 605
+    Top = 556
+    Width = 609
     Height = 40
     Align = alBottom
     BevelInner = bvLowered
@@ -306,15 +304,14 @@ inherited FrmPreview: TFrmPreview
       AutoSize = False
       Caption = '0 %'
       WordWrap = True
-      ExplicitLeft = 127
-      ExplicitTop = 13
     end
     object TrackBar: TTrackBar
       AlignWithMargins = True
-      Left = 124
+      Left = 130
       Top = 4
-      Width = 423
+      Width = 421
       Height = 32
+      Cursor = crHandPoint
       Align = alClient
       Max = 100
       Frequency = 5
@@ -323,10 +320,11 @@ inherited FrmPreview: TFrmPreview
       OnChange = TrackBarChange
     end
     object TogglePanel: TPanel
-      Left = 1
-      Top = 1
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
       Width = 120
-      Height = 38
+      Height = 32
       Align = alLeft
       TabOrder = 1
       object LoopToggleSwitch: TToggleSwitch
@@ -341,6 +339,7 @@ inherited FrmPreview: TFrmPreview
         StateCaptions.CaptionOn = 'Loop'
         StateCaptions.CaptionOff = 'No Loop'
         TabOrder = 0
+        TabStop = False
         OnClick = LoopToggleSwitchClick
       end
     end

@@ -8,7 +8,6 @@ object UserSettingsForm: TUserSettingsForm
   Color = clBtnFace
   Constraints.MinHeight = 480
   Constraints.MinWidth = 600
-  DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
@@ -28,7 +27,7 @@ object UserSettingsForm: TUserSettingsForm
   object pc: TPageControl
     Left = 153
     Top = 41
-    Width = 666
+    Width = 662
     Height = 451
     ActivePage = tsColors
     Align = alClient
@@ -38,10 +37,10 @@ object UserSettingsForm: TUserSettingsForm
       Caption = 'Text color'
       ImageName = 'palette'
       object VertSplitter: TSplitter
-        Left = 143
-        Top = 0
+        Left = 193
+        Top = 25
         Width = 4
-        Height = 366
+        Height = 377
         MinSize = 100
       end
       object paLeft: TPanel
@@ -411,7 +410,7 @@ object UserSettingsForm: TUserSettingsForm
       object PanelTopPreviewSettings: TPanel
         Left = 0
         Top = 0
-        Width = 650
+        Width = 654
         Height = 25
         Align = alTop
         Caption = 'PREVIEW SETTINGS'
@@ -421,30 +420,26 @@ object UserSettingsForm: TUserSettingsForm
         AlignWithMargins = True
         Left = 3
         Top = 28
-        Width = 644
+        Width = 648
         Height = 32
         Align = alTop
         AutoSize = False
         StateCaptions.CaptionOn = 'Autoplay On'
         StateCaptions.CaptionOff = 'Autoplay Off'
         TabOrder = 1
-        ExplicitLeft = 6
-        ExplicitTop = 11
       end
       object LoopToggleSwitch: TToggleSwitch
         AlignWithMargins = True
         Left = 3
         Top = 66
-        Width = 644
+        Width = 648
         Height = 32
         Align = alTop
         AutoSize = False
+        ParentColor = True
         StateCaptions.CaptionOn = 'Loop'
         StateCaptions.CaptionOff = 'No Loop'
         TabOrder = 2
-        ExplicitLeft = 7
-        ExplicitTop = 58
-        ExplicitWidth = 300
       end
     end
   end

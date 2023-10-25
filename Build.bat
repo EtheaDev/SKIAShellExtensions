@@ -1,4 +1,4 @@
-call "D:\BDS\Studio\22.0\bin\rsvars.bat"
+call "C:\BDS\Studio\23.0\bin\rsvars.bat"
 msbuild.exe "Source\SKIAShellExtensions.dproj" /target:Clean;Build /p:Platform=Win64 /p:config=release
 msbuild.exe "Source\SKIAShellExtensions32.dproj" /target:Clean;Build /p:Platform=Win32 /p:config=release
 msbuild.exe "Source\LottieTextEditor.dproj" /target:Clean;Build /p:Platform=Win64 /p:config=release

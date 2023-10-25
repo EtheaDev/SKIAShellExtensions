@@ -29,20 +29,26 @@ unit uSKIAThumbnailHandler;
 interface
 
 uses
-  Classes,
-  Controls,
-  ComObj,
-  ShlObj,
-  Windows,
+  System.Classes,
+  System.Types,
+  Vcl.Controls,
+  System.Win.ComObj,
+  Winapi.ShlObj,
+  Winapi.Windows,
+  Vcl.Graphics,
   Winapi.PropSys,
+  Winapi.ActiveX,
   System.Generics.Collections,
   SVGInterfaces,
-  SVGCommon,
-  Skia.Vcl,
-  Skia.Vcl.AnimatedBrush,
-  ActiveX;
+  System.Skia,
+  Vcl.Skia;
 
 type
+  TSkAnimatedImageHelper = class helper for TSkAnimatedImage
+  public
+    procedure RenderToFrame(const ACanvas: ISkCanvas; const ADest: TRectF; const AProgress: Double; const AOpacity: Single);
+  end;
+
   TSKIAThumbnailProvider = class abstract
   public
     class function GetComClass: TComClass; virtual;
@@ -75,7 +81,7 @@ type
     FThumbnailHandlerClass: TThumbnailHandlerClass;
     FIStream: IStream;
     FMode: Cardinal;
-    FAnimatedImage: TSkAnimatedImageBrush;
+    FAnimatedImage: TSkAnimatedImage;
     FLightTheme: Boolean;
   protected
     property Mode: Cardinal read FMode write FMode;
@@ -87,11 +93,9 @@ type
 implementation
 
 uses
-  ComServ,
-  Types,
-  SysUtils,
-  Graphics,
-  ExtCtrls,
+  System.Win.ComServ,
+  System.SysUtils,
+  Vcl.ExtCtrls,
   uMisc,
   uREgistry,
   uLogExcept,
@@ -135,11 +139,15 @@ begin
           LAntiAliasColor := clWebDarkSlategray;
         LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
         LBitmap.SetSize(cx, cx);
-        TLogPreview.Add('TSkAnimatedImage.PaintTo start');
+        TLogPreview.Add('TSkAnimatedImage.RenderFrame start');
         LRect := TRect.Create(0,0,cx,cx);
-        FAnimatedImage.PaintTo(LBitmap.Canvas, LRect, 1, 1);
-        //FAnimatedImage.PaintTo(LBitmap.Canvas.Handle, LRect, True, 1);
-        TLogPreview.Add('TSkAnimatedImage.PaintTo end');
+        LBitmap.SkiaDraw(
+          procedure (const ASkCanvas: ISkCanvas)
+          begin
+            FAnimatedImage.RenderToFrame(ASkCanvas, LRect, 1, 1);
+          end
+          );
+        TLogPreview.Add('TSkAnimatedImage.RenderFrame end');
         hBitmap := LBitmap.Handle;
       end;
     finally
@@ -165,7 +173,7 @@ begin
   Result := S_OK;
   if Result = S_OK then
   begin
-    FAnimatedImage := TSkAnimatedImageBrush.Create;
+    FAnimatedImage := TSkAnimatedImage.Create(nil);
     FLightTheme := IsWindowsAppThemeLight;
   end;
   TLogPreview.Add('TComAnimThumbnailProvider.IInitializeWithStream_Initialize done');
@@ -192,6 +200,14 @@ begin
   TLogPreview.Add('TSKIAThumbnailProvider.RegisterThumbnailProvider Init ' + AName);
   TThumbnailHandlerRegister.Create(Self, AClassID, AName, ADescription);
   TLogPreview.Add('TSKIAThumbnailProvider.RegisterThumbnailProvider Done ' + AName);
+end;
+
+{ TSkAnimatedImageHelper }
+
+procedure TSkAnimatedImageHelper.RenderToFrame(const ACanvas: ISkCanvas;
+  const ADest: TRectF; const AProgress: Double; const AOpacity: Single);
+begin
+  RenderFrame(ACanvas, ADest, AProgress, AOpacity);
 end;
 
 end.

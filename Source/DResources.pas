@@ -85,8 +85,8 @@ uses
   , System.JSON
   , REST.Json
   , System.StrUtils
-  , Skia
-  , skia.Vcl
+  , System.Skia
+  , Vcl.Skia
   ;
 
 

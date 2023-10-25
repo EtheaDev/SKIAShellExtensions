@@ -143,7 +143,6 @@ implementation
 uses
   Vcl.Controls,
   SVGInterfaces,
-  PasSVGFactory,
   D2DSVGFactory,
   Image32SVGFactory,
   System.Types,

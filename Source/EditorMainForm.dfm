@@ -38,6 +38,50 @@ object frmMain: TfrmMain
     ExplicitTop = 61
     ExplicitHeight = 500
   end
+  object ClientPanel: TPanel
+    Left = 44
+    Top = 36
+    Width = 526
+    Height = 533
+    Align = alClient
+    TabOrder = 0
+    object PageControl: TPageControl
+      Left = 1
+      Top = 1
+      Width = 524
+      Height = 531
+      Align = alClient
+      Images = VirtualImageList
+      TabOrder = 0
+      OnChange = PageControlChange
+      OnMouseEnter = PageControlMouseEnter
+      OnMouseLeave = PageControlMouseLeave
+      OnMouseMove = PageControlMouseMove
+    end
+    object PanelCloseButton: TPanel
+      Left = 122
+      Top = 16
+      Width = 22
+      Height = 22
+      Cursor = crHandPoint
+      BevelOuter = bvNone
+      ParentColor = True
+      TabOrder = 1
+      Visible = False
+      object SVGIconImageCloseButton: TSVGIconImage
+        Left = 0
+        Top = 0
+        Width = 22
+        Height = 22
+        AutoSize = False
+        ImageList = VirtualImageList20
+        ImageIndex = 0
+        ImageName = 'close-circle-outline'
+        Align = alClient
+        OnClick = SVGIconImageCloseButtonClick
+      end
+    end
+  end
   object StatusBar: TStatusBar
     Left = 0
     Top = 569
@@ -68,17 +112,6 @@ object frmMain: TfrmMain
     ExplicitTop = 568
     ExplicitWidth = 895
   end
-  object PageControl: TPageControl
-    Left = 44
-    Top = 36
-    Width = 526
-    Height = 533
-    Align = alClient
-    Images = VirtualImageList
-    TabOrder = 1
-    OnChange = PageControlChange
-    OnMouseMove = PageControlMouseMove
-  end
   object ImagePanel: TPanel
     Left = 576
     Top = 36
@@ -90,8 +123,6 @@ object frmMain: TfrmMain
     ParentBackground = False
     TabOrder = 2
     StyleElements = []
-    ExplicitLeft = 572
-    ExplicitHeight = 532
     object StatusSplitter: TSplitter
       Left = 0
       Top = 495
@@ -128,6 +159,7 @@ object frmMain: TfrmMain
         Top = 4
         Width = 238
         Height = 32
+        Cursor = crHandPoint
         Margins.Left = 80
         Align = alClient
         Max = 255
@@ -201,7 +233,6 @@ object frmMain: TfrmMain
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 4
-      ExplicitTop = 410
       object RunLabel: TLabel
         AlignWithMargins = True
         Left = 157
@@ -271,6 +302,7 @@ object frmMain: TfrmMain
         StateCaptions.CaptionOn = 'Loop'
         StateCaptions.CaptionOff = 'No Loop'
         TabOrder = 1
+        TabStop = False
         OnClick = LoopToggleSwitchClick
       end
       object TrackBar: TTrackBar
@@ -278,6 +310,7 @@ object frmMain: TfrmMain
         Top = 44
         Width = 321
         Height = 39
+        Cursor = crHandPoint
         Align = alBottom
         Max = 100
         Frequency = 5
@@ -421,10 +454,9 @@ object frmMain: TfrmMain
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 4
-    ExplicitWidth = 895
     object lblTitle: TLabel
       AlignWithMargins = True
-      Left = 40
+      Left = 41
       Top = 3
       Width = 88
       Height = 30
@@ -451,7 +483,6 @@ object frmMain: TfrmMain
       ParentColor = False
       TabOrder = 0
       Transparent = True
-      ExplicitLeft = 692
       object ColorSettingsToolButton: TToolButton
         Left = 0
         Top = 0
@@ -496,7 +527,7 @@ object frmMain: TfrmMain
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 31
+      Width = 32
       Height = 30
       Align = alLeft
       AutoSize = True
@@ -1180,5 +1211,18 @@ object frmMain: TfrmMain
     OnPopup = RecentPopupMenuPopup
     Left = 456
     Top = 216
+  end
+  object VirtualImageList20: TVirtualImageList
+    Images = <
+      item
+        CollectionIndex = 54
+        CollectionName = 'close-circle-outline'
+        Name = 'close-circle-outline'
+      end>
+    ImageCollection = dmResources.SVGIconImageCollection
+    Width = 20
+    Height = 20
+    Left = 448
+    Top = 368
   end
 end

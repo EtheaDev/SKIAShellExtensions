@@ -1,8 +1,8 @@
 ﻿# SKIA Shell Extensions and Lottie Editor [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Latest Version 1.4.0 - 12 Mar 2023**
+**Latest Version 1.5.0 - 25 Oct 2023**
 
-**A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (Vista, 7, 8, 10 and 11):**
+**A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (7, 8, 10 and 11):**
 
 - A [Preview handler][1]  which allows you to see static images and animations files in the "Preview Panel".
  
@@ -12,13 +12,13 @@
 
 ### Animation and file extensions supported:
 
-.json or .lottie: animated Lottie files [lottiefiles.com](https://lottiefiles.com/)
+**.json** or **.lottie**: animated Lottie files [lottiefiles.com](https://lottiefiles.com/)
 
-.gif: static and animated Gif [W3C GIF (tm)](https://www.w3.org/Graphics/GIF/spec-gif87.txt)
+**.gif**: static and animated Gif [W3C GIF (tm)](https://www.w3.org/Graphics/GIF/spec-gif87.txt)
 
-.webp: static and animated webp [An image format for the Web](https://developers.google.com/speed/webp)
+**.webp**: static and animated webp [An image format for the Web](https://developers.google.com/speed/webp)
 
-.tgs: animated telegram stickers [core.telegram.org/stickers](https://core.telegram.org/stickers)
+**.tgs**: animated telegram stickers [core.telegram.org/stickers](https://core.telegram.org/stickers)
 
 ### Features
 
@@ -26,7 +26,9 @@
 
 - Themes (Dark and Light) according to user preferences of Windows Theme
 
-- AutoPlay and Loop of animation
+- Play normal, inverse or manual control
+
+- AutoPlay and Loop of animation when selected into Explorer
 
 ### Setup using the Installer
 
@@ -62,7 +64,7 @@ A useful Text editor with preview and animation of Lottie files:
 
 ### Manual Build and Installation (for Delphi developers) ###
 
-If you have Delphi 11 Alexandria, you can manually build the project:
+If you have Delphi 11 or Delphi 12, you can manually build the project:
 
 ***Warning: To build the DLL you need also other open-source projects***
 
@@ -85,6 +87,12 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+25 Oct 2023: ver. 1.5.0
+- Added "close button" over Tabs in Editor
+- Updated to Skia4Delphi 6.0.0-beta 5
+- Fixed enabling of Inverse Play Button
+- Built with Delphi 12
 
 12 Mar 2023: ver. 1.4.0
 - Added "inverse" animation to Preview and Editor
@@ -139,7 +147,7 @@ Third Party libraries and tools used:
 
 - [Skia4Delphi][13]
 
-![Delphi 11 Alexandria Support](/Setup/SupportingDelphi.jpg)
+![Delphi Support](/Setup/SupportingDelphi.jpg)
 
 Related links: [embarcadero.com][10] - [learndelphi.org][11]
 

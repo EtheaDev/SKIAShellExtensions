@@ -43,7 +43,7 @@ uses
   Vcl.Menus, SynEditExport,
   SynExportHTML, SynExportRTF, SynEditMiscClasses,
   uSettings, System.ImageList, SynEditCodeFolding,
-  Skia.Vcl.AnimatedImageEx,
+  Vcl.Skia.AnimatedImageEx,
   Vcl.WinXCtrls,
   SVGIconImageList, SVGIconImageListBase, SVGIconImage, Vcl.VirtualImageList,
   UPreviewContainer;
@@ -462,7 +462,7 @@ begin
   ToolButtonPlay.Enabled := SkAnimatedImageEx.CanPlayAnimation or
     SkAnimatedImageEx.AnimationRunningInverse;
   ToolButtonInversePlay.Enabled := SkAnimatedImageEx.CanPlayAnimation or
-    not SkAnimatedImageEx.AnimationRunningInverse;
+    SkAnimatedImageEx.AnimationRunningNormal;
   ToolButtonPause.Enabled := SkAnimatedImageEx.CanPauseAnimation;
   ToolButtonStop.Enabled := SkAnimatedImageEx.CanStopAnimation;
 end;

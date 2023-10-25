@@ -48,24 +48,28 @@ uses
   SynEditOptionsDialog in 'SynEditOptionsDialog.pas' {fmEditorOptionsDialog},
   uSettings in 'uSettings.pas',
   SettingsForm in 'SettingsForm.pas' {UserSettingsForm},
-  uRegistry in 'uRegistry.pas';
+  uRegistry in 'uRegistry.pas',
+  Vcl.StyledTaskDialogFormUnit in '..\Ext\StyledComponents\source\Vcl.StyledTaskDialogFormUnit.pas' {StyledTaskDialogForm},
+  Skia.Vcl.StyledTaskDialogAnimatedUnit in '..\Ext\StyledComponents\source\Skia.Vcl.StyledTaskDialogAnimatedUnit.pas' {StyledTaskDialogAnimated};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskBar := True;
-  Application.Title := Title_LottieTextEditor+'- © 2022 Ethea S.r.l.';
+  Application.ActionUpdateDelay := 50;
+  Application.Title := Title_LottieTextEditor+'- © 2022-2023 Ethea S.r.l.';
   with TSplashForm.Create(nil) do
   Try
     Show;
     Update;
     Application.HelpFile := '';
-  Application.CreateForm(TdmResources, dmResources);
-  Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TTestPrintPreviewDlg, TestPrintPreviewDlg);
-  Application.CreateForm(TPageSetupDlg, PageSetupDlg);
-  Hide;
+    Application.CreateForm(TdmResources, dmResources);
+    Application.CreateForm(TfrmMain, frmMain);
+    Application.CreateForm(TTestPrintPreviewDlg, TestPrintPreviewDlg);
+    Application.CreateForm(TPageSetupDlg, PageSetupDlg);
+    Application.OnException := frmMain.ManageExceptions;
+    Hide;
   Finally
     Free;
   End;

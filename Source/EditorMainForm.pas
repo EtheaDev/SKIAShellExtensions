@@ -38,6 +38,7 @@ uses
   Vcl.CategoryButtons, Vcl.WinXCtrls, System.ImageList, Vcl.VirtualImageList,
   uSettings
   , Vcl.PlatformVclStylesActnCtrls
+  {$IFNDEF NO_VCL_STYLES}
   , Vcl.Styles.Fixes
   , Vcl.Styles.FormStyleHooks
   , Vcl.Styles.NC
@@ -52,8 +53,11 @@ uses
   , Vcl.Styles.Utils.ComCtrls
   , Vcl.Styles.Utils.StdCtrls
   , Vcl.Styles.Ext
+  {$ENDIF}
   , uDragDropUtils
-  , Skia.Vcl.AnimatedImageEx
+  , Vcl.Skia.AnimatedImageEx
+  , Vcl.StyledButton
+  , Vcl.StyledToolbar
   ;
 
 const
@@ -61,16 +65,18 @@ const
 
 resourcestring
   PAGE_HEADER_FIRST_LINE_LEFT = '$TITLE$';
-  PAGE_HEADER_FIRST_LINE_RIGHT = 'Tot. Pages: $PAGECOUNT$';
+  PAGE_HEADER_FIRST_LINE_RIGHT = 'Page count: $PAGECOUNT$';
   PAGE_FOOTER_FIRST_LINE_LEFT = 'Print Date: $DATE$. Time: $TIME$';
   PAGE_FOOTER_FIRST_LINE_RIGHT = 'Page $PAGENUM$ of $PAGECOUNT$';
   FILE_NOT_FOUND = 'File "%s" not found!';
-  SMODIFIED = 'Modified';
-  SUNMODIFIED = 'Unmodified';
+  SMODIFIED = 'Changed';
+  SUNMODIFIED = 'Not changed';
   STATE_READONLY = 'ReadOnly';
   STATE_INSERT = 'Insert';
-  STATE_OVERWRITE = 'OverWrite';
-  CLOSING_PROBLEMS = 'Closing problems!';
+  STATE_OVERWRITE = 'Overwrite';
+  CLOSING_PROBLEMS = 'Problem closing!';
+  STR_ERROR = 'ERROR!';
+  STR_UNEXPECTED_ERROR = 'UNEXPECTED ERROR!';
   CONFIRM_CHANGES = 'ATTENTION: the content of file "%s" is changed: do you want to save the file?';
   LOTTIE_PARSING_OK = 'Lottie Parsing is correct.';
 
@@ -179,6 +185,8 @@ type
     StatusStaticText: TStaticText;
     StatusSplitter: TSplitter;
     CloseAll1: TMenuItem;
+    VirtualImageList20: TVirtualImageList;
+    PanelCloseButton: TPanel;
     PlayAction: TAction;
     PlayInverseAction: TAction;
     StopAction: TAction;
@@ -273,6 +281,9 @@ type
     procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure PlayInverseActionExecute(Sender: TObject);
+    procedure PageControlMouseEnter(Sender: TObject);
+    procedure PageControlMouseLeave(Sender: TObject);
+    procedure SVGIconImageCloseButtonClick(Sender: TObject);
   private
     FirstAction: Boolean;
     SkAnimatedImageEx: TSkAnimatedImageEx;
@@ -339,10 +350,13 @@ type
     procedure ConfirmChanges(EditingFile: TEditingFile);
     procedure SkAnimatedImageAnimationProcess(Sender: TObject);
     procedure UpdateRunLabel;
+    procedure ShowTabCloseButtonOnHotTab;
     property EditorFontSize: Integer read FFontSize write SetEditorFontSize;
   protected
     procedure CreateWindowHandle(const Params: TCreateParams); override;
     procedure DestroyWindowHandle; override;
+  public
+    procedure ManageExceptions(Sender: TObject; E: Exception);
   end;
 
 var
@@ -369,6 +383,7 @@ uses
   , Winapi.SHFolder
   , dlgExportPNG
   , SettingsForm
+  , Vcl.StyledTaskDialog
   ;
 
 {$R *.dfm}
@@ -667,6 +682,14 @@ procedure TfrmMain.SVClosing(Sender: TObject);
 begin
   if SV.Opened then
     SV.OpenedWidth := SV.Width;
+end;
+
+procedure TfrmMain.SVGIconImageCloseButtonClick(Sender: TObject);
+begin
+  PanelCloseButton.Visible := False;
+  PageControl.ActivePageIndex := PanelCloseButton.Tag;
+  acClose.Execute;
+  ShowTabCloseButtonOnHotTab;
 end;
 
 procedure TfrmMain.SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -1187,10 +1210,16 @@ end;
 
 procedure TfrmMain.PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
+{$WRITEABLECONST ON}
+const oldPos : integer = -2;
+{$WRITEABLECONST OFF}
 var
+  iot : integer;
+
   LhintPause: Integer;
   LTabIndex: Integer;
 begin
+  inherited;
   LTabIndex := PageControl.IndexOfTabAt(X, Y);
   if (LTabIndex >= 0) and (PageControl.Hint <> PageControl.Pages[LTabIndex].Hint) then
   begin
@@ -1206,6 +1235,14 @@ begin
       Application.HintPause := LHintPause;
     end;
   end;
+
+  iot := TTabControl(Sender).IndexOfTabAt(x,y);
+  if (iot > -1) then
+  begin
+    if iot <> oldPos then
+      ShowTabCloseButtonOnHotTab;
+  end;
+  oldPos := iot;
 end;
 
 procedure TfrmMain.StopActionExecute(Sender: TObject);
@@ -1267,7 +1304,7 @@ begin
   //Confirm save changes
   if EditingFile.SynEditor.Modified then
   begin
-    LConfirm := MessageDlg(Format(CONFIRM_CHANGES,[EditingFile.FileName]),
+    LConfirm := StyledMessageDlg(Format(CONFIRM_CHANGES,[EditingFile.FileName]),
       mtWarning, [mbYes, mbNo], 0);
     if LConfirm = mrYes then
       EditingFile.SaveToFile
@@ -1297,6 +1334,8 @@ begin
   //Confirm save changes
   ConfirmChanges(EditingFile);
 
+  PanelCloseButton.Visible := False;
+
   //Delete the file from the Opened-List
   EditFileList.Delete(pos);
 
@@ -1320,6 +1359,7 @@ procedure TfrmMain.acCloseAllExecute(Sender: TObject);
 begin
   FProcessingFiles := True;
   try
+    PanelCloseButton.Visible := False;
     while EditFileList.Count > 0 do
       RemoveEditingFile(TEditingFile(EditFileList.items[0]));
   finally
@@ -1685,7 +1725,7 @@ begin
   PlayAction.Enabled := SkAnimatedImageEx.CanPlayAnimation or
     SkAnimatedImageEx.AnimationRunningInverse;
   PlayInverseAction.Enabled := SkAnimatedImageEx.CanPlayAnimation or
-    not SkAnimatedImageEx.AnimationRunningInverse;
+    SkAnimatedImageEx.AnimationRunningNormal;
   PauseAction.Enabled := SkAnimatedImageEx.CanPauseAnimation;
   StopAction.Enabled := SkAnimatedImageEx.CanStopAnimation;
   LoopToggleSwitch.Enabled := SkAnimatedImageEx.AnimationLoaded;
@@ -1885,6 +1925,67 @@ end;
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   BackgroundTrackBarChange(nil);
+end;
+
+procedure TfrmMain.ShowTabCloseButtonOnHotTab;
+var
+  iot : integer;
+  cp : TPoint;
+  rectOver: TRect;
+begin
+  cp := PageControl.ScreenToClient(Mouse.CursorPos);
+  iot := PageControl.IndexOfTabAt(cp.X, cp.Y);
+
+  if iot > -1 then
+  begin
+    rectOver := PageControl.TabRect(iot);
+
+    PanelCloseButton.Left := rectOver.Right - PanelCloseButton.Width;
+    PanelCloseButton.Top := rectOver.Top + ((rectOver.Height div 2) - (PanelCloseButton.Height div 2)) + 1;
+
+    PanelCloseButton.Tag := iot;
+    PanelCloseButton.Show;
+  end
+  else
+  begin
+    PanelCloseButton.Tag := -1;
+    PanelCloseButton.Hide;
+  end;
+end;
+
+procedure TfrmMain.PageControlMouseEnter(Sender: TObject);
+begin
+  ShowTabCloseButtonOnHotTab;
+end;
+
+procedure TfrmMain.PageControlMouseLeave(Sender: TObject);
+begin
+  if PanelCloseButton <> FindVCLWindow(Mouse.CursorPos) then
+  begin
+    PanelCloseButton.Hide;
+    PanelCloseButton.Tag := -1;
+  end;
+end;
+
+procedure TfrmMain.ManageExceptions(Sender: TObject; E: Exception);
+begin
+  //This is an event-handler for exceptions that replace Delphi standard handler
+  if E is EAccessViolation then
+  begin
+    if StyledMessageDlg(STR_UNEXPECTED_ERROR,
+      Format('Unexpected Error: %s%s',[sLineBreak,E.Message]),
+      TMsgDlgType.mtError,
+      [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbAbort], 0) = mrAbort then
+    Application.Terminate;
+  end
+  else
+  begin
+
+    StyledMessageDlg(STR_ERROR,
+      Format('Error: %s%s',[sLineBreak,E.Message]),
+      TMsgDlgType.mtError,
+      [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbHelp], 0);
+  end;
 end;
 
 initialization
