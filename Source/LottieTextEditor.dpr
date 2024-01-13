@@ -2,7 +2,7 @@
 {                                                                              }
 {       LottieTextEditor: Advanced Editor for Lottie files                     }
 {                                                                              }
-{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -58,7 +58,9 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskBar := True;
   Application.ActionUpdateDelay := 50;
-  Application.Title := Title_LottieTextEditor+'- © 2022-2023 Ethea S.r.l.';
+  Application.Title := Title_LottieTextEditor+'- © 2022-2024 Ethea S.r.l.';
+  //Uses System Style for border / shadow of Forms
+  TStyleManager.FormBorderStyle := TStyleManager.TFormBorderStyle.fbsSystemStyle;
   with TSplashForm.Create(nil) do
   Try
     Show;

@@ -4,7 +4,10 @@ inherited FrmPreview: TFrmPreview
   ClientHeight = 615
   ClientWidth = 609
   Font.Name = 'Segoe UI'
+  StyleElements = [seFont, seClient, seBorder]
   OnResize = FormResize
+  ExplicitWidth = 625
+  ExplicitHeight = 654
   TextHeight = 13
   object Splitter: TSplitter
     Left = 0
@@ -227,7 +230,7 @@ inherited FrmPreview: TFrmPreview
     ParentFont = True
     SimplePanel = True
     SimpleText = 
-      'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2023 Ethea S.r.l' +
+      'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2024 Ethea S.r.l' +
       '. - Author: Carlo Barazzetta'
     UseSystemFont = False
   end

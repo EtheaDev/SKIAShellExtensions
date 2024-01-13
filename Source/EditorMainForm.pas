@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -1744,6 +1744,9 @@ begin
   if not FirstAction then
   begin
     FirstAction := True;
+    //Load previous opened-files
+    LoadOpenedFiles;
+
     //Initialize Open and Save Dialog with application path
     LFileName := ParamStr(1);
     if LFileName <> '' then
@@ -1758,9 +1761,6 @@ begin
 
     OpenDialog.InitialDir := InitialDir;
     SaveDialog.InitialDir := InitialDir;
-
-    //Load previous opened-files
-    LoadOpenedFiles;
   end;
 end;
 

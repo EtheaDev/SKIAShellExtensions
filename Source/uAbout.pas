@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -42,7 +42,6 @@ uses
 resourcestring
   Title_LottieTextEditor = 'SKIA/Lottie Text Editor';
   Title_SKIAPreview = 'SKIA Image/Animation Preview';
-  FReeware_Caption = ' - Freeware';
 
 type
   TFrmAbout = class(TForm)
@@ -181,7 +180,7 @@ begin
   MemoCopyRights.Lines.Add('Author: Carlo Barazzetta - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('Custom icons: Ariel Montes - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('https://github.com/EtheaDev/SKIAShellExtensions');
-  MemoCopyRights.Lines.Add('Copyright © 2022-2023 all rights reserved.');
+  MemoCopyRights.Lines.Add('Copyright © 2022-2024 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Ethea''s libraries and tools used:');
   MemoCopyRights.Lines.Add('SVGIconImageList https://github.com/EtheaDev/SVGIconImageList/');
@@ -219,7 +218,7 @@ procedure TFrmAbout.SetTitle(const Value: string);
 begin
   FTitle := Value;
   Caption := FTitle;
-  TitleLabel.Caption := Value + FReeware_Caption;
+  TitleLabel.Caption := Value;
 end;
 
 end.

@@ -216,8 +216,8 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 36
         Top = 4
-        Width = 283
-        Height = 26
+        Width = 4
+        Height = 4
         Align = alClient
         Alignment = taCenter
         TabOrder = 0

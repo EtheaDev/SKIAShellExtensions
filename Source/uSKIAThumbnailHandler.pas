@@ -44,11 +44,6 @@ uses
   Vcl.Skia;
 
 type
-  TSkAnimatedImageHelper = class helper for TSkAnimatedImage
-  public
-    procedure RenderToFrame(const ACanvas: ISkCanvas; const ADest: TRectF; const AProgress: Double; const AOpacity: Single);
-  end;
-
   TSKIAThumbnailProvider = class abstract
   public
     class function GetComClass: TComClass; virtual;
@@ -81,8 +76,10 @@ type
     FThumbnailHandlerClass: TThumbnailHandlerClass;
     FIStream: IStream;
     FMode: Cardinal;
-    FAnimatedImage: TSkAnimatedImage;
+    FSource: TSkAnimatedImage.TSource;
+    FCodec: TSkAnimatedImage.TAnimationCodec;
     FLightTheme: Boolean;
+    procedure SourceChange;
   protected
     property Mode: Cardinal read FMode write FMode;
     property IStream: IStream read FIStream write FIStream;
@@ -114,7 +111,18 @@ var
   AStream: TIStreamAdapter;
   LBitmap: TBitmap;
   LAntiAliasColor: TColor;
-  LRect: TRect;
+  LRect: TRectF;
+
+  procedure LoadAnimFromStream(const AStream: TStream);
+  var
+    LBytes: TBytes;
+  begin
+    SetLength(LBytes, AStream.Size - AStream.Position);
+    if Length(LBytes) > 0 then
+      AStream.ReadBuffer(LBytes, 0, Length(LBytes));
+    FSource.Data := LBytes;
+  end;
+
 begin
   try
     TLogPreview.Add('TComAnimThumbnailProvider.GetThumbnail start');
@@ -128,28 +136,37 @@ begin
     AStream := TIStreamAdapter.Create(FIStream);
     try
       TLogPreview.Add('TComAnimThumbnailProvider.GetThumbnail LoadFromStream');
-      FAnimatedImage.LoadFromStream(AStream);
-      //if not FAnimatedImage.Animation.Enabled then
-      begin
-        LBitmap := TBitmap.Create;
-        LBitmap.PixelFormat := pf32bit;
-        if FLightTheme then
-          LAntiAliasColor := clWhite
-        else
-          LAntiAliasColor := clWebDarkSlategray;
-        LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
-        LBitmap.SetSize(cx, cx);
-        TLogPreview.Add('TSkAnimatedImage.RenderFrame start');
-        LRect := TRect.Create(0,0,cx,cx);
-        LBitmap.SkiaDraw(
-          procedure (const ASkCanvas: ISkCanvas)
-          begin
-            FAnimatedImage.RenderToFrame(ASkCanvas, LRect, 1, 1);
-          end
-          );
-        TLogPreview.Add('TSkAnimatedImage.RenderFrame end');
-        hBitmap := LBitmap.Handle;
-      end;
+      LoadAnimFromStream(AStream);
+      LBitmap := TBitmap.Create;
+      LBitmap.PixelFormat := pf32bit;
+      if FLightTheme then
+        LAntiAliasColor := clWhite
+      else
+        LAntiAliasColor := clWebDarkSlategray;
+      LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
+      LBitmap.SetSize(cx, cx);
+      TLogPreview.Add('TSkAnimatedImage.RenderFrame start');
+      LRect := TRectF.Create(0,0,cx,cx);
+      LBitmap.SkiaDraw(
+        procedure (const ASkCanvas: ISkCanvas)
+        var
+          LImageRect: TRectF;
+        begin
+          FCodec.SeekFrameTime(FCodec.Duration);
+          ASkCanvas.Save;
+          try
+            ASkCanvas.ClipRect(LRect);
+            //calculate TSkAnimatedImageWrapMode.Fit
+            LImageRect := TRectF.Create(PointF(0, 0), FCodec.Size);
+            LRect := LImageRect.FitInto(LRect);
+            FCodec.Render(ASkCanvas, LRect, 1);
+          finally
+            ASkCanvas.Restore;
+          end;
+        end
+        );
+      TLogPreview.Add('TSkAnimatedImage.RenderFrame end');
+      hBitmap := LBitmap.Handle;
     finally
       AStream.Free;
     end;
@@ -173,10 +190,26 @@ begin
   Result := S_OK;
   if Result = S_OK then
   begin
-    FAnimatedImage := TSkAnimatedImage.Create(nil);
+    FSource := TSkAnimatedImage.TSource.Create(SourceChange);
     FLightTheme := IsWindowsAppThemeLight;
   end;
   TLogPreview.Add('TComAnimThumbnailProvider.IInitializeWithStream_Initialize done');
+end;
+
+procedure TComAnimThumbnailProvider.SourceChange;
+begin
+  FreeAndNil(FCodec);
+  var LStream := TBytesStream.Create(FSource.Data);
+  try
+    for var LCodecClass in TSkAnimatedImage.RegisteredCodecs do
+    begin
+      LStream.Position := 0;
+      if LCodecClass.TryMakeFromStream(LStream, FCodec) then
+        Break;
+    end;
+  finally
+    LStream.Free;
+  end;
 end;
 
 function TComAnimThumbnailProvider.Unload: HRESULT;
@@ -200,14 +233,6 @@ begin
   TLogPreview.Add('TSKIAThumbnailProvider.RegisterThumbnailProvider Init ' + AName);
   TThumbnailHandlerRegister.Create(Self, AClassID, AName, ADescription);
   TLogPreview.Add('TSKIAThumbnailProvider.RegisterThumbnailProvider Done ' + AName);
-end;
-
-{ TSkAnimatedImageHelper }
-
-procedure TSkAnimatedImageHelper.RenderToFrame(const ACanvas: ISkCanvas;
-  const ADest: TRectF; const AProgress: Double; const AOpacity: Single);
-begin
-  RenderFrame(ACanvas, ADest, AProgress, AOpacity);
 end;
 
 end.
