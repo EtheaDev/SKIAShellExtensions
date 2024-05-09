@@ -1,0 +1,171 @@
+<style type="text/css">
+code{
+  font-family: "Consolas", monospace;
+}
+pre{
+  border: 1px solid #ddd;
+  border-left: 3px solid #f36d33;
+  overflow: auto;
+  padding: 1em 1.5em;
+  display: block;
+}
+Blockquote{
+  border-left: 3px solid #d0d0d0;
+  padding-left: 0.5em;
+  margin-left:1em;
+}
+Blockquote p{
+  margin: 0;
+}
+table{
+  border:1px solid;
+  border-collapse:collapse;
+}
+th{  padding:5px;
+  border:1px solid;
+}
+td{
+  padding:5px;
+  border:1px solid;
+}
+</style>
+<h1>SKIA Shell Extensions and Lottie Editor <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg" alt="License"/></a></h1>
+<p><strong>Latest Version 1.5.3 - 09 May 2024</strong></p>
+<p><strong>A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (7, 8, 10 and 11):</strong></p>
+<ul>
+<li><p>A <a href="https://docs.microsoft.com/en-us/windows/win32/shell/preview-handlers">Preview handler</a>  which allows you to see static images and animations files in the &ldquo;Preview Panel&rdquo;.</p>
+</li>
+<li><p>A <a href="https://docs.microsoft.com/en-us/windows/win32/shell/thumbnail-providers">Thumbnail handler</a> which allows you to see static images and anomations files (the last last frame of animation) into Windows Explorer.</p>
+</li>
+<li><p>A <a href="https://github.com/EtheaDev/SKIAShellExtensions/wiki/Using-The-Lottie-Text-Editor">Lottie Text Editor</a> to manually edit and preview the animation of Lottie files.</p>
+</li>
+</ul>
+<h3>Animation and file extensions supported:</h3>
+<p><strong>.json</strong> or <strong>.lottie</strong>: animated Lottie files <a href="https://lottiefiles.com/">lottiefiles.com</a></p>
+<p><strong>.gif</strong>: static and animated Gif <a href="https://www.w3.org/Graphics/GIF/spec-gif87.txt">W3C GIF (tm)</a></p>
+<p><strong>.webp</strong>: static and animated webp <a href="https://developers.google.com/speed/webp">An image format for the Web</a></p>
+<p><strong>.tgs</strong>: animated telegram stickers <a href="https://core.telegram.org/stickers">core.telegram.org/stickers</a></p>
+<h3>Features</h3>
+<ul>
+<li><p>Supports Windows Vista, 7, 8, 10 and 11 (for 32 bits and 64 bits).</p>
+</li>
+<li><p>Themes (Dark and Light) according to user preferences of Windows Theme</p>
+</li>
+<li><p>Play normal, inverse or manual control</p>
+</li>
+<li><p>AutoPlay and Loop of animation when selected into Explorer</p>
+</li>
+</ul>
+<h3>Setup using the Installer</h3>
+<p>Click to download the <a href="https://github.com/EtheaDev/SKIAShellExtensions/releases/latest/download/SKIAShellExtensionsSetup.exe">SKIAShellExtensionsSetup.exe</a> located also in the Release area. The Installer works both for 32 and 64 bit system.</p>
+<p><img src="./Images/Setup.png" alt="Lottie Setup_Program"/></p>
+<p><strong><em>For a clean Setup close all the windows explorer instances which have the preview handler active or the preview handler was used (remember the dll remains in memory until the windows explorer was closed).</em></strong></p>
+<h3>Preview Panel and Thumbnails in action</h3>
+<p>In Windows 11 with Light theme:</p>
+<p><img src="./Images/PreviewThumbnailsLight.png" alt="Preview Thumbnails Light"/></p>
+<p>In Windows 11 with Dark theme:</p>
+<p><img src="./Images/PreviewThumbnailsDark.png" alt="Preview Thumbnails Dark"/></p>
+<h3>Lottie Text Editor</h3>
+<p>A useful Text editor with preview and animation of Lottie files:</p>
+<p><img src="./Images/LottieTextEditorDark.png" alt="Lottie Text Editor Dark"/></p>
+<h3>Settings: Preview page</h3>
+<p><img src="./Images/SettingsPreview.png" alt="Settings: Preview page"/></p>
+<h3>Settings: Theme page</h3>
+<p><img src="./Images/SettingsTheme.png" alt="Settings: Theme page"/></p>
+<h3>Manual Build and Installation (for Delphi developers)</h3>
+<p>If you have Delphi 11 or Delphi 12, you can manually build the project:</p>
+<p><strong><em>Warning: To build the DLL you need also other open-source projects</em></strong></p>
+<ul>
+<li><p><a href="https://github.com/EtheaDev/SVGIconImageList">SVGIconImageList</a></p>
+</li>
+<li><p><a href="https://github.com/SynEdit/SynEdit">Synedit</a></p>
+</li>
+<li><p><a href="https://github.com/RRUZ/vcl-styles-utils">VCL-Style-Utils</a></p>
+</li>
+<li><p><a href="https://skia4delphi.org">Skia4Delphi</a></p>
+</li>
+</ul>
+<p>To manually install the SKIAShellExtensions.dll follow these steps:</p>
+<ol>
+<li><p>Close all the windows explorer instances which have the preview handler active or the preview handler was used (remember the dll remains in memory until the windows explorer was closed).</p>
+</li>
+<li><p>If you have already used the installer uninstall the components from system.</p>
+</li>
+<li><p>To Uninstall/Install manually the dll run the <code>Unregister_Register.cmd</code> (run-as-administrator).</p>
+</li>
+<li><p>If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.</p>
+</li>
+</ol>
+<h2>Release Notes</h2>
+<p>13 Jan 2024: ver. 1.5.2</p>
+<ul>
+<li>Added File Changed notification and reload</li>
+<li>Built with Delphi 12.1</li>
+<li>Built with Latest Image32 Library</li>
+<li>Built with Latest Skia4Delphi 6.1 Library</li>
+</ul>
+<p>26 Oct 2023: ver. 1.5.1</p>
+<ul>
+<li>Optimized rendering of Icon using the Skia Codec directly</li>
+<li>Enabled system draw for title and border of Editor when Styled</li>
+</ul>
+<p>25 Oct 2023: ver. 1.5.0</p>
+<ul>
+<li>Added &ldquo;close button&rdquo; over Tabs in Editor</li>
+<li>Updated to Skia4Delphi 6.0.0-beta 5</li>
+<li>Fixed enabling of Inverse Play Button</li>
+<li>Built with Delphi 12</li>
+</ul>
+<p>12 Mar 2023: ver. 1.4.0</p>
+<ul>
+<li>Added &ldquo;inverse&rdquo; animation to Preview and Editor</li>
+</ul>
+<p>27 Feb 2023: ver. 1.3.0</p>
+<ul>
+<li>Updated to Skia4Delphi 4.1.1</li>
+<li>Updated Projects to Delphi 11.3</li>
+</ul>
+<p>13 Jan 2023: ver. 1.2.0</p>
+<ul>
+<li>Updated to Skia4Delphi 4.0.2</li>
+<li>Fixed Animation Panel of Preview</li>
+</ul>
+<p>09 Nov 2022: ver. 1.1.0</p>
+<ul>
+<li>Updated to Skia4Delphi 4.0.1</li>
+<li>Fixed settings filename</li>
+</ul>
+<p>24 Set 2022: ver. 1.0.1</p>
+<ul>
+<li>Fixed Setup registering 32bit dll</li>
+<li>Fixed settings filename</li>
+</ul>
+<p>23 Set 2022: ver. 1.0.0</p>
+<ul>
+<li>First version</li>
+</ul>
+<h2>Credits</h2>
+<p>Many thanks to <strong>Rodrigo Ruz V.</strong> (author of <a href="https://theroadtodelphi.com">theroadtodelphi.com</a> Blog) for his wonderful work on <a href="https://github.com/RRUZ/delphi-preview-handler">delphi-preview-handler</a> from which this project has used a lot of code and inspiration.</p>
+<h2>Powered by Skia4Delphi</h2>
+<p><a href="https://www.skia4delphi.org"><img src="./Images/logo-gradient.svg" alt="Logo" height="300" width="360"  /></a></p>
+<p>Many thanks to the project &ldquo;Skia4Delphi&rdquo;</p>
+<p><strong><a href="https://skia4delphi.org">Skia4Delphi</a></strong> is a cross-platform 2D graphics API for Delphi based on <a href="https://skia.org/">Google's Skia</a> graphics library.</p>
+<h2>License</h2>
+<p>Licensed under the <a href="https://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a> (the &ldquo;License&rdquo;);
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an &ldquo;AS IS&rdquo; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+<p>The Initial Developer of the <a href="https://github.com/RRUZ/delphi-preview-handler">Original Code</a> is <strong>Rodrigo Ruz V</strong>. Portions created by him are Copyright © 2011-2021 Rodrigo Ruz V.</p>
+<p>Third Party libraries and tools used from Ethea:</p>
+<ul>
+<li><a href="https://github.com/EtheaDev/SVGIconImageList">SVGIconImageList</a></li>
+</ul>
+<p>Third Party libraries and tools used:</p>
+<ul>
+<li><p><a href="https://github.com/RRUZ/vcl-styles-utils">VCLStyles Utils</a></p>
+</li>
+<li><p><a href="https://github.com/SynEdit/SynEdit">SynEdit</a></p>
+</li>
+<li><p><a href="https://skia4delphi.org">Skia4Delphi</a></p>
+</li>
+</ul>
+<p><img src="/Setup/SupportingDelphi.jpg" alt="Delphi Support"/></p>
+<p>Related links: <a href="https://www.embarcadero.com">embarcadero.com</a> - <a href="https://learndelphi.org">learndelphi.org</a></p>

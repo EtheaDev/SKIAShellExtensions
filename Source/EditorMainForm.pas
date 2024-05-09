@@ -79,12 +79,14 @@ resourcestring
   STR_UNEXPECTED_ERROR = 'UNEXPECTED ERROR!';
   CONFIRM_CHANGES = 'ATTENTION: the content of file "%s" is changed: do you want to save the file?';
   LOTTIE_PARSING_OK = 'Lottie Parsing is correct.';
+  FILE_CHANGED_RELOAD = 'File "%s" Date/Time changed! Do you want to reload it?';
 
 type
   TEditingFile = class
   private
     FIcon : TIcon;
     FFileName : string;
+    FFileAge: TDateTime;
     FName : string;
     FExtension: string;
     procedure ReadFromFile;
@@ -200,6 +202,7 @@ type
     PauseAction: TAction;
     ToolButtonStop: TToolButton;
     ToolButtonPlayInverse: TToolButton;
+    CheckFileChangedTimer: TTimer;
     procedure PlayActionExecute(Sender: TObject);
     procedure StopActionExecute(Sender: TObject);
     procedure WMGetMinMaxInfo(var Message: TWMGetMinMaxInfo); message WM_GETMINMAXINFO;
@@ -284,6 +287,7 @@ type
     procedure PageControlMouseEnter(Sender: TObject);
     procedure PageControlMouseLeave(Sender: TObject);
     procedure SVGIconImageCloseButtonClick(Sender: TObject);
+    procedure CheckFileChangedTimerTimer(Sender: TObject);
   private
     FirstAction: Boolean;
     SkAnimatedImageEx: TSkAnimatedImageEx;
@@ -351,6 +355,7 @@ type
     procedure SkAnimatedImageAnimationProcess(Sender: TObject);
     procedure UpdateRunLabel;
     procedure ShowTabCloseButtonOnHotTab;
+    procedure UpdateTabsheetImage(ATabSheet: TTabSheet; AModified: Boolean);
     property EditorFontSize: Integer read FFontSize write SetEditorFontSize;
   protected
     procedure CreateWindowHandle(const Params: TCreateParams); override;
@@ -465,12 +470,15 @@ end;
 procedure TEditingFile.LoadFromFile(const AFileName: string);
 begin
   SynEditor.Lines.LoadFromFile(AFileName, TEncoding.UTF8);
+  SynEditor.Modified := False;
+  FileAge(AFileName, FFileAge);
 end;
 
 procedure TEditingFile.SaveToFile;
 begin
   SynEditor.Lines.SaveToFile(Self.FileName);
   SynEditor.Modified := False;
+  FileAge(Self.FileName, FFileAge);
   SynEditor.OnChange(SynEditor);
 end;
 
@@ -1039,14 +1047,20 @@ begin
   acEditUndo.Enabled := (CurrentEditor <> nil) and CurrentEditor.Modified;
 end;
 
+procedure TfrmMain.UpdateTabsheetImage(ATabSheet: TTabSheet;
+  AModified: Boolean);
+begin
+  if AModified then
+    ATabSheet.ImageName := 'lottie-logo'
+  else
+    ATabSheet.ImageName := 'lottie-logo-gray';
+end;
+
 procedure TfrmMain.SynEditChange(Sender: TObject);
 begin
   if Sender = CurrentEditor then
   begin
-    if CurrentEditor.Modified then
-      pageControl.ActivePage.Imagename := 'lottie-logo'
-    else
-      pageControl.ActivePage.Imagename := 'lottie-logo-gray';
+    UpdateTabsheetImage(pageControl.ActivePage, CurrentEditor.Modified);
     AssignLottieTextToImage;
   end;
 end;
@@ -1268,6 +1282,36 @@ end;
 procedure TfrmMain.acSaveUpdate(Sender: TObject);
 begin
   acSave.Enabled := (CurrentEditor <> nil) and (CurrentEditor.Modified);
+end;
+
+procedure TfrmMain.CheckFileChangedTimerTimer(Sender: TObject);
+var
+  LFileAge: TDateTime;
+begin
+  CheckFileChangedTimer.Enabled := False;
+  Try
+    //Check if opened files are changed on Disk
+    for var I := 0 to EditFileList.Count -1 do
+    begin
+      var LEditFile := TEditingFile(EditFileList.items[I]);
+      FileAge(LEditFile.FileName, LFileAge);
+      if LFileAge <> LEditFile.FFileAge then
+      begin
+        var LConfirm := StyledMessageDlg(Format(FILE_CHANGED_RELOAD,[LEditFile.FileName]),
+          mtWarning, [mbYes, mbNo], 0);
+        if LConfirm = mrYes then
+        begin
+          LEditFile.ReadFromFile;
+          UpdateTabsheetImage(LEditFile.TabSheet, False);
+          SynEditChange(LEditFile.SynEditor);
+        end
+        else
+          LEditFile.FFileAge := LFileAge;
+      end;
+    end;
+  Finally
+    CheckFileChangedTimer.Enabled := True;
+  End;
 end;
 
 procedure TfrmMain.CloseSplitViewMenu;
@@ -1944,6 +1988,7 @@ begin
     PanelCloseButton.Top := rectOver.Top + ((rectOver.Height div 2) - (PanelCloseButton.Height div 2)) + 1;
 
     PanelCloseButton.Tag := iot;
+    PanelCloseButton.Color := Self.Color;
     PanelCloseButton.Show;
   end
   else

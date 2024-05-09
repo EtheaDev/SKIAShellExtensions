@@ -68,6 +68,7 @@ object frmMain: TfrmMain
       ParentColor = True
       TabOrder = 1
       Visible = False
+      StyleElements = [seFont, seBorder]
       object SVGIconImageCloseButton: TSVGIconImage
         Left = 0
         Top = 0
@@ -109,8 +110,6 @@ object frmMain: TfrmMain
       item
         Width = 80
       end>
-    ExplicitTop = 568
-    ExplicitWidth = 895
   end
   object ImagePanel: TPanel
     Left = 576
@@ -200,7 +199,6 @@ object frmMain: TfrmMain
       Align = alBottom
       ParentBackground = False
       TabOrder = 2
-      ExplicitTop = 498
       object StatusImage: TSVGIconImage
         Left = 1
         Top = 1
@@ -216,8 +214,8 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 36
         Top = 4
-        Width = 4
-        Height = 4
+        Width = 283
+        Height = 26
         Align = alClient
         Alignment = taCenter
         TabOrder = 0
@@ -336,7 +334,6 @@ object frmMain: TfrmMain
     OnClosing = SVClosing
     OnOpened = SVOpened
     OnOpening = SVOpening
-    ExplicitHeight = 532
     object catMenuItems: TCategoryButtons
       Left = 0
       Top = 0
@@ -442,7 +439,6 @@ object frmMain: TfrmMain
       OnGetHint = catMenuItemsGetHint
       OnMouseLeave = catMenuItemsMouseLeave
       OnMouseMove = catMenuItemsMouseMove
-      ExplicitHeight = 532
     end
   end
   object panlTop: TPanel
@@ -456,7 +452,7 @@ object frmMain: TfrmMain
     TabOrder = 4
     object lblTitle: TLabel
       AlignWithMargins = True
-      Left = 41
+      Left = 40
       Top = 3
       Width = 88
       Height = 30
@@ -527,7 +523,7 @@ object frmMain: TfrmMain
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 32
+      Width = 31
       Height = 30
       Align = alLeft
       AutoSize = True
@@ -1224,5 +1220,11 @@ object frmMain: TfrmMain
     Height = 20
     Left = 448
     Top = 368
+  end
+  object CheckFileChangedTimer: TTimer
+    Interval = 3000
+    OnTimer = CheckFileChangedTimerTimer
+    Left = 296
+    Top = 356
   end
 end
