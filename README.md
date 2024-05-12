@@ -1,6 +1,6 @@
 ﻿# SKIA Shell Extensions and Lottie Editor [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Latest Version 1.5.3 - 09 May 2024**
+**Latest Version 1.5.4 - 12 May 2024**
 
 **A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (7, 8, 10 and 11):**
 
@@ -87,6 +87,11 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+12 May 2024: ver. 1.5.4
+- Added StyledComponents (Rounded Buttons options)
+- Added init for GDI+Plus to Dll's
+- Deleted unused images
 
 09 May 2024: ver. 1.5.3
 - Added File Changed notification and reload

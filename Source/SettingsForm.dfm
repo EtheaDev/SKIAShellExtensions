@@ -141,7 +141,7 @@ object UserSettingsForm: TUserSettingsForm
           DesignSize = (
             193
             42)
-          object ResetButton: TButton
+          object ResetButton: TStyledButton
             Left = 9
             Top = 6
             Width = 174
@@ -405,8 +405,8 @@ object UserSettingsForm: TUserSettingsForm
     end
     object stGeneral: TTabSheet
       Caption = 'Preview settings'
-      ImageIndex = 3
-      ImageName = 'arrow-left'
+      ImageIndex = 4
+      ImageName = 'eye-settings'
       object PanelTopPreviewSettings: TPanel
         Left = 0
         Top = 0
@@ -416,30 +416,63 @@ object UserSettingsForm: TUserSettingsForm
         Caption = 'PREVIEW SETTINGS'
         TabOrder = 0
       end
-      object AutoPlayToggleSwitch: TToggleSwitch
+      object RoundedButtonsGroupBox: TGroupBox
         AlignWithMargins = True
-        Left = 3
-        Top = 28
-        Width = 648
-        Height = 32
-        Align = alTop
-        AutoSize = False
-        StateCaptions.CaptionOn = 'Autoplay On'
-        StateCaptions.CaptionOff = 'Autoplay Off'
+        Left = 11
+        Top = 115
+        Width = 314
+        Height = 102
+        Caption = 'Rounded Buttons'
         TabOrder = 1
+        object ToolbarRoundedCheckBox: TCheckBox
+          Left = 15
+          Top = 24
+          Width = 185
+          Height = 17
+          Caption = 'Apply to Toolbars'
+          TabOrder = 0
+        end
+        object ButtonsRoundedCheckBox: TCheckBox
+          Left = 15
+          Top = 47
+          Width = 185
+          Height = 17
+          Caption = 'Apply to Buttons'
+          TabOrder = 1
+        end
+        object MenuRoundedCheckBox: TCheckBox
+          Left = 15
+          Top = 70
+          Width = 185
+          Height = 17
+          Caption = 'Apply to Menu Buttons'
+          TabOrder = 2
+        end
       end
-      object LoopToggleSwitch: TToggleSwitch
+      object AnimationsGroupBox: TGroupBox
         AlignWithMargins = True
-        Left = 3
-        Top = 66
-        Width = 648
-        Height = 32
-        Align = alTop
-        AutoSize = False
-        ParentColor = True
-        StateCaptions.CaptionOn = 'Loop'
-        StateCaptions.CaptionOff = 'No Loop'
+        Left = 11
+        Top = 31
+        Width = 314
+        Height = 78
+        Caption = 'Animations'
         TabOrder = 2
+        object AutoPlayCheckBox: TCheckBox
+          Left = 15
+          Top = 20
+          Width = 185
+          Height = 17
+          Caption = 'AutoPlay'
+          TabOrder = 0
+        end
+        object LoopCheckBox: TCheckBox
+          Left = 15
+          Top = 47
+          Width = 185
+          Height = 17
+          Caption = 'Animation in Loop'
+          TabOrder = 1
+        end
       end
     end
   end
@@ -453,7 +486,7 @@ object UserSettingsForm: TUserSettingsForm
     SimplePanel = True
     UseSystemFont = False
   end
-  object MenuButtonGroup: TButtonGroup
+  object MenuButtonGroup: TStyledButtonGroup
     Left = 0
     Top = 41
     Width = 153

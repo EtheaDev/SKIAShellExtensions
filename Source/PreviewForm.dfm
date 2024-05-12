@@ -28,153 +28,142 @@ inherited FrmPreview: TFrmPreview
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    object ToolBar: TToolBar
+    object StyledToolBar: TStyledToolbar
       Left = 0
       Top = 0
       Width = 609
       Height = 35
       Align = alClient
-      AutoSize = True
       ButtonHeight = 30
-      ButtonWidth = 35
-      EdgeInner = esNone
-      EdgeOuter = esNone
+      ButtonWidth = 30
       Images = SVGIconImageList
       List = True
       TabOrder = 0
-      object ToolButtonPlay: TToolButton
+      object ToolButtonPlay: TStyledToolButton
         Left = 0
         Top = 0
-        Cursor = crHandPoint
         Hint = 'Play/Restart animation'
-        AutoSize = True
+        OnMouseEnter = ToolButtonMouseEnter
+        OnMouseLeave = ToolButtonMouseLeave
+        OnClick = ToolButtonPlayClick
         Caption = 'Play'
         ImageIndex = 13
         ImageName = 'play'
-        OnClick = ToolButtonPlayClick
-        OnMouseEnter = ToolButtonMouseEnter
-        OnMouseLeave = ToolButtonMouseLeave
+        AutoSize = True
       end
-      object ToolButtonInversePlay: TToolButton
-        Left = 35
+      object ToolButtonInversePlay: TStyledToolButton
+        Left = 30
         Top = 0
         Hint = 'Inverse Play/Restart animation'
-        Caption = 'Play inverse'
         Enabled = False
+        OnMouseEnter = ToolButtonMouseEnter
+        OnMouseLeave = ToolButtonMouseLeave
+        OnClick = ToolButtonInversePlayClick
+        Caption = 'Inverse'
         ImageIndex = 15
         ImageName = 'PlayInverse'
-        OnClick = ToolButtonInversePlayClick
+      end
+      object ToolButtonPause: TStyledToolButton
+        Left = 60
+        Top = 0
+        Hint = 'Pause animation'
+        Enabled = False
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonPause: TToolButton
-        Left = 70
-        Top = 0
-        Cursor = crHandPoint
-        Hint = 'Pause animation'
-        AutoSize = True
+        OnClick = ToolButtonPauseClick
         Caption = 'Pause'
-        Enabled = False
         ImageIndex = 12
         ImageName = 'pause'
-        OnClick = ToolButtonPauseClick
-        OnMouseEnter = ToolButtonMouseEnter
-        OnMouseLeave = ToolButtonMouseLeave
+        AutoSize = True
       end
-      object ToolButtonStop: TToolButton
-        Left = 105
+      object ToolButtonStop: TStyledToolButton
+        Left = 90
         Top = 0
         Hint = 'Stop animation'
-        AutoSize = True
-        Caption = 'Stop'
         Enabled = False
-        ImageIndex = 14
-        ImageName = 'Stop'
-        OnClick = ToolButtonStopClick
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonSettings: TToolButton
-        Left = 140
-        Top = 0
-        Cursor = crHandPoint
-        Hint = 'Preview settings...'
+        OnClick = ToolButtonStopClick
+        Caption = 'Stop'
+        ImageIndex = 14
+        ImageName = 'Stop'
         AutoSize = True
+      end
+      object ToolButtonSettings: TStyledToolButton
+        Left = 120
+        Top = 0
+        Hint = 'Preview settings...'
+        OnMouseEnter = ToolButtonMouseEnter
+        OnMouseLeave = ToolButtonMouseLeave
+        OnClick = ToolButtonSettingsClick
+        Visible = False
         Caption = 'Settings...'
         ImageIndex = 11
         ImageName = 'preferences-desktop'
-        Visible = False
-        OnClick = ToolButtonSettingsClick
+        AutoSize = True
+      end
+      object ToolButtonAbout: TStyledToolButton
+        Left = 150
+        Top = 0
+        Hint = 'Show about...'
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonAbout: TToolButton
-        Left = 175
-        Top = 0
-        Cursor = crHandPoint
-        Hint = 'Show about...'
-        AutoSize = True
+        OnClick = ToolButtonAboutClick
+        Visible = False
         Caption = 'About...'
         ImageIndex = 2
         ImageName = 'about'
-        Visible = False
-        OnClick = ToolButtonAboutClick
+        AutoSize = True
+      end
+      object ToolButtonShowText: TStyledToolButton
+        Left = 180
+        Top = 0
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonShowText: TToolButton
-        Left = 210
-        Top = 0
-        Cursor = crHandPoint
-        AutoSize = True
+        OnClick = ToolButtonShowTextClick
+        Visible = False
         Caption = 'Hide text'
         ImageIndex = 1
         ImageName = 'Hide-Text'
-        Visible = False
-        OnClick = ToolButtonShowTextClick
+        AutoSize = True
+      end
+      object ToolButtonReformat: TStyledToolButton
+        Left = 210
+        Top = 0
+        Hint = 'Reformat JSON text'
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonReformat: TToolButton
-        Left = 245
-        Top = 0
-        Cursor = crHandPoint
-        Hint = 'Reformat JSON text'
-        AutoSize = True
+        OnClick = ToolButtonReformatClick
         Caption = 'Format'
         ImageIndex = 10
         ImageName = 'Reformat'
-        OnClick = ToolButtonReformatClick
+        AutoSize = True
+      end
+      object ToolButtonZoomOut: TStyledToolButton
+        Left = 240
+        Top = 0
+        Hint = 'Zoom out (decrease font size)'
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonZoomOut: TToolButton
-        Left = 280
-        Top = 0
-        Cursor = crHandPoint
-        Hint = 'Zoom out (decrease font size)'
-        AutoSize = True
+        OnClick = ToolButtonZoomOutClick
+        Visible = False
         Caption = 'Zoom Out'
         ImageIndex = 7
         ImageName = 'minus'
-        Visible = False
-        OnClick = ToolButtonZoomOutClick
+        AutoSize = True
+      end
+      object ToolButtonZoomIn: TStyledToolButton
+        Left = 270
+        Top = 0
+        Hint = 'Zoom in (increase font size)'
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
-      end
-      object ToolButtonZoomIn: TToolButton
-        Left = 315
-        Top = 0
-        Cursor = crHandPoint
-        Hint = 'Zoom in (increase font size)'
-        AutoSize = True
+        OnClick = ToolButtonZoomInClick
+        Visible = False
         Caption = 'Zoom In'
         ImageIndex = 6
         ImageName = 'plus'
-        Visible = False
-        OnClick = ToolButtonZoomInClick
-        OnMouseEnter = ToolButtonMouseEnter
-        OnMouseLeave = ToolButtonMouseLeave
+        AutoSize = True
       end
     end
   end
@@ -254,7 +243,6 @@ inherited FrmPreview: TFrmPreview
       Height = 40
       Align = alTop
       ParentBackground = False
-      ShowCaption = False
       TabOrder = 0
       object BackgroundGrayScaleLabel: TLabel
         Left = 10

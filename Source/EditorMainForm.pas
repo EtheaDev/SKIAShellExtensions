@@ -58,6 +58,9 @@ uses
   , Vcl.Skia.AnimatedImageEx
   , Vcl.StyledButton
   , Vcl.StyledToolbar
+  , Vcl.ButtonStylesAttributes
+  , Vcl.StyledButtonGroup
+  , Vcl.StyledCategoryButtons
   ;
 
 const
@@ -153,21 +156,21 @@ type
     RightSplitter: TSplitter;
     panelPreview: TPanel;
     SV: TSplitView;
-    catMenuItems: TCategoryButtons;
+    catMenuItems: TStyledCategoryButtons;
     panlTop: TPanel;
     lblTitle: TLabel;
-    SettingsToolBar: TToolBar;
-    ColorSettingsToolButton: TToolButton;
-    EditOptionsToolButton: TToolButton;
+    SettingsToolBar: TStyledToolBar;
+    ColorSettingsToolButton: TStyledToolButton;
+    EditOptionsToolButton: TStyledToolButton;
     VirtualImageList: TVirtualImageList;
     actMenu: TAction;
-    MenuButtonToolbar: TToolBar;
-    ToolButton1: TToolButton;
-    PageSetupToolButton: TToolButton;
-    PrinterSetupToolButton: TToolButton;
-    AboutToolButton: TToolButton;
-    QuitToolButton: TToolButton;
-    ToolButton9: TToolButton;
+    MenuButtonToolbar: TStyledToolBar;
+    ToolButton1: TStyledToolButton;
+    PageSetupToolButton: TStyledToolButton;
+    PrinterSetupToolButton: TStyledToolButton;
+    AbouTStyledToolButton: TStyledToolButton;
+    QuiTStyledToolButton: TStyledToolButton;
+    ToolButton9: TStyledToolButton;
     FlowPanel: TFlowPanel;
     BackgroundTrackBar: TTrackBar;
     BackgroundGrayScaleLabel: TLabel;
@@ -193,15 +196,15 @@ type
     PlayInverseAction: TAction;
     StopAction: TAction;
     PlayerPanel: TPanel;
-    PlayerToolBar: TToolBar;
-    ToolButtonPlay: TToolButton;
-    ToolButtonPause: TToolButton;
+    PlayerToolBar: TStyledToolBar;
+    ToolButtonPlay: TStyledToolButton;
+    ToolButtonPause: TStyledToolButton;
     LoopToggleSwitch: TToggleSwitch;
     TrackBar: TTrackBar;
     RunLabel: TLabel;
     PauseAction: TAction;
-    ToolButtonStop: TToolButton;
-    ToolButtonPlayInverse: TToolButton;
+    ToolButtonStop: TStyledToolButton;
+    ToolButtonPlayInverse: TStyledToolButton;
     CheckFileChangedTimer: TTimer;
     procedure PlayActionExecute(Sender: TObject);
     procedure StopActionExecute(Sender: TObject);
@@ -469,7 +472,18 @@ end;
 
 procedure TEditingFile.LoadFromFile(const AFileName: string);
 begin
-  SynEditor.Lines.LoadFromFile(AFileName, TEncoding.UTF8);
+  try
+    //Try loading UTF-8 file
+    SynEditor.Lines.LoadFromFile(AFileName, TEncoding.UTF8);
+  except
+    on E: EEncodingError do
+    begin
+      //Try to load ANSI file
+      SynEditor.Lines.LoadFromFile(AFileName, TEncoding.ANSI);
+    end
+    else
+      raise;
+  end;
   SynEditor.Modified := False;
   FileAge(AFileName, FFileAge);
 end;
@@ -974,15 +988,24 @@ end;
 
 procedure TfrmMain.acNewFileExecute(Sender: TObject);
 var
-  NewExt : string;
+  NewExt, LNewFileName: string;
   EditingFile : TEditingFile;
+  LCount: Integer;
   NewFileType : TEditFileType;
 begin
   NewExt := 'lottie';
   NewFileType := dmResources.GetEditFileType(NewExt);
 
   //Create object to manage new file
-  EditingFile := TEditingFile.Create(CurrentDir+'New.'+NewExt);
+  LCount := 0;
+  LNewFileName := Format('%s%s.%s', [CurrentDir,'New',NewExt]);
+  while FileExists(LNewFileName) do
+  begin
+    Inc(LCount);
+    LNewFileName := Format('%s%s(%d).%s', [CurrentDir,'New',LCount,NewExt]);
+  end;
+
+  EditingFile := TEditingFile.Create(LNewFileName);
   Try
     AddEditingFile(EditingFile);
     if EditingFile.SynEditor.CanFocus then
@@ -1294,19 +1317,21 @@ begin
     for var I := 0 to EditFileList.Count -1 do
     begin
       var LEditFile := TEditingFile(EditFileList.items[I]);
-      FileAge(LEditFile.FileName, LFileAge);
-      if LFileAge <> LEditFile.FFileAge then
+      if FileAge(LEditFile.FileName, LFileAge) then
       begin
-        var LConfirm := StyledMessageDlg(Format(FILE_CHANGED_RELOAD,[LEditFile.FileName]),
-          mtWarning, [mbYes, mbNo], 0);
-        if LConfirm = mrYes then
+        if LFileAge <> LEditFile.FFileAge then
         begin
-          LEditFile.ReadFromFile;
-          UpdateTabsheetImage(LEditFile.TabSheet, False);
-          SynEditChange(LEditFile.SynEditor);
-        end
-        else
-          LEditFile.FFileAge := LFileAge;
+          var LConfirm := StyledMessageDlg(Format(FILE_CHANGED_RELOAD,[LEditFile.FileName]),
+            mtWarning, [mbYes, mbNo], 0);
+          if LConfirm = mrYes then
+          begin
+            LEditFile.ReadFromFile;
+            UpdateTabsheetImage(LEditFile.TabSheet, False);
+            SynEditChange(LEditFile.SynEditor);
+          end
+          else
+            LEditFile.FFileAge := LFileAge;
+        end;
       end;
     end;
   Finally
@@ -1578,11 +1603,42 @@ begin
 end;
 
 procedure TfrmMain.UpdateFromSettings(AEditor: TSynEdit);
+var
+  LStyle: TStyledButtonDrawType;
 begin
   if AEditor <> nil then
-    FEditorSettings.ReadSettings(AEditor.Highlighter, self.FEditorOptions)
+  begin
+    FEditorSettings.ReadSettings(AEditor.Highlighter, self.FEditorOptions);
+    AEditor.ReadOnly := False;
+  end
   else
     FEditorSettings.ReadSettings(nil, self.FEditorOptions);
+
+  //Rounded Buttons for StyledButtons
+  if FEditorSettings.ButtonDrawRounded then
+    LStyle := btRounded
+  else
+    LStyle := btRoundRect;
+  TStyledButton.RegisterDefaultRenderingStyle(LStyle);
+
+  //Rounded Buttons for StyledToolbars
+  if FEditorSettings.ToolbarDrawRounded then
+    LStyle := btRounded
+  else
+    LStyle := btRoundRect;
+  TStyledToolbar.RegisterDefaultRenderingStyle(LStyle);
+  SettingsToolBar.StyleDrawType := LStyle;
+
+  //Rounded Buttons for menus: StyledCategories and StyledButtonGroup
+  if FEditorSettings.MenuDrawRounded then
+    LStyle := btRounded
+  else
+    LStyle := btRoundRect;
+  TStyledCategoryButtons.RegisterDefaultRenderingStyle(LStyle);
+  TStyledButtonGroup.RegisterDefaultRenderingStyle(LStyle);
+  catMenuItems.StyleDrawType := LStyle;
+  MenuButtonToolbar.StyleDrawType := LStyle;
+
   if FEditorSettings.FontSize >= MinfontSize then
     EditorFontSize := FEditorSettings.FontSize
   else

@@ -28,28 +28,25 @@ object frmMain: TfrmMain
   TextHeight = 15
   object RightSplitter: TSplitter
     Left = 570
-    Top = 36
+    Top = 38
     Width = 6
-    Height = 533
+    Height = 531
     Align = alRight
     AutoSnap = False
     MinSize = 240
-    ExplicitLeft = 741
-    ExplicitTop = 61
-    ExplicitHeight = 500
   end
   object ClientPanel: TPanel
     Left = 44
-    Top = 36
+    Top = 38
     Width = 526
-    Height = 533
+    Height = 531
     Align = alClient
     TabOrder = 0
     object PageControl: TPageControl
       Left = 1
       Top = 1
       Width = 524
-      Height = 531
+      Height = 529
       Align = alClient
       Images = VirtualImageList
       TabOrder = 0
@@ -113,9 +110,9 @@ object frmMain: TfrmMain
   end
   object ImagePanel: TPanel
     Left = 576
-    Top = 36
+    Top = 38
     Width = 323
-    Height = 533
+    Height = 531
     Align = alRight
     BevelOuter = bvNone
     Color = clWhite
@@ -124,15 +121,12 @@ object frmMain: TfrmMain
     StyleElements = []
     object StatusSplitter: TSplitter
       Left = 0
-      Top = 495
+      Top = 493
       Width = 323
       Height = 4
       Cursor = crVSplit
       Align = alBottom
       AutoSnap = False
-      ExplicitLeft = 1
-      ExplicitTop = 487
-      ExplicitWidth = 248
     end
     object panelPreview: TPanel
       Left = 0
@@ -193,7 +187,7 @@ object frmMain: TfrmMain
     end
     object StatusPanel: TPanel
       Left = 0
-      Top = 499
+      Top = 497
       Width = 323
       Height = 34
       Align = alBottom
@@ -223,7 +217,7 @@ object frmMain: TfrmMain
     end
     object PlayerPanel: TPanel
       Left = 0
-      Top = 411
+      Top = 409
       Width = 323
       Height = 84
       Align = alBottom
@@ -246,47 +240,37 @@ object frmMain: TfrmMain
         AutoSize = False
         Caption = '0 %'
         WordWrap = True
-        ExplicitLeft = 49
-        ExplicitTop = 10
-        ExplicitWidth = 157
-        ExplicitHeight = 191
       end
-      object PlayerToolBar: TToolBar
+      object PlayerToolBar: TStyledToolbar
         AlignWithMargins = True
         Left = 4
         Top = 4
         Width = 144
         Height = 37
         Align = alLeft
-        AutoSize = True
         ButtonHeight = 36
         ButtonWidth = 36
-        Color = clYellow
-        DrawingStyle = dsGradient
-        GradientEndColor = clBtnFace
-        GradientStartColor = clBtnFace
         Images = VirtualImageList
-        ParentColor = False
+        Indent = 3
         TabOrder = 0
-        Transparent = True
-        object ToolButtonPlay: TToolButton
+        object ToolButtonPlay: TStyledToolButton
           Left = 0
           Top = 0
           Action = PlayAction
         end
-        object ToolButtonPlayInverse: TToolButton
+        object ToolButtonPlayInverse: TStyledToolButton
           Left = 36
           Top = 0
           Action = PlayInverseAction
         end
-        object ToolButtonPause: TToolButton
+        object ToolButtonPause: TStyledToolButton
           Left = 72
           Top = 0
           Action = PauseAction
         end
-        object ToolButtonStop: TToolButton
-          Left = 108
-          Top = 0
+        object ToolButtonStop: TStyledToolButton
+          Left = 0
+          Top = 36
           Action = StopAction
         end
       end
@@ -334,7 +318,7 @@ object frmMain: TfrmMain
     OnClosing = SVClosing
     OnOpened = SVOpened
     OnOpening = SVOpening
-    object catMenuItems: TCategoryButtons
+    object catMenuItems: TStyledCategoryButtons
       Left = 0
       Top = 0
       Width = 160
@@ -445,100 +429,84 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 899
-    Height = 36
+    Height = 38
     Align = alTop
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 4
     object lblTitle: TLabel
       AlignWithMargins = True
-      Left = 40
+      Left = 41
       Top = 3
       Width = 88
-      Height = 30
+      Height = 32
       Align = alLeft
       Caption = 'Lottie Text Editor'
       Layout = tlCenter
-      ExplicitHeight = 15
     end
-    object SettingsToolBar: TToolBar
+    object SettingsToolBar: TStyledToolbar
       AlignWithMargins = True
       Left = 696
       Top = 3
       Width = 200
-      Height = 30
+      Height = 32
       Align = alRight
-      AutoSize = True
       ButtonHeight = 32
       ButtonWidth = 32
-      Color = clYellow
-      DrawingStyle = dsGradient
-      GradientEndColor = clBtnFace
-      GradientStartColor = clBtnFace
       Images = VirtualImageList
-      ParentColor = False
+      Indent = 3
       TabOrder = 0
-      Transparent = True
-      object ColorSettingsToolButton: TToolButton
+      object ColorSettingsToolButton: TStyledToolButton
         Left = 0
         Top = 0
         Action = actnColorSettings
       end
-      object EditOptionsToolButton: TToolButton
+      object EditOptionsToolButton: TStyledToolButton
         Left = 32
         Top = 0
         Action = actnEditOptions
       end
-      object PageSetupToolButton: TToolButton
+      object PageSetupToolButton: TStyledToolButton
         Left = 64
         Top = 0
         Action = actnPageSetup
       end
-      object PrinterSetupToolButton: TToolButton
+      object PrinterSetupToolButton: TStyledToolButton
         Left = 96
         Top = 0
         Action = actnPrinterSetup
       end
-      object ToolButton9: TToolButton
+      object ToolButton9: TStyledToolButton
         Left = 128
         Top = 0
-        Width = 8
-        ImageIndex = 23
-        ImageName = 'about'
         Style = tbsSeparator
       end
-      object AboutToolButton: TToolButton
-        Left = 136
+      object AbouTStyledToolButton: TStyledToolButton
+        Left = 134
         Top = 0
         Action = acAbout
       end
-      object QuitToolButton: TToolButton
-        Left = 168
+      object QuiTStyledToolButton: TStyledToolButton
+        Left = 166
         Top = 0
         Action = acQuit
         ImageName = 'Exit'
       end
     end
-    object MenuButtonToolbar: TToolBar
+    object MenuButtonToolbar: TStyledToolbar
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 31
-      Height = 30
+      Width = 32
+      Height = 32
       Align = alLeft
       AutoSize = True
       ButtonHeight = 32
       ButtonWidth = 32
-      Color = clYellow
-      DrawingStyle = dsGradient
-      GradientEndColor = clBtnFace
-      GradientStartColor = clBtnFace
       Images = VirtualImageList
-      ParentColor = False
+      Indent = 3
       TabOrder = 1
-      Transparent = True
-      object ToolButton1: TToolButton
-        AlignWithMargins = True
+      object ToolButton1: TStyledToolButton
         Left = 0
         Top = 0
         Action = actMenu

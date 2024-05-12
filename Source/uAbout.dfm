@@ -187,17 +187,18 @@ object FrmAbout: TFrmAbout
     Color = clWindow
     ParentBackground = False
     TabOrder = 0
-    object btnOK: TButton
+    object btnOK: TStyledButton
       Left = 360
       Top = 16
       Width = 75
       Height = 25
+      Cancel = True
       Caption = 'CLOSE'
       Default = True
       TabOrder = 0
       OnClick = btnOKClick
     end
-    object btnIssues: TButton
+    object btnIssues: TStyledButton
       Left = 8
       Top = 16
       Width = 125
@@ -207,7 +208,7 @@ object FrmAbout: TFrmAbout
       TabOrder = 1
       OnClick = btnIssuesClick
     end
-    object btnCheckUpdates: TButton
+    object btnCheckUpdates: TStyledButton
       Left = 139
       Top = 16
       Width = 125
