@@ -3,7 +3,7 @@
 {       VCL Skia4Delphi Extensions: extended Controls of Skia4Delphi/VCL       }
 {       to simplify use animations                                             }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2023 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/Skia4DelphiExtensions                      }
@@ -278,9 +278,9 @@ begin
       LBitmap.SetSize(LWidth, LHeight);
       LRect := TRect.Create(0,0,LWidth, LHeight);
       LBitmap.SkiaDraw(
-        procedure (const ACanvas: ISkCanvas)
+        procedure (const ASkCanvas: ISkCanvas)
         begin
-          RenderFrame(ACanvas, LRect, GetProgress, AOpacity);
+          RenderFrame(ASkCanvas, LRect, GetProgress, AOpacity);
         end
         );
         ACanvas.Draw(LTop, LLeft, LBitmap);

@@ -3,7 +3,7 @@
 {  StyledMessagesHooks: an interposer Unit to use Styled Dialog Boxes          }
 {  using Standard Delphi calls MessageDialog or ShowMessage                    }
 {                                                                              }
-{  Copyright (c) 2022-2024 (Ethea S.r.l.)                                      }
+{  Copyright (c) 2022-2025 (Ethea S.r.l.)                                      }
 {  Author: Carlo Barazzetta                                                    }
 {  Contributors:                                                               }
 {                                                                              }
@@ -34,6 +34,9 @@ uses
   Vcl.Dialogs
   ;
 
+function TaskMessageDlg(const Title, Msg: string; DlgType: TMsgDlgType;
+  Buttons: TMsgDlgButtons; HelpCtx: Longint): Integer;
+
 function MessageDlg(const Msg: string; DlgType: TMsgDlgType;
   Buttons: TMsgDlgButtons; HelpCtx: Longint): Integer;
 
@@ -53,6 +56,12 @@ uses
   Vcl.StyledTaskDialog
   ;
 
+function TaskMessageDlg(const Title, Msg: string; DlgType: TMsgDlgType;
+  Buttons: TMsgDlgButtons; HelpCtx: Longint): Integer;
+begin
+  Result := StyledTaskMessageDlg(Title, Msg, DlgType, Buttons, HelpCtx);
+end;
+
 function MessageDlg(const Msg: string; DlgType: TMsgDlgType;
   Buttons: TMsgDlgButtons; HelpCtx: Longint): Integer;
 begin
@@ -70,7 +79,7 @@ function TaskDlgPos(const Title, Msg: string; DlgType: TMsgDlgType;
   Buttons: TMsgDlgButtons; HelpCtx: Longint;
   X: Integer = -1; Y: Integer = -1): Integer;
 begin
-  Result := StyledTaskDlgPos(Title, Msg, DlgType, Buttons, HelpCtx, X, Y);
+  Result := StyledTaskMessageDlgPos(Title, Msg, DlgType, Buttons, HelpCtx, X, Y);
 end;
 
 procedure ShowMessage(const Msg: string);

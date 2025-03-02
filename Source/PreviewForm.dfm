@@ -115,8 +115,19 @@ inherited FrmPreview: TFrmPreview
         ImageName = 'about'
         AutoSize = True
       end
-      object ToolButtonShowText: TStyledToolButton
+      object ToolButtonEditorSettings: TStyledToolButton
         Left = 180
+        Top = 0
+        Hint = 'Text Settings...'
+        OnMouseEnter = ToolButtonMouseEnter
+        OnMouseLeave = ToolButtonMouseLeave
+        OnClick = ToolButtonEditorSettingsClick
+        Caption = 'Options...'
+        ImageIndex = 3
+        ImageName = 'Support'
+      end
+      object ToolButtonShowText: TStyledToolButton
+        Left = 210
         Top = 0
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
@@ -128,7 +139,7 @@ inherited FrmPreview: TFrmPreview
         AutoSize = True
       end
       object ToolButtonReformat: TStyledToolButton
-        Left = 210
+        Left = 240
         Top = 0
         Hint = 'Reformat JSON text'
         OnMouseEnter = ToolButtonMouseEnter
@@ -140,7 +151,7 @@ inherited FrmPreview: TFrmPreview
         AutoSize = True
       end
       object ToolButtonZoomOut: TStyledToolButton
-        Left = 240
+        Left = 270
         Top = 0
         Hint = 'Zoom out (decrease font size)'
         OnMouseEnter = ToolButtonMouseEnter
@@ -153,7 +164,7 @@ inherited FrmPreview: TFrmPreview
         AutoSize = True
       end
       object ToolButtonZoomIn: TStyledToolButton
-        Left = 270
+        Left = 300
         Top = 0
         Hint = 'Zoom in (increase font size)'
         OnMouseEnter = ToolButtonMouseEnter
@@ -190,14 +201,11 @@ inherited FrmPreview: TFrmPreview
       Font.Name = 'Consolas'
       Font.Pitch = fpFixed
       Font.Style = []
+      Font.Quality = fqClearTypeNatural
       TabOrder = 0
       CodeFolding.GutterShapeSize = 11
-      CodeFolding.CollapsedLineColor = clGrayText
-      CodeFolding.FolderBarLinesColor = clGrayText
       CodeFolding.IndentGuidesColor = clGray
       CodeFolding.IndentGuides = True
-      CodeFolding.ShowCollapsedLine = False
-      CodeFolding.ShowHintMark = True
       UseCodeFolding = False
       BorderStyle = bsNone
       Gutter.Font.Charset = DEFAULT_CHARSET
@@ -205,8 +213,13 @@ inherited FrmPreview: TFrmPreview
       Gutter.Font.Height = -11
       Gutter.Font.Name = 'Consolas'
       Gutter.Font.Style = []
+      Gutter.Font.Quality = fqClearTypeNatural
       Gutter.ShowLineNumbers = True
+      Gutter.Width = 0
+      Gutter.Bands = <>
       ReadOnly = True
+      ScrollbarAnnotations = <>
+      WordWrap = True
       FontSmoothing = fsmNone
     end
   end
@@ -320,7 +333,7 @@ inherited FrmPreview: TFrmPreview
       TabOrder = 1
       object LoopToggleSwitch: TToggleSwitch
         Left = 6
-        Top = 3
+        Top = 5
         Width = 100
         Height = 20
         Margins.Left = 0

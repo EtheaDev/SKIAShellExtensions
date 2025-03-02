@@ -42,6 +42,8 @@ object frmMain: TfrmMain
     Height = 531
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 522
+    ExplicitHeight = 530
     object PageControl: TPageControl
       Left = 1
       Top = 1
@@ -54,6 +56,8 @@ object frmMain: TfrmMain
       OnMouseEnter = PageControlMouseEnter
       OnMouseLeave = PageControlMouseLeave
       OnMouseMove = PageControlMouseMove
+      ExplicitWidth = 520
+      ExplicitHeight = 528
     end
     object PanelCloseButton: TPanel
       Left = 122
@@ -107,6 +111,8 @@ object frmMain: TfrmMain
       item
         Width = 80
       end>
+    ExplicitTop = 568
+    ExplicitWidth = 895
   end
   object ImagePanel: TPanel
     Left = 576
@@ -119,6 +125,8 @@ object frmMain: TfrmMain
     ParentBackground = False
     TabOrder = 2
     StyleElements = []
+    ExplicitLeft = 572
+    ExplicitHeight = 530
     object StatusSplitter: TSplitter
       Left = 0
       Top = 493
@@ -193,6 +201,7 @@ object frmMain: TfrmMain
       Align = alBottom
       ParentBackground = False
       TabOrder = 2
+      ExplicitTop = 496
       object StatusImage: TSVGIconImage
         Left = 1
         Top = 1
@@ -225,6 +234,7 @@ object frmMain: TfrmMain
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 4
+      ExplicitTop = 408
       object RunLabel: TLabel
         AlignWithMargins = True
         Left = 157
@@ -318,6 +328,7 @@ object frmMain: TfrmMain
     OnClosing = SVClosing
     OnOpened = SVOpened
     OnOpening = SVOpening
+    ExplicitHeight = 532
     object catMenuItems: TStyledCategoryButtons
       Left = 0
       Top = 0
@@ -423,6 +434,7 @@ object frmMain: TfrmMain
       OnGetHint = catMenuItemsGetHint
       OnMouseLeave = catMenuItemsMouseLeave
       OnMouseMove = catMenuItemsMouseMove
+      ExplicitHeight = 532
     end
   end
   object panlTop: TPanel
@@ -434,6 +446,7 @@ object frmMain: TfrmMain
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 4
+    ExplicitWidth = 895
     object lblTitle: TLabel
       AlignWithMargins = True
       Left = 41
@@ -443,6 +456,7 @@ object frmMain: TfrmMain
       Align = alLeft
       Caption = 'Lottie Text Editor'
       Layout = tlCenter
+      ExplicitHeight = 15
     end
     object SettingsToolBar: TStyledToolbar
       AlignWithMargins = True

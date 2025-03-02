@@ -22,7 +22,7 @@ unit uCommonPreviewHandler;
 
 interface
 
-{$DEFINE USE_TStreamPreviewHandler}
+{.$DEFINE USE_TStreamPreviewHandler}
 
 uses
   Classes,

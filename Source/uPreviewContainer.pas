@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -95,7 +95,7 @@ begin
   TLogPreview.Add('TPreviewContainer.FormCreate'+
     'ScaleFactor: '+Self.ScaleFactor.ToString+
     'CurrentPPI '+Self.CurrentPPI.ToString);
-  LSettings := TPreviewSettings.CreateSettings(nil);
+  LSettings := TPreviewSettings.CreateSettings(nil, nil);
   try
 {$IFNDEF DISABLE_STYLES}
     if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then

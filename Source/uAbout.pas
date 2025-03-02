@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -171,6 +171,8 @@ procedure TFrmAbout.FormCreate(Sender: TObject);
 var
   FileVersionStr: string;
 begin
+  TitleLabel.Font.Height := Round(TitleLabel.Font.Height * 1.6);
+
   FileVersionStr:=uMisc.GetFileVersion(GetModuleLocation());
   {$IFDEF WIN32}
   LabelVersion.Caption := Format('Version %s (32bit)', [FileVersionStr]);
@@ -180,23 +182,23 @@ begin
   MemoCopyRights.Lines.Add('Author: Carlo Barazzetta - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('Custom icons: Ariel Montes - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('https://github.com/EtheaDev/SKIAShellExtensions');
-  MemoCopyRights.Lines.Add('Copyright © 2022-2024 all rights reserved.');
+  MemoCopyRights.Lines.Add('Copyright © 2022-2025 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Ethea''s libraries and tools used:');
   MemoCopyRights.Lines.Add('SVGIconImageList https://github.com/EtheaDev/SVGIconImageList/');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('The Initial Developer of the Original Code is Rodrigo Ruz V.');
-  MemoCopyRights.Lines.Add('Portions created by Rodrigo Ruz V. are Copyright © 2011-2023 Rodrigo Ruz V.');
+  MemoCopyRights.Lines.Add('Portions created by Rodrigo Ruz V. are Copyright © 2011-2022 Rodrigo Ruz V.');
   MemoCopyRights.Lines.Add('https://github.com/RRUZ/delphi-preview-handler');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Third Party libraries and tools used');
   MemoCopyRights.Lines.Add('SKIA4Delphi - https://skia4delphi.org/');
-  MemoCopyRights.Lines.Add('2021 - 2023 © Skia4Delphi. All rights reserved.');
+  MemoCopyRights.Lines.Add('2021 - 2025 © Skia4Delphi. All rights reserved.');
   MemoCopyRights.Lines.Add('');
-  MemoCopyRights.Lines.Add('SynEdit http://synedit.svn.sourceforge.net/viewvc/synedit/ all rights reserved.');
+  MemoCopyRights.Lines.Add('SynEdit forked by Pyscripter https://github.com/pyscripter/SynEdit/');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Image32 Library - http://www.angusj.com/delphi/image32/Docs/_Body.htm');
-  MemoCopyRights.Lines.Add('Copyright ©2019-2023 Angus Johnson.');
+  MemoCopyRights.Lines.Add('Copyright ©2019-2025 Angus Johnson.');
   MemoCopyRights.Lines.Add('');
 end;
 

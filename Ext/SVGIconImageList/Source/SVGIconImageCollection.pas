@@ -3,7 +3,7 @@
 {       SVGIconImageList: An extended ImageList for Delphi/VCL                 }
 {       to simplify use of SVG Icons (resize, opacity and more...)             }
 {                                                                              }
-{       Copyright (c) 2019-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2019-2025 (Ethea S.r.l.)                                 }
 {       Author: Vincent Parrett                                                }
 {       Contributors: Carlo Barazzetta, Kiriakos Vlahos                        }
 {                                                                              }
@@ -109,10 +109,12 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
-
     function LoadFromFiles(const AFileNames: TStrings;
       const AAppend: Boolean = True): Integer;
-
+    function LoadFromFile(const AFileName: string;
+      out AImageName: string): TSVGIconItem;
+    function SaveToFile(const AFileName: string;
+      const AImageName: string): Boolean;
     function Add(const ASVG: ISVG; const AIconName: string;
        const AGrayScale: Boolean = False;
        const AFixedColor: TColor = SVG_INHERIT_COLOR;
@@ -139,6 +141,7 @@ implementation
 
 uses
   System.SysUtils
+  , VCL.Controls
   , {$IFDEF DXE4+}System.Messaging{$ELSE}SVGMessaging{$ENDIF};
 
 { TSVGIconImageCollection }
@@ -267,6 +270,17 @@ begin
   Result := -1;
 end;
 
+function TSVGIconImageCollection.LoadFromFile(const AFileName: string;
+  out AImageName: string): TSVGIconItem;
+begin
+  SVGIconItems.BeginUpdate;
+  try
+    Result := SVGIconItems.LoadFromFile(AFileName, AImageName);
+  finally
+    SVGIconItems.EndUpdate;
+  end;
+end;
+
 function TSVGIconImageCollection.LoadFromFiles(const AFileNames: TStrings;
   const AAppend: Boolean): Integer;
 begin
@@ -323,6 +337,23 @@ end;
 procedure TSVGIconImageCollection.Remove(const Name: string);
 begin
   Delete(IndexOf(Name));
+end;
+
+function TSVGIconImageCollection.SaveToFile(const AFileName,
+  AImageName: string): Boolean;
+var
+  LOutDir: string;
+  LItem: TSVGIconItem;
+begin
+  Result := False;
+  LItem := SVGIconItems.GetIconByName(AImageName);
+  if Assigned(LItem) then
+  begin
+    LOutDir := ExtractFilePath(AFileName);
+    System.SysUtils.ForceDirectories(LOutDir);
+    LItem.SVG.SaveToFile(AFileName);
+    Result := True;
+  end;
 end;
 
 procedure TSVGIconImageCollection.SetAntiAliasColor(const Value: TColor);
@@ -526,5 +557,14 @@ begin
 
   LSVG.PaintTo(ACanvas.Handle, TRectF.Create(ARect), AProportional);
 end;
+
+initialization
+
+{$IF NOT DEFINED(CLR)}
+  StartClassGroup(VCL.Controls.TControl);
+  ActivateClassGroup(VCL.Controls.TControl);
+  GroupDescendentsWith(TSVGIconImageCollection, VCL.Controls.TControl);
+{$IFEND}
+
 
 end.

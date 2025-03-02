@@ -4,8 +4,8 @@ msbuild.exe "Source\SKIAShellExtensions32.dproj" /target:Clean;Build /p:Platform
 msbuild.exe "Source\LottieTextEditor.dproj" /target:Clean;Build /p:Platform=Win64 /p:config=release
 msbuild.exe "Source\LottieTextEditor.dproj" /target:Clean;Build /p:Platform=Win32 /p:config=release
 
-call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\LottieShellExtensions\Bin32\LottieTextEditor.exe
-call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\LottieShellExtensions\Bin64\LottieTextEditor.exe
+call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\SkiaShellExtensions\Bin32\LottieTextEditor.exe
+call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\SkiaShellExtensions\Bin64\LottieTextEditor.exe
 
 :INNO
 "C:\Program Files (x86)\Inno Setup 6\iscc.exe" "D:\ETHEA\SKIAShellExtensions\Setup\SKIAShellExtensions.iss"

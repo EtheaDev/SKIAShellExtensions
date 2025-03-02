@@ -2,11 +2,11 @@ unit Clipper.Offset;
 
 (*******************************************************************************
 * Author    :  Angus Johnson                                                   *
-* Date      :  14 March 2024                                                   *
-* Website   :  http://www.angusj.com                                           *
-* Copyright :  Angus Johnson 2010-2024                                         *
+* Date      :  22 January 2025                                                 *
+* Website   :  https://www.angusj.com                                          *
+* Copyright :  Angus Johnson 2010-2025                                         *
 * Purpose   :  Path Offset (Inflate/Shrink)                                    *
-* License   :  http://www.boost.org/LICENSE_1_0.txt                            *
+* License   :  https://www.boost.org/LICENSE_1_0.txt                           *
 *******************************************************************************)
 
 {$I Clipper.inc}
@@ -41,8 +41,6 @@ type
 	  endType       : TEndType;
     reversed      : Boolean;
     lowestPathIdx : integer;
-    areasList     : TDoubleArray;
-    isHoleList    : BooleanArray;
     constructor Create(const pathsIn: TPaths64; jt: TJoinType; et: TEndType);
   end;
 
@@ -72,12 +70,19 @@ type
     fDeltaCallback64    : TDeltaCallback64;
 {$IFDEF USINGZ}
     fZCallback64 : TZCallback64;
-    procedure AddPoint(x,y: double; z: Int64); overload;
-{$ELSE}
-    procedure AddPoint(x,y: double); overload;
-{$ENDIF}
+    procedure ZCB(const bot1, top1, bot2, top2: TPoint64;
+      var intersectPt: TPoint64);
+    procedure AddPoint(x,y: double; z: ZType); overload;
     procedure AddPoint(const pt: TPoint64); overload;
       {$IFDEF INLINING} inline; {$ENDIF}
+    procedure AddPoint(const pt: TPoint64; newZ: ZType); overload;
+      {$IFDEF INLINING} inline; {$ENDIF}
+{$ELSE}
+    procedure AddPoint(x,y: double); overload;
+
+    procedure AddPoint(const pt: TPoint64); overload;
+      {$IFDEF INLINING} inline; {$ENDIF}
+{$ENDIF}
     procedure DoSquare(j, k: Integer);
     procedure DoBevel(j, k: Integer);
     procedure DoMiter(j, k: Integer; cosA: Double);
@@ -86,7 +91,7 @@ type
 
     procedure BuildNormals;
     procedure DoGroupOffset(group: TGroup);
-    procedure OffsetPolygon(isShrinking: Boolean; area_: double);
+    procedure OffsetPolygon;
     procedure OffsetOpenJoined;
     procedure OffsetOpenPath;
     function CalcSolutionCapacity: integer;
@@ -136,6 +141,20 @@ resourcestring
 const
   TwoPi     : Double = 2 * PI;
   InvTwoPi  : Double = 1/(2 * PI);
+
+// Clipper2 approximates arcs by using series of relatively short straight
+//line segments. And logically, shorter line segments will produce better arc
+// approximations. But very short segments can degrade performance, usually
+// with little or no discernable improvement in curve quality. Very short
+// segments can even detract from curve quality, due to the effects of integer
+// rounding. Since there isn't an optimal number of line segments for any given
+// arc radius (that perfectly balances curve approximation with performance),
+// arc tolerance is user defined. Nevertheless, when the user doesn't define
+// an arc tolerance (ie leaves alone the 0 default value), the calculated
+// default arc tolerance (offset_radius / 500) generally produces good (smooth)
+// arc approximations without producing excessively small segment lengths.
+// See also: https://www.angusj.com/clipper2/Docs/Trigonometry.htm
+const arc_const = 0.002; // <-- 1/500
 
 //------------------------------------------------------------------------------
 //  Miscellaneous offset support functions
@@ -232,9 +251,7 @@ end;
 constructor TGroup.Create(const pathsIn: TPaths64; jt: TJoinType; et: TEndType);
 var
   i, len: integer;
-  a: double;
   isJoined: boolean;
-  pb: PBoolean;
 begin
   Self.joinType := jt;
   Self.endType := et;
@@ -246,29 +263,13 @@ begin
     paths[i] := StripDuplicates(pathsIn[i], isJoined);
 
   reversed := false;
-	SetLength(isHoleList, len);
-	SetLength(areasList, len);
   if (et = etPolygon) then
   begin
-    pb := @isHoleList[0];
-    for i := 0 to len -1 do
-    begin
-      a := Area(paths[i]);
-      pb^ := a < 0;
-      inc(pb);
-    end;
-
     // the lowermost path must be an outer path, so if its orientation is
     // negative, then flag that the whole group is 'reversed' (so negate
     // delta etc.) as this is much more efficient than reversing every path.
 	  lowestPathIdx := GetLowestPolygonIdx(pathsIn);
-    reversed := (lowestPathIdx >= 0) and isHoleList[lowestPathIdx];
-    if not reversed then Exit;
-    pb := @isHoleList[0];
-    for i := 0 to len -1 do
-    begin
-      pb^ := not pb^; inc(pb);
-    end;
+    reversed := (lowestPathIdx >= 0) and (Area(pathsIn[lowestPathIdx]) < 0);
   end else
     lowestPathIdx := -1;
 end;
@@ -357,7 +358,6 @@ var
   i,j, len, steps: Integer;
   r, stepsPer360, arcTol: Double;
   absDelta: double;
-  isShrinking: Boolean;
   rec: TRect64;
   pt0: TPoint64;
 begin
@@ -378,13 +378,12 @@ begin
   if (group.joinType = jtRound) or (group.endType = etRound) then
   begin
 		// calculate the number of steps required to approximate a circle
-    // (see http://www.angusj.com/clipper2/Docs/Trigonometry.htm)
+    // (see https://www.angusj.com/clipper2/Docs/Trigonometry.htm)
 		// arcTol - when arc_tolerance_ is undefined (0) then curve imprecision
     // will be relative to the size of the offset (delta). Obviously very
     //large offsets will almost always require much less precision.
-    arcTol := Iif(fArcTolerance > 0.01,
-      Min(absDelta, fArcTolerance),
-      Log10(2 + absDelta) * 0.25); // empirically derived
+    arcTol := Iif(fArcTolerance > 0.0,
+      Min(absDelta, fArcTolerance), absDelta * arc_const);
 
     stepsPer360 := Pi / ArcCos(1 - arcTol / absDelta);
 		if (stepsPer360 > absDelta * Pi) then
@@ -397,9 +396,6 @@ begin
 
   for i := 0 to High(group.paths) do
   begin
-    isShrinking := (group.endType = etPolygon) and
-      (group.reversed = ((fGroupDelta < 0) = group.isHoleList[i]));
-
     fInPath := group.paths[i];
     fNorms := nil;
     len := Length(fInPath);
@@ -450,7 +446,7 @@ begin
 
     BuildNormals;
     if fEndType = etPolygon then
-      OffsetPolygon(isShrinking, group.areasList[i])
+      OffsetPolygon
     else if fEndType = etJoined then
       OffsetOpenJoined
     else
@@ -465,6 +461,7 @@ var
 begin
   len := Length(fInPath);
   SetLength(fNorms, len);
+  if len = 0 then Exit;
   for i := 0 to len-2 do
     fNorms[i] := GetUnitNormal(fInPath[i], fInPath[i+1]);
   fNorms[len -1] := GetUnitNormal(fInPath[len -1], fInPath[0]);
@@ -495,33 +492,26 @@ begin
 end;
 //------------------------------------------------------------------------------
 
-procedure TClipperOffset.OffsetPolygon(isShrinking: Boolean; area_: double);
+procedure TClipperOffset.OffsetPolygon;
 var
   i,j: integer;
 begin
   j := high(fInPath);
   for i := 0 to high(fInPath) do
     OffsetPoint(i, j);
-
-  // make sure that polygon areas aren't reversing which would indicate
-  // that the polygon has shrunk too far and that it should be discarded.
-  // See also - #593 & #715
-  if isShrinking and (area_ <> 0) and // area = 0.0 when JoinType.Joined
-    ((area_ < 0) <> (Area(fOutPath) < 0)) then Exit;
-
   UpdateSolution;
 end;
 //------------------------------------------------------------------------------
 
 procedure TClipperOffset.OffsetOpenJoined;
 begin
-  OffsetPolygon(false, 0);
+  OffsetPolygon;
   fInPath := ReversePath(fInPath);
   // Rebuild normals // BuildNormals;
   fNorms := ReversePath(fNorms);
   fNorms := ShiftPath(fNorms, 1);
   fNorms := NegatePath(fNorms);
-  OffsetPolygon(true, 0);
+  OffsetPolygon;
 end;
 //------------------------------------------------------------------------------
 
@@ -647,6 +637,10 @@ begin
     PreserveCollinear := fPreserveCollinear;
     // the solution should retain the orientation of the input
     ReverseSolution := fReverseSolution <> pathsReversed;
+{$IFDEF USINGZ}
+    ZCallback := ZCB;
+{$ENDIF}
+
     AddSubject(fSolution);
     if assigned(fSolutionTree) then
       Execute(ctUnion, fillRule, fSolutionTree, dummy);
@@ -701,7 +695,21 @@ end;
 //------------------------------------------------------------------------------
 
 {$IFDEF USINGZ}
-procedure TClipperOffset.AddPoint(x,y: double; z: Int64);
+procedure TClipperOffset.ZCB(const bot1, top1, bot2, top2: TPoint64;
+  var intersectPt: TPoint64);
+begin
+  if (bot1.Z <> 0) and
+    ((bot1.Z = bot2.Z) or (bot1.Z = top2.Z)) then intersectPt.Z := bot1.Z
+  else if (bot2.Z <> 0) and (bot2.Z = top1.Z) then intersectPt.Z := bot2.Z
+  else if (top1.Z <> 0) and (top1.Z = top2.Z) then intersectPt.Z := top1.Z
+  else if Assigned(ZCallback) then
+    ZCallback(bot1, top1, bot2, top2, intersectPt);
+end;
+{$ENDIF}
+//------------------------------------------------------------------------------
+
+{$IFDEF USINGZ}
+procedure TClipperOffset.AddPoint(x,y: double; z: ZType);
 {$ELSE}
 procedure TClipperOffset.AddPoint(x,y: double);
 {$ENDIF}
@@ -724,22 +732,33 @@ begin
 end;
 //------------------------------------------------------------------------------
 
-procedure TClipperOffset.AddPoint(const pt: TPoint64);
-begin
 {$IFDEF USINGZ}
-  AddPoint(pt.X, pt.Y, pt.Z);
-{$ELSE}
-  AddPoint(pt.X, pt.Y);
-{$ENDIF}
+procedure TClipperOffset.AddPoint(const pt: TPoint64; newZ: ZType);
+begin
+  AddPoint(pt.X, pt.Y, newZ);
 end;
 //------------------------------------------------------------------------------
+
+procedure TClipperOffset.AddPoint(const pt: TPoint64);
+begin
+  AddPoint(pt.X, pt.Y, pt.Z);
+end;
+//------------------------------------------------------------------------------
+
+{$ELSE}
+procedure TClipperOffset.AddPoint(const pt: TPoint64);
+begin
+  AddPoint(pt.X, pt.Y);
+end;
+//------------------------------------------------------------------------------
+{$ENDIF}
 
 function IntersectPoint(const ln1a, ln1b, ln2a, ln2b: TPointD): TPointD;
 var
   m1,b1,m2,b2: double;
 begin
   result := NullPointD;
-  //see http://astronomy.swin.edu.au/~pbourke/geometry/lineline2d/
+  //see https://paulbourke.net/geometry/pointlineplane/#i2l
   if (ln1B.X = ln1A.X) then
   begin
     if (ln2B.X = ln2A.X) then exit; //parallel lines
@@ -911,10 +930,8 @@ begin
     // when fDeltaCallback64 is assigned, fGroupDelta won't be constant,
     // so we'll need to do the following calculations for *every* vertex.
     absDelta := Abs(fGroupDelta);
-    arcTol := Iif(fArcTolerance > 0.01,
-      Min(absDelta, fArcTolerance),
-      Log10(2 + absDelta) * 0.25); // empirically derived
-    //http://www.angusj.com/clipper2/Docs/Trigonometry.htm
+    arcTol := Iif(fArcTolerance > 0.0,
+      Min(absDelta, fArcTolerance), absDelta * arc_const);
     stepsPer360 := Pi / ArcCos(1 - arcTol / absDelta);
 		if (stepsPer360 > absDelta * Pi) then
 			stepsPer360 := absDelta * Pi;  // avoid excessive precision
@@ -984,11 +1001,20 @@ begin
   if (cosA > -0.999) and (sinA * fGroupDelta < 0) then
   begin
     // is concave
+    // by far the simplest way to construct concave joins, especially those
+    // joining very short segments, is to insert 3 points that produce negative
+    // regions. These regions will be removed later by the finishing union
+    // operation. This is also the best way to ensure that path reversals
+    // (ie over-shrunk paths) are removed.
+{$IFDEF USINGZ}
+    AddPoint(GetPerpendic(fInPath[j], fNorms[k], fGroupDelta), fInPath[j].Z);
+    AddPoint(fInPath[j]); // (#405, #873)
+    AddPoint(GetPerpendic(fInPath[j], fNorms[j], fGroupDelta), fInPath[j].Z);
+{$ELSE}
     AddPoint(GetPerpendic(fInPath[j], fNorms[k], fGroupDelta));
-    // this extra point is the only (simple) way to ensure that
-    // path reversals are fully cleaned with the trailing clipper
-    AddPoint(fInPath[j]); // (#405)
+    AddPoint(fInPath[j]); // (#405, #873)
     AddPoint(GetPerpendic(fInPath[j], fNorms[j], fGroupDelta));
+{$ENDIF}
   end
   else if (cosA > 0.999) and (fJoinType <> jtRound) then
   begin

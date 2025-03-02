@@ -138,7 +138,7 @@ begin
         DragQueryFile(medium.hGlobal, 0, PChar (FFileName), 1000);
         // realign string
         FFileName := PChar(FFileName);
-        FSettings := TPreviewSettings.CreateSettings(nil);
+        FSettings := TPreviewSettings.CreateSettings(nil, nil);
         TLogPreview.Add('FFileName: '+FFileName);
         LFileExt := ExtractFileExt(FFileName);
         // only for lottie files

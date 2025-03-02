@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -38,7 +38,6 @@ uses
   Vcl.CategoryButtons, Vcl.WinXCtrls, System.ImageList, Vcl.VirtualImageList,
   uSettings
   , Vcl.PlatformVclStylesActnCtrls
-  {$IFNDEF NO_VCL_STYLES}
   , Vcl.Styles.Fixes
   , Vcl.Styles.FormStyleHooks
   , Vcl.Styles.NC
@@ -53,7 +52,6 @@ uses
   , Vcl.Styles.Utils.ComCtrls
   , Vcl.Styles.Utils.StdCtrls
   , Vcl.Styles.Ext
-  {$ENDIF}
   , uDragDropUtils
   , Vcl.Skia.AnimatedImageEx
   , Vcl.StyledButton
@@ -65,6 +63,9 @@ uses
 
 const
   SET_FILE_NAME = 'HiglightSettings';
+  SV_COLLAPSED_WIDTH = 42;
+  SV_COLLAPSED_WIDTH_WITH_SCROLLBARS = 60;
+
 
 resourcestring
   PAGE_HEADER_FIRST_LINE_LEFT = '$TITLE$';
@@ -1159,7 +1160,6 @@ begin
 
     //Assign user preferences to the editor
     FEditorOptions.AssignTo(LEditor);
-    LEditor.MaxScrollWidth := 3000;
     EditingFile.SynEditor := LEditor;
     UpdateFromSettings(LEditor);
     UpdateHighlighter(LEditor);
@@ -1931,9 +1931,9 @@ procedure TfrmMain.AdjustCompactWidth;
 begin
   //Change size of compact because Scrollbars appears
   if (Height / ScaleFactor) > 900 then
-    SV.CompactWidth := Round(44 * ScaleFactor)
+    SV.CompactWidth := Round(SV_COLLAPSED_WIDTH * ScaleFactor)
   else
-    SV.CompactWidth := Round(66 * ScaleFactor);
+    SV.CompactWidth := Round(SV_COLLAPSED_WIDTH_WITH_SCROLLBARS * ScaleFactor);
   if PageControl.Width < 100 then
     ImagePanel.Width := Width div 3;
 end;
@@ -2073,7 +2073,7 @@ begin
   //This is an event-handler for exceptions that replace Delphi standard handler
   if E is EAccessViolation then
   begin
-    if StyledMessageDlg(STR_UNEXPECTED_ERROR,
+    if StyledTaskMessageDlg(STR_UNEXPECTED_ERROR,
       Format('Unexpected Error: %s%s',[sLineBreak,E.Message]),
       TMsgDlgType.mtError,
       [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbAbort], 0) = mrAbort then
@@ -2082,7 +2082,7 @@ begin
   else
   begin
 
-    StyledMessageDlg(STR_ERROR,
+    StyledTaskMessageDlg(STR_ERROR,
       Format('Error: %s%s',[sLineBreak,E.Message]),
       TMsgDlgType.mtError,
       [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbHelp], 0);

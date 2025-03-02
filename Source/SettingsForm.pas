@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, Lottie Editor)                         }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -96,6 +96,9 @@ type
     AnimationsGroupBox: TGroupBox;
     AutoPlayCheckBox: TCheckBox;
     LoopCheckBox: TCheckBox;
+    ActiveLineColorGroupBox: TGroupBox;
+    DarkActiveLineColorColorBox: TColorBox;
+    LightActiveLineColorColorBox: TColorBox;
     procedure BoxElementsClick(Sender: TObject);
     procedure cbForegroundClick(Sender: TObject);
     procedure cbBackgroundClick(Sender: TObject);
@@ -309,6 +312,8 @@ begin
 {$ENDIF}
   SynEdit.Highlighter.Assign(dmResources.GetSynHighlighter(
     SelectedStyleIsDark, LBackGroundColor));
+  DarkActiveLineColorColorBox.Selected := default_darkactivelinecolor;
+  LightActiveLineColorColorBox.Selected := default_lightactivelinecolor;
 end;
 
 procedure TUserSettingsForm.RefreshMap;
@@ -545,6 +550,10 @@ begin
   ToolbarRoundedCheckBox.Checked := ASettings.ToolbarDrawRounded;
   ButtonsRoundedCheckBox.Checked := ASettings.ButtonDrawRounded;
   MenuRoundedCheckBox.Checked := ASettings.MenuDrawRounded;
+
+  DarkActiveLineColorColorBox.Selected := TEditorSettings(ASettings).DarkActiveLineColor;
+  LightActiveLineColorColorBox.Selected := TEditorSettings(ASettings).LightActiveLineColor;
+
   PopulateAvailThemes;
 end;
 
@@ -579,6 +588,11 @@ begin
   ASettings.ToolbarDrawRounded := ToolbarRoundedCheckBox.Checked;
   ASettings.ButtonDrawRounded := ButtonsRoundedCheckBox.Checked;
   ASettings.MenuDrawRounded := MenuRoundedCheckBox.Checked;
+  if ASettings is TEditorSettings then
+  begin
+    TEditorSettings(ASettings).DarkActiveLineColor := DarkActiveLineColorColorBox.Selected;
+    TEditorSettings(ASettings).LightActiveLineColor := LightActiveLineColorColorBox.Selected;
+  end;
 end;
 
 procedure TUserSettingsForm.MenuButtonGroupButtonClicked(Sender: TObject;
@@ -651,6 +665,8 @@ begin
     SelectThemeRadioGroup.OnClick := SelectThemeRadioGroupClick;
     SelectThemeRadioGroupClick(SelectThemeRadioGroup);
   end;
+  DarkActiveLineColorColorBox.Visible := not IsLight;
+  LightActiveLineColorColorBox.Visible := IsLight;
 end;
 
 procedure TUserSettingsForm.ExitFromSettings(Sender: TObject);
