@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -38,9 +38,9 @@ uses
   Vcl.CategoryButtons, Vcl.WinXCtrls, System.ImageList, Vcl.VirtualImageList,
   uSettings
   , Vcl.PlatformVclStylesActnCtrls
+  {$IFNDEF NO_VCL_STYLES}
   , Vcl.Styles.Fixes
   , Vcl.Styles.FormStyleHooks
-  , Vcl.Styles.NC
   , Vcl.Styles.OwnerDrawFix
   , Vcl.Styles.Utils.ScreenTips
   , Vcl.Styles.Utils.SysStyleHook
@@ -52,6 +52,7 @@ uses
   , Vcl.Styles.Utils.ComCtrls
   , Vcl.Styles.Utils.StdCtrls
   , Vcl.Styles.Ext
+  {$ENDIF}
   , uDragDropUtils
   , Vcl.Skia.AnimatedImageEx
   , Vcl.StyledButton
@@ -59,39 +60,20 @@ uses
   , Vcl.ButtonStylesAttributes
   , Vcl.StyledButtonGroup
   , Vcl.StyledCategoryButtons
+  , PageControlHook
   ;
 
 const
   SET_FILE_NAME = 'HiglightSettings';
   SV_COLLAPSED_WIDTH = 42;
   SV_COLLAPSED_WIDTH_WITH_SCROLLBARS = 60;
-
-
-resourcestring
-  PAGE_HEADER_FIRST_LINE_LEFT = '$TITLE$';
-  PAGE_HEADER_FIRST_LINE_RIGHT = 'Page count: $PAGECOUNT$';
-  PAGE_FOOTER_FIRST_LINE_LEFT = 'Print Date: $DATE$. Time: $TIME$';
-  PAGE_FOOTER_FIRST_LINE_RIGHT = 'Page $PAGENUM$ of $PAGECOUNT$';
-  FILE_NOT_FOUND = 'File "%s" not found!';
-  SMODIFIED = 'Changed';
-  SUNMODIFIED = 'Not changed';
-  STATE_READONLY = 'ReadOnly';
-  STATE_INSERT = 'Insert';
-  STATE_OVERWRITE = 'Overwrite';
-  CLOSING_PROBLEMS = 'Problem closing!';
-  STR_ERROR = 'ERROR!';
-  STR_UNEXPECTED_ERROR = 'UNEXPECTED ERROR!';
-  CONFIRM_CHANGES = 'ATTENTION: the content of file "%s" is changed: do you want to save the file?';
-  LOTTIE_PARSING_OK = 'Lottie Parsing is correct.';
-  FILE_CHANGED_RELOAD = 'File "%s" Date/Time changed! Do you want to reload it?';
+  TABSHEET_IMAGE = 'lottie-logo';
 
 type
   TEditingFile = class
   private
-    FIcon : TIcon;
     FFileName : string;
     FFileAge: TDateTime;
-    FName : string;
     FExtension: string;
     procedure ReadFromFile;
     procedure SaveToFile;
@@ -99,23 +81,26 @@ type
     function GetName: string;
     procedure SetFileName(const Value: string);
     procedure LoadFromFile(const AFileName: string);
+    function GetImageName: string;
+    procedure UpdateTabSheetCaption;
   public
     EditFileType: TEditFileType;
     SynEditor: TSynEdit;
     TabSheet: TTabSheet;
-    Constructor Create(const EditFileName : string);
+    constructor Create(const EditFileName : string);
     Destructor Destroy; override;
     property FileName: string read GetFileName write SetFileName; //with full path
     property Name: string read GetName; //only name of file
+    property ImageName: string read GetImageName;
     property Extension : string read FExtension;
   end;
 
   TfrmMain = class(TForm, IDragDrop)
-    OpenDialog: TOpenDialog;
+    OpenDialog: TFileOpenDialog;
     ActionList: TActionList;
     acOpenFile: TAction;
     acSave: TAction;
-    SaveDialog: TSaveDialog;
+    SaveDialog: TFileSaveDialog;
     acEditCut: TEditCut;
     acEditCopy: TEditCopy;
     acEditPaste: TEditPaste;
@@ -152,7 +137,6 @@ type
     actnColorSettings: TAction;
     actnFormatJSON: TAction;
     SynEditSearch: TSynEditSearch;
-    PageControl: TPageControl;
     ImagePanel: TPanel;
     RightSplitter: TSplitter;
     panelPreview: TPanel;
@@ -160,18 +144,18 @@ type
     catMenuItems: TStyledCategoryButtons;
     panlTop: TPanel;
     lblTitle: TLabel;
-    SettingsToolBar: TStyledToolBar;
+    SettingsToolBar: TStyledToolbar;
     ColorSettingsToolButton: TStyledToolButton;
     EditOptionsToolButton: TStyledToolButton;
     VirtualImageList: TVirtualImageList;
     actMenu: TAction;
-    MenuButtonToolbar: TStyledToolBar;
-    ToolButton1: TStyledToolButton;
+    MenuButtonToolbar: TStyledToolbar;
+    MenuToolButton: TStyledToolButton;
     PageSetupToolButton: TStyledToolButton;
     PrinterSetupToolButton: TStyledToolButton;
-    AbouTStyledToolButton: TStyledToolButton;
-    QuiTStyledToolButton: TStyledToolButton;
-    ToolButton9: TStyledToolButton;
+    AboutToolButton: TStyledToolButton;
+    QuitToolButton: TStyledToolButton;
+    SepToolButton: TStyledToolButton;
     FlowPanel: TFlowPanel;
     BackgroundTrackBar: TTrackBar;
     BackgroundGrayScaleLabel: TLabel;
@@ -181,18 +165,17 @@ type
     CloseMenuItem: TMenuItem;
     Sep1MenuItem: TMenuItem;
     SelectAllMenuItem: TMenuItem;
-    Reformattext1: TMenuItem;
+    ReformatTextMenuItem: TMenuItem;
     ImagePreviewPanel: TPanel;
     ExportToPNGAction: TAction;
     N1: TMenuItem;
+    CloseAllMenuItem: TMenuItem;
     ExporttoPNGMenuItem: TMenuItem;
     StatusPanel: TPanel;
     StatusImage: TSVGIconImage;
     StatusStaticText: TStaticText;
     StatusSplitter: TSplitter;
-    CloseAll1: TMenuItem;
     VirtualImageList20: TVirtualImageList;
-    PanelCloseButton: TPanel;
     PlayAction: TAction;
     PlayInverseAction: TAction;
     StopAction: TAction;
@@ -207,6 +190,7 @@ type
     ToolButtonStop: TStyledToolButton;
     ToolButtonPlayInverse: TStyledToolButton;
     CheckFileChangedTimer: TTimer;
+    ClientPanel: TPanel;
     procedure PlayActionExecute(Sender: TObject);
     procedure StopActionExecute(Sender: TObject);
     procedure WMGetMinMaxInfo(var Message: TWMGetMinMaxInfo); message WM_GETMINMAXINFO;
@@ -279,20 +263,22 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure acEditCopyUpdate(Sender: TObject);
     procedure TrackBarChange(Sender: TObject);
     procedure LoopToggleSwitchClick(Sender: TObject);
     procedure SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure PauseActionExecute(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure acEditCopyUpdate(Sender: TObject);
     procedure PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
+    procedure TabSheetCloseButtonClick(Sender: TObject);
     procedure PlayInverseActionExecute(Sender: TObject);
-    procedure PageControlMouseEnter(Sender: TObject);
-    procedure PageControlMouseLeave(Sender: TObject);
-    procedure SVGIconImageCloseButtonClick(Sender: TObject);
     procedure CheckFileChangedTimerTimer(Sender: TObject);
+    procedure AppDeactivate(Sender: TObject);
+    procedure AppActivate(Sender: TObject);
   private
+    PageControl: TPageControlEx;
+    FEditingInProgress: Boolean;
     FirstAction: Boolean;
     SkAnimatedImageEx: TSkAnimatedImageEx;
     SkAnimatedImageEx16: TSkAnimatedImageEx;
@@ -302,7 +288,7 @@ type
     MinFormWidth, MinFormHeight, MaxFormWidth, MaxFormHeight: Integer;
     FProcessingFiles: Boolean;
     FEditorSettings: TEditorSettings;
-    currentDir: string;
+    CurrentDir: string;
     EditFileList: TObjectList;
     fSearchFromCaret: boolean;
     gbSearchBackwards: boolean;
@@ -330,15 +316,17 @@ type
     procedure UpdateFromSettings(AEditor: TSynEdit);
     function DialogPosRect: TRect;
     procedure AdjustCompactWidth;
+    procedure AdjustViewerWidth(const ACenter: Boolean = False);
     function OpenFile(const FileName: string;
       const ARaiseError: Boolean = True): Boolean;
-    function AddEditingFile(EditingFile: TEditingFile): Integer;
+    function AddEditingFile(const EditingFile: TEditingFile): Integer;
     procedure RemoveEditingFile(EditingFile: TEditingFile);
     function CurrentEditFile: TEditingFile;
     function CurrentEditor: TSynEdit;
     function ModifiedCount: integer;
     procedure InitSynEditPrint;
     procedure InitEditorOptions;
+    procedure InitDialog(const ADialog: TCustomFileDialog; const ADefaultFolder: string);
     procedure SetSynEditPrintProperties(SynEditPrint : TSynEditPrint);
     procedure UpdateEditorsOptions;
     function CurrentEditorState : string;
@@ -355,15 +343,18 @@ type
     function CreateAnimatedImageEx(const AParent: TWinControl; const ALeft,
       ATop, AWidth, AHeight: Integer; const AHint: string): TSkAnimatedImageEx;
     procedure UpdatePlayerControls;
-    procedure ConfirmChanges(EditingFile: TEditingFile);
     procedure SkAnimatedImageAnimationProcess(Sender: TObject);
     procedure UpdateRunLabel;
-    procedure ShowTabCloseButtonOnHotTab;
+    procedure ConfirmChanges(EditingFile: TEditingFile);
     procedure UpdateTabsheetImage(ATabSheet: TTabSheet; AModified: Boolean);
+    procedure UpdateRightSplitterPos;
     property EditorFontSize: Integer read FFontSize write SetEditorFontSize;
+    procedure CreatePageControl;
   protected
+    procedure CreateParams(var Params: TCreateParams); override;
     procedure CreateWindowHandle(const Params: TCreateParams); override;
     procedure DestroyWindowHandle; override;
+    procedure WMCopyData(var Msg: TWMCopyData); message WM_COPYDATA;
   public
     procedure ManageExceptions(Sender: TObject; E: Exception);
   end;
@@ -390,8 +381,8 @@ uses
   , FSynHighlightProp
   , Math
   , Winapi.SHFolder
-  , dlgExportPNG
   , SettingsForm
+  , uSingleInstance
   , Vcl.StyledTaskDialog
   ;
 
@@ -424,20 +415,15 @@ begin
 end;
 
 constructor TEditingFile.Create(const EditFileName: string);
-var
-  Filter : Word;
 begin
   inherited Create;
-
+  {$IFNDEF NO_VCL_STYLES}
   if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
     TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
+  {$ENDIF}
 
   FileName := EditFileName;
   Fextension := ExtractFileExt(FileName);
-
-  FIcon := TIcon.Create;
-  if FileExists(FileName) then
-    FIcon.Handle := ExtractAssociatedIcon(hInstance, PChar(DoubleQuote(FileName)),Filter);
 end;
 
 function TEditingFile.GetFileName: string;
@@ -445,9 +431,24 @@ begin
   Result := FFileName;
 end;
 
+function TEditingFile.GetImageName: string;
+begin
+  Result := TABSHEET_IMAGE;
+end;
+
 function TEditingFile.GetName: string;
 begin
-  Result := FName;
+  Result := ExtractFileName(FFileName);
+end;
+
+procedure TEditingFile.UpdateTabSheetCaption;
+begin
+  if TabSheet <> nil then
+  begin
+    TabSheet.Caption := Name+'      '; //Spaces for Close Button space
+    TabSheet.Hint := FFileName;
+    TabSheet.ShowHint := True;
+  end;
 end;
 
 procedure TEditingFile.SetFileName(const Value: string);
@@ -455,19 +456,13 @@ var
   Ext : string;
 begin
   FFileName := Value;
-  FName := ExtractFileName(FFileName);
   Ext := ExtractFileExt(FFileName);
   EditFileType := dmResources.GetEditFileType(Ext);
-  if TabSheet <> nil then
-  begin
-    TabSheet.Caption := Name;
-    TabSheet.Hint := FFileName;
-  end;
+  UpdateTabSheetCaption;
 end;
 
 destructor TEditingFile.Destroy;
 begin
-  FreeAndNil(FIcon);
   inherited;
 end;
 
@@ -486,6 +481,7 @@ begin
       raise;
   end;
   SynEditor.Modified := False;
+  SynEditor.OnChange(SynEditor);
   FileAge(AFileName, FFileAge);
 end;
 
@@ -527,6 +523,7 @@ function TfrmMain.OpenFile(const FileName : string;
 var
   EditingFile: TEditingFile;
   I, J: Integer;
+  LErrorMsg: string;
 begin
   Screen.Cursor := crHourGlass;
   Try
@@ -535,7 +532,7 @@ begin
     begin
       if not CanAcceptFileName(FileName) then
         raise Exception.CreateFmt('Cannot open file with extensions different from "%s"',
-        [AcceptedExtensions]);
+          [AcceptedExtensions]);
 
       //looking for the file already opened
       EditingFile := nil;
@@ -559,6 +556,7 @@ begin
           I := AddEditingFile(EditingFile);
         end;
 
+        //Opens the file
         EditingFile.ReadFromFile;
 
         Result := True;
@@ -575,7 +573,11 @@ begin
     begin
       Result := False;
       if ARaiseError then
-        Raise EFilerError.CreateFmt(FILE_NOT_FOUND,[FileName]);
+      begin
+        LErrorMsg := Format(FILE_NOT_FOUND,[FileName]);
+        StatusBar.Panels[STATUSBAR_MESSAGE].Text := LErrorMsg;
+        Raise EFilerError.Create(LErrorMsg);
+      end;
     end;
   Finally
     FProcessingFiles := False;
@@ -598,6 +600,16 @@ end;
 procedure TfrmMain.acSaveExecute(Sender: TObject);
 begin
   CurrentEditFile.SaveToFile;
+end;
+
+procedure TfrmMain.AppActivate(Sender: TObject);
+begin
+  CheckFileChangedTimerTimer(CheckFileChangedTimer);
+end;
+
+procedure TfrmMain.AppDeactivate(Sender: TObject);
+begin
+  CheckFileChangedTimer.Enabled := False;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -632,6 +644,7 @@ end;
 procedure TfrmMain.FormResize(Sender: TObject);
 begin
   AdjustCompactWidth;
+  AdjustViewerWidth;
 end;
 
 procedure TfrmMain.ShowSRDialog(aReplace: boolean);
@@ -707,15 +720,14 @@ begin
     SV.OpenedWidth := SV.Width;
 end;
 
-procedure TfrmMain.SVGIconImageCloseButtonClick(Sender: TObject);
+procedure TfrmMain.TabSheetCloseButtonClick(Sender: TObject);
 begin
-  PanelCloseButton.Visible := False;
-  PageControl.ActivePageIndex := PanelCloseButton.Tag;
+  PageControl.ActivePage := Sender as TTabSheet;
   acClose.Execute;
-  ShowTabCloseButtonOnHotTab;
 end;
 
-procedure TfrmMain.SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TfrmMain.SkAnimatedImageExMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
 var
   LSize: Integer;
   LSkAnimatedImageEx: TSkAnimatedImageEx;
@@ -840,7 +852,6 @@ var
   LFileName: string;
 begin
   LFileName := ChangeFileExt(CurrentEditFile.FileName, '.png');
-  //ExportToPNG(DialogPosRect, LFileName, SkAnimatedImageEx.LottieText, True);
 end;
 
 procedure TfrmMain.acSearchExecute(Sender: TObject);
@@ -867,9 +878,10 @@ var
 begin
   LFileList := TStringList.Create;
   try
-    for I := 0 to EditFileList.Count -1 do
+    //Save Opened File list, based on Pages
+    for I := 0 to PageControl.PageCount -1 do
     begin
-      LEditingFile := TEditingFile(EditFileList.Items[I]);
+      LEditingFile := TEditingFile(PageControl.Pages[I].Tag);
       //Confirm save changes
       ConfirmChanges(LEditingFile);
       LFileList.Add(LEditingFile.FileName);
@@ -893,16 +905,23 @@ var
   LCurrentFileName: string;
 begin
   LIndex := -1;
-  for I := 0 to FEditorSettings.OpenedFileList.Count-1 do
-  begin
-    LCurrentFileName := FEditorSettings.CurrentFileName;
-    LFileName := FEditorSettings.OpenedFileList.Strings[I];
-    if OpenFile(LFileName, False) and SameText(LFileName, LCurrentFileName) then
-      LIndex := I;
+  PageControl.Hide;
+  try
+    for I := 0 to FEditorSettings.OpenedFileList.Count-1 do
+    begin
+      LCurrentFileName := FEditorSettings.CurrentFileName;
+      LFileName := FEditorSettings.OpenedFileList.Strings[I];
+      if OpenFile(LFileName, False) and SameText(LFileName, LCurrentFileName) then
+        LIndex := I;
+    end;
+    if LIndex <> -1 then
+    begin
+      PageControl.ActivePageIndex := LIndex;
+      AssignLottieTextToImage;
+    end;
+  finally
+    PageControl.Show;
   end;
-  if LIndex <> -1 then
-    PageControl.ActivePageIndex := LIndex;
-  AssignLottieTextToImage;
 end;
 
 procedure TfrmMain.LoopToggleSwitchClick(Sender: TObject);
@@ -938,7 +957,15 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var
   FileVersionStr: string;
 begin
-  OpenDialog.Filter := GetOpenDialogFilter(True);
+  CreatePageControl;
+
+  //To check Application Focus
+  Application.OnActivate := AppActivate;
+  Application.OnDeactivate := AppDeactivate;
+
+  //Initialize AnimatedTaskDialog font size and use of CommandLinks
+  Screen.MessageFont.Size := Round(Screen.MessageFont.Size*1.2);
+  InitializeStyledTaskDialogs(True, Screen.MessageFont, True);
 
   //Build animated preview images
   SkAnimatedImageEx   := CreateAnimatedImageEx(ImagePanel, -1,-1,-1,-1,'96x96');
@@ -953,8 +980,10 @@ begin
   EditFileList := TObjectList.Create(True);
   FEditorOptions := TSynEditorOptionsContainer.create(self);
   FEditorSettings := TEditorSettings.CreateSettings(nil, FEditorOptions);
+  {$IFNDEF NO_VCL_STYLES}
   if not IsStyleHookRegistered(TCustomSynEdit, TScrollingStyleHook) then
     TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
+  {$ENDIF}
 
   if (Trim(FEditorSettings.StyleName) <> '') and not SameText('Windows', FEditorSettings.StyleName) then
     TStyleManager.TrySetStyle(FEditorSettings.StyleName, False);
@@ -992,10 +1021,8 @@ var
   NewExt, LNewFileName: string;
   EditingFile : TEditingFile;
   LCount: Integer;
-  NewFileType : TEditFileType;
 begin
   NewExt := 'lottie';
-  NewFileType := dmResources.GetEditFileType(NewExt);
 
   //Create object to manage new file
   LCount := 0;
@@ -1030,7 +1057,6 @@ end;
 
 procedure TfrmMain.acCloseExecute(Sender: TObject);
 begin
-  //Remove editing file
   RemoveEditingFile(CurrentEditFile);
 end;
 
@@ -1075,15 +1101,16 @@ procedure TfrmMain.UpdateTabsheetImage(ATabSheet: TTabSheet;
   AModified: Boolean);
 begin
   if AModified then
-    ATabSheet.ImageName := 'lottie-logo'
+    ATabSheet.ImageName := TABSHEET_IMAGE
   else
-    ATabSheet.ImageName := 'lottie-logo-gray';
+    ATabSheet.ImageName := TABSHEET_IMAGE+'-gray';
 end;
 
 procedure TfrmMain.SynEditChange(Sender: TObject);
 begin
-  if Sender = CurrentEditor then
+  if (Sender = CurrentEditor) and not FProcessingFiles then
   begin
+    FEditingInProgress := True;
     UpdateTabsheetImage(pageControl.ActivePage, CurrentEditor.Modified);
     AssignLottieTextToImage;
   end;
@@ -1126,10 +1153,30 @@ begin
   End;
 end;
 
-function TfrmMain.AddEditingFile(EditingFile: TEditingFile): Integer;
+procedure TfrmMain.StopActionExecute(Sender: TObject);
+begin
+  StopAnimations;
+end;
+
+procedure TfrmMain.PauseActionExecute(Sender: TObject);
+begin
+  PauseAnimations;
+end;
+
+procedure TfrmMain.PlayActionExecute(Sender: TObject);
+begin
+  StartAnimations(False);
+end;
+
+procedure TfrmMain.PlayInverseActionExecute(Sender: TObject);
+begin
+  StartAnimations(False, True);
+end;
+
+function TfrmMain.AddEditingFile(const EditingFile: TEditingFile): Integer;
 var
-  LTabSheet : TTabSheet;
-  LEditor : TSynEdit;
+  LTabSheet: TTabSheet;
+  LEditor: TSynEdit;
 begin
   //Add file to opened-list
   Result := EditFileList.Add(EditingFile);
@@ -1141,12 +1188,11 @@ begin
     LTabSheet.PageControl := PageControl;
     //Use TAG of tabsheet to store the object pointer
     LTabSheet.Tag := NativeInt(EditingFile);
-    LTabSheet.Caption := EditingFile.Name;
-    LTabSheet.Hint := EditingFile.FileName;
-    LTabSheet.Imagename := 'lottie-logo-gray';
+    LTabSheet.Imagename := TABSHEET_IMAGE+'-gray';
     LTabSheet.Parent := PageControl;
     LTabSheet.TabVisible := True;
     EditingFile.TabSheet := LTabSheet;
+    EditingFile.UpdateTabSheetCaption;
 
     //Create the SynEdit object editor into the TabSheet that is the owner
     LEditor := TSynEdit.Create(LTabSheet);
@@ -1174,11 +1220,11 @@ begin
     raise;
   End;
 
-    //Make the Tabsheet the current page
-    PageControl.ActivePage := LTabSheet;
+  //Make the Tabsheet the current page
+  PageControl.ActivePage := LTabSheet;
 
-    //and call "change" of pagecontrol
-    PageControl.OnChange(PageControl);
+  //and call "change" of pagecontrol
+  PageControl.OnChange(PageControl);
 end;
 
 procedure TfrmMain.AssignLottieTextToImage;
@@ -1241,18 +1287,15 @@ begin
   if CurrentEditFile <> nil then
   begin
     Caption := Application.Title+' - '+CurrentEditFile.FileName;
+    if (CurrentEditFile.SynEditor.CanFocus) then
+      CurrentEditFile.SynEditor.SetFocus;
   end;
   AssignLottieTextToImage;
 end;
 
 procedure TfrmMain.PageControlMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
-{$WRITEABLECONST ON}
-const oldPos : integer = -2;
-{$WRITEABLECONST OFF}
 var
-  iot : integer;
-
   LhintPause: Integer;
   LTabIndex: Integer;
 begin
@@ -1267,39 +1310,10 @@ begin
       Application.CancelHint;
       PageControl.Hint := PageControl.Pages[LTabIndex].Hint;
       PageControl.ShowHint := true;
-      Application.ProcessMessages; // force hint to appear
     finally
       Application.HintPause := LHintPause;
     end;
   end;
-
-  iot := TTabControl(Sender).IndexOfTabAt(x,y);
-  if (iot > -1) then
-  begin
-    if iot <> oldPos then
-      ShowTabCloseButtonOnHotTab;
-  end;
-  oldPos := iot;
-end;
-
-procedure TfrmMain.StopActionExecute(Sender: TObject);
-begin
-  StopAnimations;
-end;
-
-procedure TfrmMain.PauseActionExecute(Sender: TObject);
-begin
-  PauseAnimations;
-end;
-
-procedure TfrmMain.PlayActionExecute(Sender: TObject);
-begin
-  StartAnimations(False);
-end;
-
-procedure TfrmMain.PlayInverseActionExecute(Sender: TObject);
-begin
-  StartAnimations(False, True);
 end;
 
 procedure TfrmMain.acSaveUpdate(Sender: TObject);
@@ -1345,10 +1359,53 @@ begin
   Screen.Cursor := crDefault;
 end;
 
+procedure TfrmMain.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  // Custom window-class name so a second instance can locate us via
+  // FindWindow() and forward command-line files via WM_COPYDATA.
+  StrPLCopy(Params.WinClassName, cLottieTextEditorWindowClass,
+    Length(Params.WinClassName) - 1);
+end;
+
 procedure TfrmMain.CreateWindowHandle(const Params: TCreateParams);
 begin
   inherited;
   FDropTarget := TDropTarget.Create(WindowHandle, Self);
+end;
+
+procedure TfrmMain.WMCopyData(var Msg: TWMCopyData);
+var
+  LFileName: string;
+  LChars: Integer;
+begin
+  Msg.Result := 0;
+  if (Msg.CopyDataStruct = nil) or
+     (Msg.CopyDataStruct.dwData <> cLottieTextEditorCopyDataOpenFile) or
+     (Msg.CopyDataStruct.cbData = 0) or
+     (Msg.CopyDataStruct.lpData = nil) then
+    Exit;
+
+  // Payload is a null-terminated PChar (UnicodeString). cbData is in bytes.
+  LChars := (Msg.CopyDataStruct.cbData div SizeOf(Char));
+  if LChars > 0 then Dec(LChars); // drop the trailing #0
+  SetString(LFileName, PChar(Msg.CopyDataStruct.lpData), LChars);
+
+  if FileExists(LFileName) then
+  begin
+    OpenFile(LFileName, False);
+    AssignLottieTextToImage;
+  end;
+
+  // Bring our window to the foreground (the sender called
+  // AllowSetForegroundWindow so SetForegroundWindow is allowed).
+  if IsIconic(Handle) then
+    ShowWindow(Handle, SW_RESTORE)
+  else
+    ShowWindow(Handle, SW_SHOW);
+  SetForegroundWindow(Handle);
+
+  Msg.Result := 1;
 end;
 
 function TfrmMain.CurrentEditFile: TEditingFile;
@@ -1403,8 +1460,6 @@ begin
   //Confirm save changes
   ConfirmChanges(EditingFile);
 
-  PanelCloseButton.Visible := False;
-
   //Delete the file from the Opened-List
   EditFileList.Delete(pos);
 
@@ -1428,7 +1483,6 @@ procedure TfrmMain.acCloseAllExecute(Sender: TObject);
 begin
   FProcessingFiles := True;
   try
-    PanelCloseButton.Visible := False;
     while EditFileList.Count > 0 do
       RemoveEditingFile(TEditingFile(EditFileList.items[0]));
   finally
@@ -1473,7 +1527,7 @@ end;
 
 procedure TfrmMain.acAboutExecute(Sender: TObject);
 begin
-  ShowAboutForm(DialogPosRect, Title_LottieTextEditor);
+  ShowAboutForm(DialogPosRect, Title_LottieTextEditor, False);
 end;
 
 procedure TfrmMain.acSearchAgainExecute(Sender: TObject);
@@ -1545,17 +1599,10 @@ begin
 end;
 
 procedure TfrmMain.SetEditorFontSize(const Value: Integer);
-var
-  LScaleFactor: Single;
 begin
   if (CurrentEditor <> nil) and (Value >= MinfontSize) and (Value <= MaxfontSize) then
   begin
-    if FFontSize <> 0 then
-      LScaleFactor := CurrentEditor.Font.Height / FFontSize
-    else
-      LScaleFactor := 1;
-    CurrentEditor.Font.PixelsPerInch := Self.PixelsPerInch;
-    CurrentEditor.Font.Height := Round(Value * LScaleFactor * Self.ScaleFactor);
+    CurrentEditor.Font.Height := -Round(Value * Self.ScaleFactor);
     FEditorSettings.FontSize := Value;
   end;
   FFontSize := Value;
@@ -1606,6 +1653,7 @@ procedure TfrmMain.UpdateFromSettings(AEditor: TSynEdit);
 var
   LStyle: TStyledButtonDrawType;
 begin
+  UpdateApplicationStyle(FEditorSettings.StyleName);
   if AEditor <> nil then
   begin
     FEditorSettings.ReadSettings(AEditor.Highlighter, self.FEditorOptions);
@@ -1645,7 +1693,6 @@ begin
     EditorFontSize := MinfontSize;
   InitEditorOptions;
   UpdateEditorsOptions;
-  UpdateApplicationStyle(FEditorSettings.StyleName);
   UpdateHighlighter(AEditor);
   BackgroundTrackBar.Position := FEditorSettings.LightBackground;
   LoopToggleSwitch.State := TToggleSwitchState(Ord(FEditorSettings.PlayInLoop));
@@ -1708,6 +1755,24 @@ begin
     Options := Options - [eoSmartTabs];
     Gutter.Font.Name := Font.Name;
     Gutter.Font.Size := Font.Size;
+  end;
+end;
+
+procedure TfrmMain.InitDialog(const ADialog: TCustomFileDialog;
+  const ADefaultFolder: string);
+var
+  LExtensions: TArray<string>;
+begin
+  ADialog.DefaultFolder := ADefaultFolder;
+  LExtensions := GetSupportedExtensions(True);
+  for var I := Low(LExtensions) to High(LExtensions) do
+  begin
+    // Add File Filters
+    with ADialog.FileTypes.Add do
+    begin
+      DisplayName := FILES_TYPE;
+      FileMask := '*'+LExtensions[I];
+    end;
   end;
 end;
 
@@ -1836,16 +1901,19 @@ end;
 procedure TfrmMain.ActionListUpdate(Action: TBasicAction;
   var Handled: Boolean);
 var
-  InitialDir : string;
-  LFileName: string;
+  InitialDir: string;
+  LFileName: TFileName;
 begin
   UpdateStatusBarPanels;
   UpdatePlayerControls;
   if not FirstAction then
   begin
     FirstAction := True;
-    //Load previous opened-files
-    LoadOpenedFiles;
+
+    //Restore previously-opened files only if the user opted in (Settings:
+    //"Remember current session at next run").
+    if FEditorSettings.RestoreLastSession then
+      LoadOpenedFiles;
 
     //Initialize Open and Save Dialog with application path
     LFileName := ParamStr(1);
@@ -1859,8 +1927,18 @@ begin
     else
       InitialDir := '.';
 
-    OpenDialog.InitialDir := InitialDir;
-    SaveDialog.InitialDir := InitialDir;
+    InitDialog(OpenDialog, InitialDir);
+    InitDialog(SaveDialog, InitialDir);
+
+    ImagePanel.Visible := True;
+    UpdateRightSplitterPos;
+
+    //Check for new version available
+    if FEditorSettings.IsTimeToCheckNewVersion then
+    begin
+      if AcceptNewSetup(False) then
+        ShowAboutForm(DialogPosRect, Title_LottieTextEditor, True);
+    end;
   end;
 end;
 
@@ -1909,7 +1987,8 @@ end;
 
 procedure TfrmMain.actionForFileUpdate(Sender: TObject);
 begin
-  (Sender as TAction).Enabled := CurrentEditFile <> nil;
+  (Sender As TAction).Enabled := (CurrentEditor <> nil)
+    and not CurrentEditor.ReadOnly;
 end;
 
 procedure TfrmMain.AddOpenedFile(const AFileName: string);
@@ -1927,15 +2006,45 @@ begin
   FEditorSettings.HistoryFileList.Insert(0, AFileName);
 end;
 
+procedure TfrmMain.AdjustViewerWidth(const ACenter: Boolean = False);
+begin
+  if CurrentEditFile <> nil then
+  begin
+    if ACenter then
+    begin
+      ImagePanel.Width :=
+        (Self.Width - catMenuItems.Width) div 2;
+    end
+    else
+    begin
+      var LViewerWidth := ImagePanel.Width;
+      var LMinWidth := Self.Width div 6;
+      var LMaxWidth := Self.Width - LMinWidth;
+      if LViewerWidth < LMinWidth then
+        ImagePanel.Width := LMinWidth
+      else if LViewerWidth > LMaxWidth then
+        ImagePanel.Width := LMaxWidth;
+    end;
+    UpdateRightSplitterPos;
+  end;
+end;
+
+procedure TfrmMain.UpdateRightSplitterPos;
+begin
+  if ImagePanel.Visible then
+    RightSplitter.Left := ImagePanel.Left - RightSplitter.Width;
+  RightSplitter.Visible := ImagePanel.Visible;
+end;
+
 procedure TfrmMain.AdjustCompactWidth;
 begin
-  //Change size of compact because Scrollbars appears
+  //Change size of compact view because Scrollbars appears
   if (Height / ScaleFactor) > 900 then
     SV.CompactWidth := Round(SV_COLLAPSED_WIDTH * ScaleFactor)
   else
     SV.CompactWidth := Round(SV_COLLAPSED_WIDTH_WITH_SCROLLBARS * ScaleFactor);
-  if PageControl.Width < 100 then
-    ImagePanel.Width := Width div 3;
+  if (ImagePanel.Width > PageControl.Width) then
+    ImagePanel.Width := width div 3;
 end;
 
 procedure TfrmMain.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI,
@@ -2027,47 +2136,6 @@ begin
   BackgroundTrackBarChange(nil);
 end;
 
-procedure TfrmMain.ShowTabCloseButtonOnHotTab;
-var
-  iot : integer;
-  cp : TPoint;
-  rectOver: TRect;
-begin
-  cp := PageControl.ScreenToClient(Mouse.CursorPos);
-  iot := PageControl.IndexOfTabAt(cp.X, cp.Y);
-
-  if iot > -1 then
-  begin
-    rectOver := PageControl.TabRect(iot);
-
-    PanelCloseButton.Left := rectOver.Right - PanelCloseButton.Width;
-    PanelCloseButton.Top := rectOver.Top + ((rectOver.Height div 2) - (PanelCloseButton.Height div 2)) + 1;
-
-    PanelCloseButton.Tag := iot;
-    PanelCloseButton.Color := Self.Color;
-    PanelCloseButton.Show;
-  end
-  else
-  begin
-    PanelCloseButton.Tag := -1;
-    PanelCloseButton.Hide;
-  end;
-end;
-
-procedure TfrmMain.PageControlMouseEnter(Sender: TObject);
-begin
-  ShowTabCloseButtonOnHotTab;
-end;
-
-procedure TfrmMain.PageControlMouseLeave(Sender: TObject);
-begin
-  if PanelCloseButton <> FindVCLWindow(Mouse.CursorPos) then
-  begin
-    PanelCloseButton.Hide;
-    PanelCloseButton.Tag := -1;
-  end;
-end;
-
 procedure TfrmMain.ManageExceptions(Sender: TObject; E: Exception);
 begin
   //This is an event-handler for exceptions that replace Delphi standard handler
@@ -2087,6 +2155,18 @@ begin
       TMsgDlgType.mtError,
       [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbHelp], 0);
   end;
+end;
+
+procedure TfrmMain.CreatePageControl;
+begin
+  PageControl := TPageControlEx.Create(Self);
+  PageControl.Parent := ClientPanel;
+  PageControl.Align := alClient;
+  PageControl.Images := VirtualImageList;
+  PageControl.TabOrder := 0;
+  PageControl.OnChange := PageControlChange;
+  PageControl.OnMouseMove := PageControlMouseMove;
+  PageControl.OnCloseButtonClick := TabSheetCloseButtonClick;
 end;
 
 initialization

@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2021-2022 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2021-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -41,8 +41,8 @@ uses
 
 const
   MENU_ITEM_OPEN_WITH_EDITOR = 0;
-  //MENU_ITEM_EXPORT_TO_PNG = 1;
-  MENU_ITEM_COUNT = 1;
+  MENU_ITEM_SHOW_ANIMATION = 1;
+  MENU_ITEM_COUNT = 2;
 
 type
   TSKIAContextMenu = class(TComObject, IUnknown,
@@ -81,8 +81,8 @@ type
   end;
 
 const
-  MyClass_SKIAContextMenu_64: TGUID = '{B763EEFC-33D1-4F23-A451-C0D9A5EED592}';
-  MyClass_SKIAContextMenu_32: TGUID = '{2E933706-1E1D-48CA-9DB8-4706CA13B7F8}';
+  MyClass_SKIAContextMenu_64: TGUID = '{048B4077-8CAF-4941-A7E9-63F0817B9DC6}';
+  MyClass_SKIAContextMenu_32: TGUID = '{CBBE5B6E-4013-431F-A80F-78231F9E1293}';
 
 implementation
 
@@ -99,7 +99,8 @@ uses
   , Vcl.Themes
 {$ENDIF}
   , dlgExportPNG
-  , DResources;
+  , DResources
+  , PreviewForm;
 
 // IShellExtInit method
 function TSKIAContextMenu.InitShellExt(pidlFolder: PItemIDList;
@@ -127,7 +128,7 @@ begin
     end;
     // transform the lpdobj data to a storage medium structure
     Result := lpdobj.GetData(fe, medium);
-    if not Failed (Result) then
+    if not Failed(Result) then
     begin
       LCountFile := DragQueryFile(medium.hGlobal, $FFFFFFFF, nil, 0);
       TLogPreview.Add('LCountFile: '+IntToStr(LCountFile));
@@ -166,11 +167,9 @@ begin
   LMenuIndex := indexMenu;
   InsertMenu(Menu, LMenuIndex, MF_STRING or MF_BYPOSITION, idCmdFirst+MENU_ITEM_OPEN_WITH_EDITOR,
     'Open with "Lottie Text Editor"...');
-  (*
   Inc(LMenuIndex);
-  InsertMenu(Menu, LMenuIndex, MF_STRING or MF_BYPOSITION, idCmdFirst+MENU_ITEM_EXPORT_TO_PNG,
-    'Export to PNG files...');
-  *)
+  InsertMenu(Menu, LMenuIndex, MF_STRING or MF_BYPOSITION, idCmdFirst+MENU_ITEM_SHOW_ANIMATION,
+    'Open with "Animation Viewer"...');
   // Return number of menu items added
   Result := MENU_ITEM_COUNT;
 end;
@@ -179,6 +178,7 @@ function TSKIAContextMenu.InvokeCommand(var lpici: TCMInvokeCommandInfo): HResul
 var
 //  LStringStream: TStringStream;
   LFileName: string;
+//  LLottieText: string;
   Reg: TRegistry;
   LCommand: string;
 
@@ -191,6 +191,18 @@ var
   procedure EditorNotFound;
   begin
     MessageBox(0, '"Lottie Text Editor" not found!',
+      'Error opening file', MB_OK);
+  end;
+
+  procedure ViewerNotInstalled;
+  begin
+    MessageBox(0, '"Animation Viewer" not installed',
+      'Error opening file', MB_OK);
+  end;
+
+  procedure ViewerNotFound;
+  begin
+    MessageBox(0, '"Animation Viewer" not found!',
       'Error opening file', MB_OK);
   end;
 
@@ -238,27 +250,36 @@ begin
     finally
       Reg.Free;
     end;
-  (*
   end
-  else if LoWord(lpici.lpVerb) = MENU_ITEM_EXPORT_TO_PNG then
+  else if LoWord(lpici.lpVerb) = MENU_ITEM_SHOW_ANIMATION then
   begin
-    LStringStream := TStringStream.Create('',TEncoding.UTF8);
-    LStringStream.LoadFromFile(fFileName);
+    TLogPreview.Add('TSKIAContextMenu: Menu clicked');
+
+    Reg := TRegistry.Create(KEY_READ);
     try
-      LFileName := ChangeFileExt(fFileName,'.png');
-{$IFNDEF DISABLE_STYLES}
-        if (Trim(FSettings.StyleName) <> '') and not SameText('Windows', FSettings.StyleName) then
-          TStyleManager.TrySetStyle(FSettings.StyleName, False);
-{$ENDIF}
-      ExportToPNG(TRect.Create(0,0,0,0),
-        LFileName,
-        LSVGText,
-        False);
-      LSVGText := LStringStream.DataString;
+      Reg.RootKey := HKEY_CLASSES_ROOT;
+      TLogPreview.Add('TSKIAContextMenuHandler: Open Registry');
+      if Reg.OpenKey('OpenAnimationViewer\Shell\Open\Command', False) then
+      begin
+        LCommand := Reg.ReadString('');
+        LCommand := StringReplace(LCommand,' "%1"','', []);
+        LFileName := format('"%s"',[FFileName]);
+        TLogPreview.Add(Format('TMDContextMenuHandler: Command: %s FileName %s',
+          [LCommand, LFileName]));
+        if (FFileName <> '') and FileExists(FFileName) then
+        begin
+          TLogPreview.Add(Format('TSKIAContextMenuHandler: ShellExecute: %s for file %s',
+            [LCommand, LFileName]));
+          ShellExecute(0, 'Open', PChar(LCommand), PChar(LFileName), nil, SW_SHOWNORMAL);
+        end
+        else
+          ViewerNotInstalled;
+      end
+      else
+        ViewerNotFound;
     finally
-      LStringStream.Free;
+      Reg.Free;
     end;
-*)
   end;
 end;
 
@@ -273,65 +294,6 @@ function TSKIAContextMenu.GetCommandString(idCmd: UINT_PTR; uFlags: UINT; pwRese
 begin
   Result := E_INVALIDARG;
 end;
-
-(*
-//IContextMenu2
-function TSKIAContextMenu.HandleMenuMsg(uMsg: UINT; WParam: WPARAM; LParam: LPARAM): HResult; stdcall;
-var
- res: Winapi.Windows.LPARAM;
-begin
- TLogPreview.Add('HandleMenuMsg: HandleMenuMsg');
- Result:=MenuMessageHandler ( uMsg, wParam, lParam, res);
-end;
-
-//IContextMenu3
-function TSKIAContextMenu.HandleMenuMsg2(uMsg: UINT; wParam: WPARAM; lParam: LPARAM; var lpResult: LRESULT): HResult; stdcall;
-begin
-  TLogPreview.Add('HandleMenuMsg: HandleMenuMsg2');
-  Result:= MenuMessageHandler( uMsg, wParam, lParam, lpResult);
-end;
-
-function TSKIAContextMenu.MenuMessageHandler(uMsg: UINT; wParam: WPARAM; lParam: LPARAM; var lpResult: LRESULT): HResult; stdcall;
-const
-  Dx = 20;
-  Dy = 5;
-  MinHeight = 16;
-var
-  LRect: TRect;
-  i, Lx,Ly :Integer;
-  LCanvas: TCanvas;
-  SaveIndex: Integer;
-  LIcon: TIcon;
-  FSVG: ISVG;
-  Found: Boolean;
-begin
-  TLogPreview.Add('HandleMenuMsg: MenuMessageHandler');
-  try
-    case uMsg of
-      WM_DRAWITEM:
-      begin
-        if PDrawItemStruct(lParam)^.itemID<>FOwnerDrawId then
-        with PDrawItemStruct(lParam)^ do
-        begin
-          FSVG := GlobalSVGFactory.NewSvg;
-          FSVG.Source := GETSVGLogoText;
-          LRect.Left := rcItem.Left-16;
-          LRect.Top := rcItem.Top + (rcItem.Bottom - rcItem.Top - 16) div 2;
-          LRect.Width := 16;
-          LRect.Height := 16;
-          FSVG.PaintTo(hDC,LRect,False);
-        end;
-      end;
-    end;
-    Result:=S_OK;
-
-  except on  E: Exception do
-    begin
-     Result := E_FAIL;
-    end;
-  end;
-end;
-*)
 
 { TSKIAContextMenuFactory methods }
 

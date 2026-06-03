@@ -1,11 +1,15 @@
-call "C:\BDS\Studio\23.0\bin\rsvars.bat"
+call "C:\BDS\Studio\37.0\bin\rsvars.bat"
 msbuild.exe "Source\SKIAShellExtensions.dproj" /target:Clean;Build /p:Platform=Win64 /p:config=release
 msbuild.exe "Source\SKIAShellExtensions32.dproj" /target:Clean;Build /p:Platform=Win32 /p:config=release
 msbuild.exe "Source\LottieTextEditor.dproj" /target:Clean;Build /p:Platform=Win64 /p:config=release
 msbuild.exe "Source\LottieTextEditor.dproj" /target:Clean;Build /p:Platform=Win32 /p:config=release
+msbuild.exe "Source\AnimationViewer.dproj" /target:Clean;Build /p:Platform=Win64 /p:config=release
+msbuild.exe "Source\AnimationViewer.dproj" /target:Clean;Build /p:Platform=Win32 /p:config=release
 
 call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\SkiaShellExtensions\Bin32\LottieTextEditor.exe
 call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\SkiaShellExtensions\Bin64\LottieTextEditor.exe
+call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\SkiaShellExtensions\Bin32\AnimationViewer.exe
+call D:\ETHEA\Certificate\SignFileWithSectico.bat D:\ETHEA\SkiaShellExtensions\Bin64\AnimationViewer.exe
 
 :INNO
 "C:\Program Files (x86)\Inno Setup 6\iscc.exe" "D:\ETHEA\SKIAShellExtensions\Setup\SKIAShellExtensions.iss"

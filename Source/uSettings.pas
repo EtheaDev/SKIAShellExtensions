@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, Lottie Editor)                         }
 {                                                                              }
-{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -45,6 +45,7 @@ const
   MinfontSize = 8;
   default_lightactivelinecolor = 15066597;
   default_darkactivelinecolor = 0;
+  default_checkdays = 7;
 
 resourcestring
   Background_Grayscale_Caption = 'Backlight %d%%';
@@ -67,6 +68,8 @@ type
   TSettings = class
   private
     FSplitterPos: Integer;
+    FVersionCheckTime: TDateTime;
+    FDaysForNextCheck: Integer;
     FFontSize: Integer;
     FStyleName: string;
     FUseDarkStyle: boolean;
@@ -88,6 +91,7 @@ type
     procedure SetButtonDrawRounded(const Value: Boolean);
     procedure SetToolbarDrawRounded(const Value: Boolean);
     procedure SetMenuDrawRounded(const Value: Boolean);
+    procedure SetDaysForNextCheck(const Value: Integer);
   protected
     FIniFile: TIniFile;
   public
@@ -122,20 +126,24 @@ type
     property ButtonDrawRounded: Boolean read FButtonDrawRounded write SetButtonDrawRounded;
     property ToolbarDrawRounded: Boolean read FToolbarDrawRounded write SetToolbarDrawRounded;
     property MenuDrawRounded: Boolean read FMenuDrawRounded write SetMenuDrawRounded;
+    property DaysForNextCheck: Integer read FDaysForNextCheck write SetDaysForNextCheck;
   end;
 
   TEditorSettings = class(TSettings)
   private
     FLightActiveLineColor: TColor;
     FDarkActiveLineColor: TColor;
+    FRestoreLastSession: Boolean;
     procedure WriteSynEditorOptions(
       const ASynEditorOptions: TSynEditorOptionsContainer);
     procedure ReadSynEditorOptions(
       const ASynEditorOptions: TSynEditorOptionsContainer);
+    procedure SetRestoreLastSession(const Value: Boolean);
   public
     HistoryFileList: TStrings;
     OpenedFileList: TStrings;
     CurrentFileName: string;
+    function IsTimeToCheckNewVersion: Boolean;
     procedure ReadSettings(const ASynEditHighilighter: TSynCustomHighlighter;
       const ASynEditorOptions: TSynEditorOptionsContainer); override;
     procedure WriteSettings(const ASynEditHighilighter: TSynCustomHighlighter;
@@ -147,6 +155,7 @@ type
     procedure UpdateOpenedFiles(AFileList: TStrings; const ACurrentFileName: string);
     property LightActiveLineColor: TColor read FLightActiveLineColor write FLightActiveLineColor;
     property DarkActiveLineColor: TColor read FDarkActiveLineColor write FDarkActiveLineColor;
+    property RestoreLastSession: Boolean read FRestoreLastSession write SetRestoreLastSession;
   end;
 
   TPreviewSettings = class(TEditorSettings)
@@ -330,6 +339,8 @@ var
   LAttribute: TSynHighlighterAttributes;
 begin
   TLogPreview.Add('ReadSettings '+SettingsFileName);
+  FVersionCheckTime := FIniFile.ReadDateTime('Global', 'VersionCheckTime', Now());
+  FDaysForNextCheck := FIniFile.ReadInteger('Global', 'DaysForNextCheck', default_checkdays);
   FFontSize := FIniFile.ReadInteger('Global', 'FontSize', 10);
   FFontName := FIniFile.ReadString('Global', 'FontName', 'Consolas');
   FShowEditor := FIniFile.ReadInteger('Global', 'ShowEditor', 0) = 1;
@@ -400,6 +411,9 @@ var
   LAttribute: TSynHighlighterAttributes;
   LThemeSection: string;
 begin
+  FIniFile.WriteDateTime('Global', 'VersionCheckTime', FVersionCheckTime);
+  FIniFile.WriteInteger('Global', 'DaysForNextCheck', FDaysForNextCheck);
+
   FIniFile.WriteInteger('Global', 'FontSize', FFontSize);
   FIniFile.WriteString('Global', 'FontName', FFontName);
   FIniFile.WriteString('Global', 'StyleName', FStyleName);
@@ -446,6 +460,11 @@ begin
   FButtonDrawRounded := Value;
 end;
 
+procedure TSettings.SetDaysForNextCheck(const Value: Integer);
+begin
+  FDaysForNextCheck := Value;
+end;
+
 { TPreviewSettings }
 
 constructor TPreviewSettings.CreateSettings(
@@ -489,6 +508,18 @@ begin
   inherited;
 end;
 
+function TEditorSettings.IsTimeToCheckNewVersion: Boolean;
+begin
+  Result := Now() > FVersionCheckTime + FDaysForNextCheck;
+  if Result then
+    FVersionCheckTime := Now(); //Update Next time for check
+end;
+
+procedure TEditorSettings.SetRestoreLastSession(const Value: Boolean);
+begin
+  FRestoreLastSession := Value;
+end;
+
 procedure TEditorSettings.ReadSettings(
   const ASynEditHighilighter: TSynCustomHighlighter;
   const ASynEditorOptions: TSynEditorOptionsContainer);
@@ -501,6 +532,8 @@ begin
   //ActiveLine Color
   DarkActiveLineColor := FIniFile.ReadInteger('Global', 'DarkActiveLineColor', default_darkactivelinecolor);
   LightActiveLineColor := FIniFile.ReadInteger('Global', 'LightActiveLineColor', default_lightactivelinecolor);
+
+  RestoreLastSession := Boolean(FIniFile.ReadInteger('Global', 'RestoreLastSession', 1));
 
   if Assigned(ASynEditorOptions) then
   begin
@@ -642,6 +675,8 @@ begin
     FIniFile.WriteInteger('Global', 'LightActiveLineColor', LightActiveLineColor)
   else
     FIniFile.DeleteKey('Global', 'LightActiveLineColor');
+
+  FIniFile.WriteInteger('Global', 'RestoreLastSession', Ord(FRestoreLastSession));
 
   FIniFile.EraseSection(LAST_OPENED_SECTION);
   for I := 0 to HistoryFileList.Count -1 do

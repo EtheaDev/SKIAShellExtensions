@@ -12,6 +12,9 @@
         <Projects Include="LottieTextEditor.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="AnimationViewer.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +50,23 @@
     <Target Name="LottieTextEditor:Make">
         <MSBuild Projects="LottieTextEditor.dproj" Targets="Make"/>
     </Target>
+    <Target Name="AnimationViewer">
+        <MSBuild Projects="AnimationViewer.dproj"/>
+    </Target>
+    <Target Name="AnimationViewer:Clean">
+        <MSBuild Projects="AnimationViewer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AnimationViewer:Make">
+        <MSBuild Projects="AnimationViewer.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="SKIAShellExtensions32;SKIAShellExtensions;LottieTextEditor"/>
+        <CallTarget Targets="SKIAShellExtensions32;SKIAShellExtensions;LottieTextEditor;AnimationViewer"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SKIAShellExtensions32:Clean;SKIAShellExtensions:Clean;LottieTextEditor:Clean"/>
+        <CallTarget Targets="SKIAShellExtensions32:Clean;SKIAShellExtensions:Clean;LottieTextEditor:Clean;AnimationViewer:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SKIAShellExtensions32:Make;SKIAShellExtensions:Make;LottieTextEditor:Make"/>
+        <CallTarget Targets="SKIAShellExtensions32:Make;SKIAShellExtensions:Make;LottieTextEditor:Make;AnimationViewer:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, Lottie Editor)                         }
 {                                                                              }
-{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -79,6 +79,9 @@ type
     TogglePanel: TPanel;
     LoopToggleSwitch: TToggleSwitch;
     ToolButtonEditorSettings: TStyledToolButton;
+    ToolButtonOpen: TStyledToolButton;
+    StyledSepOpen: TStyledToolButton;
+    OpenDialog: TFileOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure ToolButtonZoomInClick(Sender: TObject);
     procedure ToolButtonZoomOutClick(Sender: TObject);
@@ -100,6 +103,9 @@ type
     procedure LoopToggleSwitchClick(Sender: TObject);
     procedure ToolButtonStopClick(Sender: TObject);
     procedure ToolButtonEditorSettingsClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ToolButtonOpenClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     SkAnimatedImageEx: TSkAnimatedImageEx;
     FFontSize: Integer;
@@ -125,8 +131,12 @@ type
     procedure PauseAnimation;
     procedure StopAnimation;
     procedure UpdateAnimButtons;
+    procedure InitDialog(const ADialog: TCustomFileDialog;
+      const ADefaultFolder: string);
   protected
   public
+    procedure InitViewer;
+    procedure ManageExceptions(Sender: TObject; E: Exception);
     procedure ScaleControls(const ANewPPI: Integer);
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -137,6 +147,8 @@ type
     property EditorFontSize: Integer read FFontSize write SetEditorFontSize;
   end;
 
+var
+  frmPreview: TFrmPreview;
 
 implementation
 
@@ -164,7 +176,8 @@ uses
 
 {$R *.dfm}
 
-  { TFrmPreview }
+
+{ TFrmPreview }
 
 procedure TFrmPreview.AppException(Sender: TObject; E: Exception);
 begin
@@ -246,12 +259,14 @@ begin
     ToolButtonReformat.Visible := PanelEditor.Visible;
     ToolButtonZoomIn.Visible := PanelEditor.Visible;
     ToolButtonZoomOut.Visible := PanelEditor.Visible;
+    ToolButtonEditorSettings.Visible := PanelEditor.Visible;
   end
   else
   begin
     ToolButtonReformat.Visible := False;
     ToolButtonZoomIn.Visible := False;
     ToolButtonZoomOut.Visible := False;
+    ToolButtonEditorSettings.Visible := False;
   end;
 end;
 
@@ -269,7 +284,6 @@ begin
   //Assegna i colori "custom" all'Highlighter
   FPreviewSettings.ReadSettings(SynEdit.Highlighter, nil);
   SynEdit.Gutter.Font.Name := SynEdit.Font.Name;
-  SynEdit.Gutter.Width := Round(30 * Self.ScaleFactor);
 {$IFNDEF DISABLE_STYLES}
   SynEdit.Gutter.Font.Color := StyleServices.GetSystemColor(clWindowText);
   SynEdit.Gutter.Color := StyleServices.GetSystemColor(clBtnFace);
@@ -283,6 +297,12 @@ end;
 procedure TFrmPreview.UpdateRunLabel;
 begin
   RunLabel.Caption := SkAnimatedImageEx.ProgressPercentage.ToString+' %';
+end;
+
+procedure TFrmPreview.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  inherited;
+  Action := caFree;
 end;
 
 procedure TFrmPreview.FormCreate(Sender: TObject);
@@ -340,6 +360,28 @@ begin
   UpdateGUI;
 end;
 
+procedure TFrmPreview.FormShow(Sender: TObject);
+begin
+  inherited;
+  if ToolButtonOpen.Visible then
+  begin
+    //Try to Open File
+    var LFileName := ParamStr(1);
+    if FileExists(LFileName) then
+      LoadFromFile(LFileName);
+  end;
+end;
+
+procedure TFrmPreview.InitViewer;
+begin
+  //Called as exe to View Animations
+  Caption := Application.Title;
+  ShowHint := True;
+  ToolButtonOpen.Visible := True;
+  StyledSepOpen.Visible := True;
+  InitDialog(OpenDialog, '');
+end;
+
 procedure TFrmPreview.LoadFromFile(const AFileName: string);
 var
   LStringStream: TStringStream;
@@ -378,7 +420,6 @@ begin
       PanelEditor.Visible := False;
 
     ToolButtonShowText.Visible := FIsJSON;
-    ToolButtonEditorSettings.Visible := FIsJSON;
     PlayerPanel.Visible := FIsAnimation;
     ToolButtonPlay.Enabled := FIsAnimation;
     ToolButtonInversePlay.Enabled := FIsAnimation;
@@ -549,7 +590,7 @@ end;
 
 procedure TFrmPreview.ToolButtonAboutClick(Sender: TObject);
 begin
-  ShowAboutForm(DialogPosRect, Title_SKIAPreview);
+  ShowAboutForm(DialogPosRect, Title_SKIAPreview, False);
 end;
 
 procedure TFrmPreview.ToolButtonEditorSettingsClick(Sender: TObject);
@@ -575,6 +616,31 @@ end;
 procedure TFrmPreview.ToolButtonMouseLeave(Sender: TObject);
 begin
   StatusBar.SimpleText := FSimpleText;
+end;
+
+procedure TFrmPreview.InitDialog(const ADialog: TCustomFileDialog;
+  const ADefaultFolder: string);
+var
+  LExtensions: TArray<string>;
+begin
+  ADialog.DefaultFolder := ADefaultFolder;
+  LExtensions := GetSupportedExtensions(False);
+  for var I := Low(LExtensions) to High(LExtensions) do
+  begin
+    // Add File Filters
+    with ADialog.FileTypes.Add do
+    begin
+      DisplayName := FILES_TYPE;
+      FileMask := '*'+LExtensions[I];
+    end;
+  end;
+end;
+
+procedure TFrmPreview.ToolButtonOpenClick(Sender: TObject);
+begin
+  inherited;
+  if OpenDialog.Execute then
+    LoadFromFile(OpenDialog.FileName);
 end;
 
 procedure TFrmPreview.ToolButtonPauseClick(Sender: TObject);
@@ -731,6 +797,26 @@ begin
   LSkAnimatedImageEx := Sender as TSkAnimatedImageEx;
   LSize := Min(LSkAnimatedImageEx.Width, LSkAnimatedImageEx.Height);
   LSkAnimatedImageEx.Hint := Format('%dx%d',[LSize, LSize]);
+end;
+
+procedure TFrmPreview.ManageExceptions(Sender: TObject; E: Exception);
+begin
+  //This is an event-handler for exceptions that replace Delphi standard handler
+  if E is EAccessViolation then
+  begin
+    if TaskMessageDlg(STR_UNEXPECTED_ERROR,
+      Format('Unexpected Error: %s%s',[sLineBreak,E.Message]),
+      TMsgDlgType.mtError,
+      [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbAbort], 0) = mrAbort then
+    Application.Terminate;
+  end
+  else
+  begin
+    TaskMessageDlg(STR_ERROR,
+      Format('Error: %s%s',[sLineBreak,E.Message]),
+      TMsgDlgType.mtError,
+      [TMsgDlgBtn.mbOK, TMsgDlgBtn.mbHelp], 0);
+  end;
 end;
 
 end.

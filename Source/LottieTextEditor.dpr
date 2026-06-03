@@ -2,7 +2,7 @@
 {                                                                              }
 {       LottieTextEditor: Advanced Editor for Lottie files                     }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -21,12 +21,6 @@
 {  See the License for the specific language governing permissions and         }
 {  limitations under the License.                                              }
 {                                                                              }
-{  The Original Code is:                                                       }
-{  Delphi Preview Handler  https://github.com/RRUZ/delphi-preview-handler      }
-{                                                                              }
-{  The Initial Developer of the Original Code is Rodrigo Ruz V.                }
-{  Portions created by Rodrigo Ruz V. are Copyright 2011-2021 Rodrigo Ruz V.   }
-{  All Rights Reserved.                                                        }
 {******************************************************************************}
 program LottieTextEditor;
 
@@ -37,6 +31,7 @@ uses
   Vcl.Styles,
   dlgSearchText in 'dlgSearchText.pas' {TextSearchDialog},
   dlgReplaceText in 'dlgReplaceText.pas' {TextReplaceDialog},
+  PageControlHook in 'PageControlHook.pas',
   EditorMainForm in 'EditorMainForm.pas' {frmMain},
   DResources in 'DResources.pas' {dmResources: TDataModule},
   DPageSetup in 'DPageSetup.pas' {PageSetupDlg},
@@ -49,16 +44,33 @@ uses
   uSettings in 'uSettings.pas',
   SettingsForm in 'SettingsForm.pas' {UserSettingsForm},
   uRegistry in 'uRegistry.pas',
+  uSingleInstance in 'uSingleInstance.pas',
+  GitHubAPI in 'GitHubAPI.pas',
   Vcl.StyledTaskDialogFormUnit in '..\Ext\StyledComponents\source\Vcl.StyledTaskDialogFormUnit.pas' {StyledTaskDialogForm},
   Skia.Vcl.StyledTaskDialogAnimatedUnit in '..\Ext\StyledComponents\source\Skia.Vcl.StyledTaskDialogAnimatedUnit.pas' {StyledTaskDialogAnimated};
 
 {$R *.res}
 
+var
+  LFileParam: string;
 begin
+  // Single instance: if a file was passed on the command line and another
+  // LottieTextEditor instance is already running, forward the file to it and
+  // exit. Launching without arguments always starts a new instance; whether
+  // that new instance restores the previous session is controlled by the
+  // user preference "Remember current session at next run".
+  if (ParamCount >= 1) and IsAnotherInstanceRunning then
+  begin
+    LFileParam := ParamStr(1);
+    if FileExists(LFileParam) and
+       SendFileToExistingInstance(ExpandFileName(LFileParam)) then
+      Exit;
+  end;
+
   Application.Initialize;
   Application.MainFormOnTaskBar := True;
   Application.ActionUpdateDelay := 50;
-  Application.Title := Title_LottieTextEditor+'- © 2022-2025 Ethea S.r.l.';
+  Application.Title := Title_LottieTextEditor+'- Â© 2022-2026 Ethea S.r.l.';
   //Uses System Style for border / shadow of Forms
   TStyleManager.FormBorderStyle := TStyleManager.TFormBorderStyle.fbsSystemStyle;
   with TSplashForm.Create(nil) do

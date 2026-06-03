@@ -117,9 +117,9 @@ uses
 destructor TComPreviewHandler.Destroy;
 begin
   TLogPreview.Add('Destroy Init');
+  inherited Destroy;
   FreeAndNil(FContainer);
   FreeAndNil(FPreviewHandler);
-  inherited Destroy;
   TLogPreview.Add('Destroy Done');
 end;
 
@@ -216,7 +216,6 @@ end;
 
 function TComPreviewHandler.IPreviewHandler_DoPreview: HRESULT;
 begin
-  Result := S_OK;
   TLogPreview.Add('IPreviewHandler_DoPreview Init');
   try
     CheckPreviewHandler;
@@ -226,14 +225,14 @@ begin
       TLogPreview.Add(Format('Error in TComPreviewHandler.IPreviewHandler_DoPreview - Message: %s: Trace %s',
         [E.Message, E.StackTrace]));
   end;
+  Result := S_OK;
   TLogPreview.Add('IPreviewHandler_DoPreview Done');
 end;
 
 function TComPreviewHandler.QueryFocus(var phwnd: HWND): HRESULT;
 begin
   TLogPreview.Add('QueryFocus Init');
-  if Container <> nil then
-    phwnd := GetFocus;
+  phwnd := GetFocus;
   Result := S_OK;
   TLogPreview.Add('QueryFocus Done');
 end;
@@ -270,7 +269,6 @@ begin
   TLogPreview.Add('SetFocus Init');
   if Container <> nil then
   begin
-    Container.Visible := True;
     if GetKeyState(VK_SHIFT) < 0 then
       Container.SetFocusTabLast
     else

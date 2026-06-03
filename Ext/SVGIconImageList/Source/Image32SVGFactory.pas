@@ -1,6 +1,6 @@
 {-----------------------------------------------------------------------------
  Unit Name: Image32SVGFactory
- Author:    Carlo Barazzxetta
+ Author:    Carlo Barazzetta
  Purpose:   High-level encapsuation of Svg functionality for Image32 Library
  History:
 -----------------------------------------------------------------------------}
@@ -160,14 +160,15 @@ begin
 end;
 
 procedure TImage32SVG.UpdateSizeInfo;
+var
+  LSize: TSize;
 begin
   //nb: default widths should be the target image's dimensions
   //since these values will be used for SVG images that simply
   //specify their widths and heights as percentages
-  if fSvgReader.RootElement.viewboxWH.IsEmpty then
-    fSvgReader.CalcViewBoxOfRootElement;
-  FWidth := fSvgReader.RootElement.viewboxWH.Width;
-  FHeight := fSvgReader.RootElement.viewboxWH.Height;
+  LSize := fSvgReader.GetImageSize;
+  FWidth := LSize.cx;
+  FHeight := LSize.cy;
 end;
 
 procedure TImage32SVG.LoadFromSource;
@@ -346,5 +347,6 @@ initialization
   FontManager.LoadFontReaderFamily('Times New Roman');
   FontManager.LoadFontReaderFamily('Segoe UI');
   FontManager.LoadFontReaderFamily('Segoe UI Emoji');
+  FontManager.LoadFontReaderFamily('Webdings');
 
 end.

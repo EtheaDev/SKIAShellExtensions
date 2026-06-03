@@ -4,8 +4,11 @@ inherited FrmPreview: TFrmPreview
   ClientHeight = 615
   ClientWidth = 609
   Font.Name = 'Segoe UI'
+  Position = poScreenCenter
   StyleElements = [seFont, seClient, seBorder]
+  OnClose = FormClose
   OnResize = FormResize
+  OnShow = FormShow
   ExplicitWidth = 625
   ExplicitHeight = 654
   TextHeight = 13
@@ -39,8 +42,24 @@ inherited FrmPreview: TFrmPreview
       Images = SVGIconImageList
       List = True
       TabOrder = 0
-      object ToolButtonPlay: TStyledToolButton
+      object ToolButtonOpen: TStyledToolButton
         Left = 0
+        Top = 0
+        Hint = 'Open Animation File...'
+        OnClick = ToolButtonOpenClick
+        Visible = False
+        Caption = 'Open...'
+        ImageIndex = 16
+        ImageName = 'Open'
+      end
+      object StyledSepOpen: TStyledToolButton
+        Left = 30
+        Top = 0
+        Visible = False
+        Style = tbsSeparator
+      end
+      object ToolButtonPlay: TStyledToolButton
+        Left = 36
         Top = 0
         Hint = 'Play/Restart animation'
         OnMouseEnter = ToolButtonMouseEnter
@@ -49,10 +68,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Play'
         ImageIndex = 13
         ImageName = 'play'
-        AutoSize = True
       end
       object ToolButtonInversePlay: TStyledToolButton
-        Left = 30
+        Left = 66
         Top = 0
         Hint = 'Inverse Play/Restart animation'
         Enabled = False
@@ -64,7 +82,7 @@ inherited FrmPreview: TFrmPreview
         ImageName = 'PlayInverse'
       end
       object ToolButtonPause: TStyledToolButton
-        Left = 60
+        Left = 96
         Top = 0
         Hint = 'Pause animation'
         Enabled = False
@@ -74,10 +92,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Pause'
         ImageIndex = 12
         ImageName = 'pause'
-        AutoSize = True
       end
       object ToolButtonStop: TStyledToolButton
-        Left = 90
+        Left = 126
         Top = 0
         Hint = 'Stop animation'
         Enabled = False
@@ -87,10 +104,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Stop'
         ImageIndex = 14
         ImageName = 'Stop'
-        AutoSize = True
       end
       object ToolButtonSettings: TStyledToolButton
-        Left = 120
+        Left = 156
         Top = 0
         Hint = 'Preview settings...'
         OnMouseEnter = ToolButtonMouseEnter
@@ -100,10 +116,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Settings...'
         ImageIndex = 11
         ImageName = 'preferences-desktop'
-        AutoSize = True
       end
       object ToolButtonAbout: TStyledToolButton
-        Left = 150
+        Left = 186
         Top = 0
         Hint = 'Show about...'
         OnMouseEnter = ToolButtonMouseEnter
@@ -113,21 +128,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'About...'
         ImageIndex = 2
         ImageName = 'about'
-        AutoSize = True
-      end
-      object ToolButtonEditorSettings: TStyledToolButton
-        Left = 180
-        Top = 0
-        Hint = 'Text Settings...'
-        OnMouseEnter = ToolButtonMouseEnter
-        OnMouseLeave = ToolButtonMouseLeave
-        OnClick = ToolButtonEditorSettingsClick
-        Caption = 'Options...'
-        ImageIndex = 3
-        ImageName = 'Support'
       end
       object ToolButtonShowText: TStyledToolButton
-        Left = 210
+        Left = 216
         Top = 0
         OnMouseEnter = ToolButtonMouseEnter
         OnMouseLeave = ToolButtonMouseLeave
@@ -136,10 +139,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Hide text'
         ImageIndex = 1
         ImageName = 'Hide-Text'
-        AutoSize = True
       end
       object ToolButtonReformat: TStyledToolButton
-        Left = 240
+        Left = 246
         Top = 0
         Hint = 'Reformat JSON text'
         OnMouseEnter = ToolButtonMouseEnter
@@ -148,10 +150,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Format'
         ImageIndex = 10
         ImageName = 'Reformat'
-        AutoSize = True
       end
       object ToolButtonZoomOut: TStyledToolButton
-        Left = 270
+        Left = 276
         Top = 0
         Hint = 'Zoom out (decrease font size)'
         OnMouseEnter = ToolButtonMouseEnter
@@ -161,10 +162,9 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Zoom Out'
         ImageIndex = 7
         ImageName = 'minus'
-        AutoSize = True
       end
       object ToolButtonZoomIn: TStyledToolButton
-        Left = 300
+        Left = 306
         Top = 0
         Hint = 'Zoom in (increase font size)'
         OnMouseEnter = ToolButtonMouseEnter
@@ -174,7 +174,17 @@ inherited FrmPreview: TFrmPreview
         Caption = 'Zoom In'
         ImageIndex = 6
         ImageName = 'plus'
-        AutoSize = True
+      end
+      object ToolButtonEditorSettings: TStyledToolButton
+        Left = 336
+        Top = 0
+        Hint = 'Text Settings...'
+        OnMouseEnter = ToolButtonMouseEnter
+        OnMouseLeave = ToolButtonMouseLeave
+        OnClick = ToolButtonEditorSettingsClick
+        Caption = 'Options...'
+        ImageIndex = 3
+        ImageName = 'Support'
       end
     end
   end
@@ -232,7 +242,7 @@ inherited FrmPreview: TFrmPreview
     ParentFont = True
     SimplePanel = True
     SimpleText = 
-      'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2024 Ethea S.r.l' +
+      'SKIA Preview - Ver.%s (%dbit)- Copyright '#169' 2021-2025 Ethea S.r.l' +
       '. - Author: Carlo Barazzetta'
     UseSystemFont = False
   end
@@ -429,11 +439,23 @@ inherited FrmPreview: TFrmPreview
         CollectionIndex = 53
         CollectionName = 'PlayInverse'
         Name = 'PlayInverse'
+      end
+      item
+        CollectionIndex = 1
+        CollectionName = 'Open'
+        Name = 'Open'
       end>
     ImageCollection = dmResources.SVGIconImageCollection
     Width = 24
     Height = 24
     Left = 384
     Top = 208
+  end
+  object OpenDialog: TFileOpenDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = [fdoPathMustExist, fdoFileMustExist, fdoShareAware]
+    Left = 300
+    Top = 196
   end
 end

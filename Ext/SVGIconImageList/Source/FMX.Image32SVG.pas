@@ -3,7 +3,7 @@
 {       SVGIconImageList: An extended ImageList for Delphi/FMX                 }
 {       to simplify use of SVG Icons (resize, opacity and more...)             }
 {                                                                              }
-{       Copyright (c) 2019-2025 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2019-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {       Contributors:                                                          }
 {                                                                              }
@@ -26,7 +26,11 @@
 {******************************************************************************}
 unit FMX.Image32SVG;
 
+{$INCLUDE ..\..\Source\SVGIconImageList.inc}
+
 interface
+
+{$IF DEFINED(FMX_Image32_SVGEngine)}
 
 Uses
   System.Types
@@ -67,7 +71,11 @@ type
     destructor Destroy; override;
   end;
 
+{$ENDIF}
+
 implementation
+
+{$IF DEFINED(FMX_Image32_SVGEngine)}
 
 function AlphaToColor32(AlphaColor: TAlphaColor): TColor32;
 var
@@ -171,11 +179,7 @@ begin
 
   //Copy Image32 to Bitmap
   FImage32.PreMultiply;
-{$IF DEFINED(ANDROID)} //todo: check this on android devices
-  LSource := TBitMapData.Create(FImage32.Width, FImage32.Height, TPixelFormat.RGBA);
-{$ELSE}
   LSource := TBitMapData.Create(FImage32.Width, FImage32.Height, TPixelFormat.BGRA);
-{$ENDIF}
   LSource.Data := FImage32.PixelBase;
   LSource.Pitch := FImage32.Width * 4;
   ABitmap.SetSize(FImage32.Width, FImage32.Height);
@@ -193,6 +197,8 @@ initialization
   FontManager.LoadFontReaderFamily('Times New Roman');
   FontManager.LoadFontReaderFamily('Segoe UI');
   FontManager.LoadFontReaderFamily('Segoe UI Emoji');
+{$ENDIF}
+
 {$ENDIF}
 
 end.

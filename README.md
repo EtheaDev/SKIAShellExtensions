@@ -1,8 +1,8 @@
 ﻿# SKIA Shell Extensions and Lottie Editor [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Latest Version 1.6.0 - 02 Mar 2025**
+**Latest Version 1.7.1 - 03 Jun 2026**
 
-**A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (7, 8, 10 and 11):**
+**A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (10 and 11):**
 
 - A [Preview handler][1]  which allows you to see static images and animations files in the "Preview Panel".
  
@@ -87,6 +87,17 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+03 Jun 2026: ver. 1.7.1
+- Added single-instance behavior: opening a file now reuses the running editor instead of starting a new one.
+- Added Settings option to remember and reopen files from the last session.
+
+07 Sep 2025: ver. 1.7.0
+- Built with Delphi 13
+- Refactoring PageControl to speedup loading
+- Added Animation Viewer
+- Added check for new version available, download and install
+- Updated Setup
 
 02 Mar 2024: ver. 1.6.0
 - Added "Wordwrap option" for the editor (active by default)

@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -35,17 +35,33 @@ unit uAbout;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, pngimage, Vcl.ImgList, System.ImageList,
-  Vcl.Imaging.GIFImg, SVGIconImage, Vcl.ButtonStylesAttributes, Vcl.StyledButton;
+  Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.Controls, System.Classes, Vcl.ImgList, System.ImageList,
+  Vcl.Imaging.GIFImg, SVGIconImage, Vcl.ButtonStylesAttributes, Vcl.StyledButton,
+  System.SysUtils, System.Types, Vcl.Forms, Vcl.ComCtrls;
 
 resourcestring
   Title_LottieTextEditor = 'SKIA/Lottie Text Editor';
   Title_SKIAPreview = 'SKIA Image/Animation Preview';
+  Title_AnimationViewer = 'SKIA Image/Animation Viewer';
+  NewVersionAvailable = 'A new installer is available to download:'+sLineBreak+
+    'Current version: %s - Available version: %s'+sLineBreak+
+    'Do you want to dowload and install the new version?';
+  NewVersionNotAvailable = 'No updates available.'+sLineBreak+
+    'You have already the latest version: %s';
+  Stop_Download_Msg = 'Stop download installer!';
+  CheckForUpdates_Msg = 'Check for updates';
+  Download_Stopped_Err = 'Download of installer stopped!';
+  Downloading_Err = 'Error downloading!';
+  Error_Checking_New_Version = 'Error checking if a new installer is available: %s';
+
+const
+  HELP_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
+  GIT_HUB_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
+  SETUP_FILENAME = 'SkiaShellExtensionsSetup.exe';
 
 type
   TFrmAbout = class(TForm)
-    Panel1:    TPanel;
+    BottomPanel: TPanel;
     btnOK: TStyledButton;
     TitleLabel: TLabel;
     LabelVersion: TLabel;
@@ -66,26 +82,123 @@ type
     procedure btnCheckUpdatesClick(Sender: TObject);
     procedure LinkLabelLinkClick(Sender: TObject;
       const Link: string; LinkType: TSysLinkType);
+    procedure FormShow(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     FTitle: string;
+    FStopDownload: Boolean;
+    FExpectedSize: Int64;
+    FProgressBar: TProgressBar;
     procedure SetTitle(const Value: string);
-  protected
-    procedure Loaded; override;
+    procedure DownloadAndInstallSetup;
+    procedure UpdateGUI(const ADownloadInProgress: Boolean);
   public
+    procedure HttpClientReceiveData(const Sender: TObject;
+      AContentLength, AReadCount: Int64; var Abort: Boolean);
     procedure DisableButtons;
     property Title: string read FTitle write SetTitle;
   end;
 
 procedure ShowAboutForm(const AParentRect: TRect;
-  const ATitle: string);
+  const ATitle: string; const DownloadNewSetup: Boolean);
 procedure HideAboutForm;
+
+function AcceptNewSetup(const AShowMsg: Boolean): Boolean;
+function GetCurrentVersion(const AApplicationExeName: TFileName): string;
 
 implementation
 
 uses
-  ShellApi, uMisc;
+  Winapi.ShellApi
+  , Winapi.Windows
+  , Vcl.Dialogs
+  , Vcl.Graphics
+  , uMisc
+  , StyledTaskDialog
+  , GitHubAPI
+  ;
 
 {$R *.dfm}
+
+var
+ _HttpClient: TGitHubHttpClient;
+
+function GetCurrentVersion(const AApplicationExeName: TFileName): string;
+var
+  LMajorVersion, LMinorVersion, LRelease: integer;
+  InfoSize, Wnd: DWORD;
+  VerBuf: Pointer;
+  FI: PVSFixedFileInfo;
+  VerSize: DWORD;
+begin
+  LMajorVersion := 0;
+  LMinorVersion := 0;
+  LRelease := 0;
+
+  InfoSize := GetFileVersionInfoSize(PChar(AApplicationExeName), Wnd);
+  if InfoSize > 0 then
+  begin
+    GetMem(VerBuf, InfoSize);
+    try
+      if GetFileVersionInfo(PChar(AApplicationExeName), Wnd, InfoSize, VerBuf) then
+      begin
+        if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
+        begin
+          LMajorVersion := HIWORD(FI.dwFileVersionMS);
+          LMinorVersion := LOWORD(FI.dwFileVersionMS);
+          LRelease := HIWORD(FI.dwFileVersionLS);
+        end;
+      end;
+    finally
+      FreeMem(VerBuf);
+    end;
+  end;
+  Result := Format('v%d.%d.%d', [LMajorVersion,LMinorVersion,LRelease]);
+end;
+
+function AcceptNewSetup(const AShowMsg: Boolean): Boolean;
+var
+  LCurrentVersion, LNewVersion: string;
+begin
+  while True do
+  begin
+    Screen.Cursor := crHourGlass;
+    try try
+      LCurrentVersion := GetCurrentVersion(Application.ExeName);
+      if not Assigned(_HttpClient) then
+        _HttpClient := TGitHubHttpClient.Create(nil);
+      Result := _HttpClient.IsNewVersionAvailable(
+        LCurrentVersion, GIT_HUB_URL, LNewVersion);
+      Break;  
+    except
+      on E: ECheckNewVersionException do
+      begin
+        if StyledTaskMessageDlg(CheckForUpdates_Msg,
+          Format(Error_Checking_New_Version, [E.Message]),
+          TMsgDlgType.mtWarning,
+          [mbAbort, mbRetry],0, mbAbort) = mrRetry then
+            Continue
+          else
+            Exit(False);  
+      end
+      else
+        raise;
+    end;
+    finally
+      Screen.Cursor := crDefault;
+    end;
+  end;
+  if Result then
+  begin
+    Result := StyledMessageDlg(Format(NewVersionAvailable,
+      [LCurrentVersion, LNewVersion]),
+      TMsgDlgType.mtWarning, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo, TMsgDlgBtn.mbCancel],
+      0) = mrYes;
+  end
+  else if AShowMsg then
+    StyledMessageDlg(Format(NewVersionNotAvailable,
+      [LCurrentVersion]), TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
+end;
 
 function GetAboutForm: TFrmAbout;
 var
@@ -109,7 +222,8 @@ begin
     LFrm.Close;
 end;
 
-procedure ShowAboutForm(const AParentRect: TRect; const ATitle: string);
+procedure ShowAboutForm(const AParentRect: TRect; const ATitle: string;
+  const DownloadNewSetup: Boolean);
 var
   LFrm: TFrmAbout;
 begin
@@ -128,6 +242,7 @@ begin
       LFrm.Top := (AParentRect.Top + AParentRect.Bottom - LFrm.Height) div 2;
     end;
     LFrm.Title := ATitle;
+    LFrm.FStopDownload := not DownloadNewSetup;
     LFrm.ShowModal;
   finally
     LFrm.Free;
@@ -135,12 +250,11 @@ begin
 end;
 
 procedure TFrmAbout.btnCheckUpdatesClick(Sender: TObject);
-var
-  LBinaryPath, LUpdaterPath: string;
 begin
-  LBinaryPath := GetModuleLocation();
-  LUpdaterPath := ExtractFilePath(LBinaryPath)+'Updater.exe';
-  ShellExecute(0, 'open', PChar(LUpdaterPath), PChar(Format('"%s"', [LBinaryPath])), '', SW_SHOWNORMAL);
+  if not FStopDownload then
+    FStopDownload := True
+  else if AcceptNewSetup(True) then
+    DownloadAndInstallSetup;
 end;
 
 
@@ -152,7 +266,7 @@ end;
 procedure TFrmAbout.btnIssuesClick(Sender: TObject);
 begin
    ShellExecute(Handle, 'open',
-    PChar('https://github.com/EtheaDev/SKIAShellExtensions/issues'),
+    PChar(GIT_HUB_URL+'/issues'),
     nil, nil, SW_SHOW);
 end;
 
@@ -162,8 +276,56 @@ begin
   btnCheckUpdates.OnClick := nil;
 end;
 
+procedure TFrmAbout.UpdateGUI(const ADownloadInProgress: Boolean);
+begin
+  btnIssues.Enabled := not ADownloadInProgress;
+  btnOK.Enabled := not ADownloadInProgress;
+  FProgressBar.Visible := ADownloadInProgress;
+  if ADownloadInProgress then
+  begin
+    FStopDownload := False;
+    btnCheckUpdates.Caption := Stop_Download_Msg;
+  end
+  else
+  begin
+    btnCheckUpdates.Caption := CheckForUpdates_Msg;
+  end;
+end;
+
+procedure TFrmAbout.DownloadAndInstallSetup;
+var
+  AOutFileName: TFileName;
+begin
+  UpdateGUI(True);
+  try
+    //Start Download
+    var LSize := _HttpClient.DownloadLatestSetup(
+      SETUP_FILENAME,
+      HttpClientReceiveData,
+      AOutFileName);
+    if LSize <> FExpectedSize then
+    begin
+      if FStopDownload then
+        raise Exception.Create(Download_Stopped_Err)
+      else
+        raise Exception.Create(Downloading_Err);
+    end;
+  finally
+    UpdateGUI(False);
+  end;
+  ShellExecute(0, 'open', PChar(AOutFileName), nil, nil, SW_SHOWNORMAL);
+  Application.Terminate;
+end;
+
+procedure TFrmAbout.FormActivate(Sender: TObject);
+begin
+  if not FStopDownload then
+    DownloadAndInstallSetup;
+end;
+
 procedure TFrmAbout.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  FStopDownload := True;
   Action := caFree;
 end;
 
@@ -179,13 +341,25 @@ begin
   {$ELSE}
   LabelVersion.Caption := Format('Version %s (64bit)', [FileVersionStr]);
   {$ENDIF}
+  //ProgressBar for Download
+  FProgressBar := TProgressBar.Create(Self);
+  FProgressBar.Visible := False;
+  FProgressBar.Align := alBottom;
+  FProgressBar.Height := Round(6 * ScaleFactor);
+  FProgressBar.Parent := BottomPanel;
+  FProgressBar.MarqueeInterval := 1;
+  FProgressBar.Max := 100;
+  btnCheckUpdates.Visible := True;
+  FStopDownload := True;
+
   MemoCopyRights.Lines.Add('Author: Carlo Barazzetta - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('Custom icons: Ariel Montes - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('https://github.com/EtheaDev/SKIAShellExtensions');
   MemoCopyRights.Lines.Add('Copyright © 2022-2025 all rights reserved.');
   MemoCopyRights.Lines.Add('');
-  MemoCopyRights.Lines.Add('Ethea''s libraries and tools used:');
+  MemoCopyRights.Lines.Add('Third Party libraries and tools used from Ethea:');
   MemoCopyRights.Lines.Add('SVGIconImageList https://github.com/EtheaDev/SVGIconImageList/');
+  MemoCopyRights.Lines.Add('Copyright © 2019-2025 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('The Initial Developer of the Original Code is Rodrigo Ruz V.');
   MemoCopyRights.Lines.Add('Portions created by Rodrigo Ruz V. are Copyright © 2011-2022 Rodrigo Ruz V.');
@@ -202,18 +376,32 @@ begin
   MemoCopyRights.Lines.Add('');
 end;
 
+procedure TFrmAbout.FormShow(Sender: TObject);
+begin
+  if btnOK.CanFocus then
+    btnOK.SetFocus;
+end;
+
+procedure TFrmAbout.HttpClientReceiveData(const Sender: TObject; AContentLength,
+  AReadCount: Int64; var Abort: Boolean);
+begin
+  if (AContentLength > 0) then
+  begin
+    if FExpectedSize = 0 then
+      FExpectedSize := AContentLength;
+    var LNewPos := Round(AReadCount * 100 / AContentLength)+10;
+    if LNewPos <= 100 then
+      FProgressBar.Position := LNewPos;
+  end;
+  Application.ProcessMessages;
+  //Abort Download if Stop Download Button was pressed
+  Abort := FStopDownload;
+end;
+
 procedure TFrmAbout.LinkLabelLinkClick(Sender: TObject;
   const Link: string; LinkType: TSysLinkType);
 begin
   ShellExecute(Handle, 'open', PChar(Link), nil, nil, SW_SHOW);
-end;
-
-procedure TFrmAbout.Loaded;
-begin
-  TitleLabel.Font.Height := Round(TitleLabel.Font.Height * 1.6);
-  PoweredLabel.Font.Height := Round(PoweredLabel.Font.Height * 1.6);
-
-  inherited;
 end;
 
 procedure TFrmAbout.SetTitle(const Value: string);
@@ -222,5 +410,11 @@ begin
   Caption := FTitle;
   TitleLabel.Caption := Value;
 end;
+
+initialization
+  _HttpClient := nil;
+
+finalization
+  FreeAndNil(_HttpClient);
 
 end.

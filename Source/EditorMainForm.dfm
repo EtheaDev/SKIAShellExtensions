@@ -4,13 +4,16 @@ object frmMain: TfrmMain
   Caption = 'Lottie Text Editor'
   ClientHeight = 588
   ClientWidth = 899
-  Color = clWindow
+  Color = clAppWorkSpace
+  Constraints.MinHeight = 600
+  Constraints.MinWidth = 800
   Ctl3D = False
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  KeyPreview = True
   Position = poScreenCenter
   ShowHint = True
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
@@ -27,7 +30,7 @@ object frmMain: TfrmMain
     588)
   TextHeight = 15
   object RightSplitter: TSplitter
-    Left = 570
+    Left = 434
     Top = 38
     Width = 6
     Height = 531
@@ -38,51 +41,10 @@ object frmMain: TfrmMain
   object ClientPanel: TPanel
     Left = 44
     Top = 38
-    Width = 526
+    Width = 390
     Height = 531
     Align = alClient
-    TabOrder = 0
-    ExplicitWidth = 522
-    ExplicitHeight = 530
-    object PageControl: TPageControl
-      Left = 1
-      Top = 1
-      Width = 524
-      Height = 529
-      Align = alClient
-      Images = VirtualImageList
-      TabOrder = 0
-      OnChange = PageControlChange
-      OnMouseEnter = PageControlMouseEnter
-      OnMouseLeave = PageControlMouseLeave
-      OnMouseMove = PageControlMouseMove
-      ExplicitWidth = 520
-      ExplicitHeight = 528
-    end
-    object PanelCloseButton: TPanel
-      Left = 122
-      Top = 16
-      Width = 22
-      Height = 22
-      Cursor = crHandPoint
-      BevelOuter = bvNone
-      ParentColor = True
-      TabOrder = 1
-      Visible = False
-      StyleElements = [seFont, seBorder]
-      object SVGIconImageCloseButton: TSVGIconImage
-        Left = 0
-        Top = 0
-        Width = 22
-        Height = 22
-        AutoSize = False
-        ImageList = VirtualImageList20
-        ImageIndex = 0
-        ImageName = 'close-circle-outline'
-        Align = alClient
-        OnClick = SVGIconImageCloseButtonClick
-      end
-    end
+    TabOrder = 4
   end
   object StatusBar: TStatusBar
     Left = 0
@@ -111,26 +73,23 @@ object frmMain: TfrmMain
       item
         Width = 80
       end>
-    ExplicitTop = 568
-    ExplicitWidth = 895
   end
   object ImagePanel: TPanel
-    Left = 576
+    Left = 440
     Top = 38
-    Width = 323
+    Width = 459
     Height = 531
     Align = alRight
     BevelOuter = bvNone
     Color = clWhite
     ParentBackground = False
-    TabOrder = 2
+    TabOrder = 0
+    Visible = False
     StyleElements = []
-    ExplicitLeft = 572
-    ExplicitHeight = 530
     object StatusSplitter: TSplitter
       Left = 0
       Top = 493
-      Width = 323
+      Width = 459
       Height = 4
       Cursor = crVSplit
       Align = alBottom
@@ -139,16 +98,16 @@ object frmMain: TfrmMain
     object panelPreview: TPanel
       Left = 0
       Top = 24
-      Width = 323
+      Width = 459
       Height = 40
       Align = alTop
       ParentBackground = False
       ShowCaption = False
-      TabOrder = 0
+      TabOrder = 1
       object BackgroundGrayScaleLabel: TLabel
-        Left = 6
+        Left = 10
         Top = 6
-        Width = 75
+        Width = 63
         Height = 39
         AutoSize = False
         Caption = 'Backlight %:'
@@ -158,7 +117,7 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 81
         Top = 4
-        Width = 238
+        Width = 374
         Height = 32
         Cursor = crHandPoint
         Margins.Left = 80
@@ -175,33 +134,32 @@ object frmMain: TfrmMain
       AlignWithMargins = True
       Left = 3
       Top = 67
-      Width = 317
+      Width = 453
       Height = 102
       Align = alTop
       AutoSize = True
       BevelOuter = bvNone
       ParentColor = True
-      TabOrder = 1
+      TabOrder = 3
     end
     object ImagePreviewPanel: TPanel
       Left = 0
       Top = 0
-      Width = 323
+      Width = 459
       Height = 24
       Align = alTop
       Caption = 'IMAGE PREVIEW'
       ParentBackground = False
-      TabOrder = 3
+      TabOrder = 0
     end
     object StatusPanel: TPanel
       Left = 0
       Top = 497
-      Width = 323
+      Width = 459
       Height = 34
       Align = alBottom
       ParentBackground = False
       TabOrder = 2
-      ExplicitTop = 496
       object StatusImage: TSVGIconImage
         Left = 1
         Top = 1
@@ -217,8 +175,8 @@ object frmMain: TfrmMain
         AlignWithMargins = True
         Left = 36
         Top = 4
-        Width = 283
-        Height = 26
+        Width = 4
+        Height = 4
         Align = alClient
         Alignment = taCenter
         TabOrder = 0
@@ -227,19 +185,18 @@ object frmMain: TfrmMain
     object PlayerPanel: TPanel
       Left = 0
       Top = 409
-      Width = 323
+      Width = 459
       Height = 84
       Align = alBottom
       BevelInner = bvLowered
       BevelOuter = bvNone
       ParentBackground = False
       TabOrder = 4
-      ExplicitTop = 408
       object RunLabel: TLabel
         AlignWithMargins = True
         Left = 157
         Top = 13
-        Width = 49
+        Width = 185
         Height = 19
         Margins.Left = 6
         Margins.Top = 12
@@ -285,7 +242,7 @@ object frmMain: TfrmMain
         end
       end
       object LoopToggleSwitch: TToggleSwitch
-        Left = 212
+        Left = 348
         Top = 1
         Width = 110
         Height = 43
@@ -300,7 +257,7 @@ object frmMain: TfrmMain
       object TrackBar: TTrackBar
         Left = 1
         Top = 44
-        Width = 321
+        Width = 457
         Height = 39
         Cursor = crHandPoint
         Align = alBottom
@@ -323,12 +280,11 @@ object frmMain: TfrmMain
     OpenedWidth = 160
     ParentDoubleBuffered = True
     Placement = svpLeft
-    TabOrder = 3
+    TabOrder = 1
     OnClosed = SVClosed
     OnClosing = SVClosing
     OnOpened = SVOpened
     OnOpening = SVOpening
-    ExplicitHeight = 532
     object catMenuItems: TStyledCategoryButtons
       Left = 0
       Top = 0
@@ -434,7 +390,6 @@ object frmMain: TfrmMain
       OnGetHint = catMenuItemsGetHint
       OnMouseLeave = catMenuItemsMouseLeave
       OnMouseMove = catMenuItemsMouseMove
-      ExplicitHeight = 532
     end
   end
   object panlTop: TPanel
@@ -445,18 +400,16 @@ object frmMain: TfrmMain
     Align = alTop
     BevelOuter = bvNone
     ParentBackground = False
-    TabOrder = 4
-    ExplicitWidth = 895
+    TabOrder = 2
     object lblTitle: TLabel
       AlignWithMargins = True
-      Left = 41
+      Left = 40
       Top = 3
       Width = 88
-      Height = 32
+      Height = 15
       Align = alLeft
       Caption = 'Lottie Text Editor'
       Layout = tlCenter
-      ExplicitHeight = 15
     end
     object SettingsToolBar: TStyledToolbar
       AlignWithMargins = True
@@ -490,17 +443,17 @@ object frmMain: TfrmMain
         Top = 0
         Action = actnPrinterSetup
       end
-      object ToolButton9: TStyledToolButton
+      object SepToolButton: TStyledToolButton
         Left = 128
         Top = 0
         Style = tbsSeparator
       end
-      object AbouTStyledToolButton: TStyledToolButton
+      object AboutToolButton: TStyledToolButton
         Left = 134
         Top = 0
         Action = acAbout
       end
-      object QuiTStyledToolButton: TStyledToolButton
+      object QuitToolButton: TStyledToolButton
         Left = 166
         Top = 0
         Action = acQuit
@@ -511,25 +464,25 @@ object frmMain: TfrmMain
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 32
+      Width = 31
       Height = 32
       Align = alLeft
-      AutoSize = True
       ButtonHeight = 32
       ButtonWidth = 32
       Images = VirtualImageList
       Indent = 3
       TabOrder = 1
-      object ToolButton1: TStyledToolButton
+      object MenuToolButton: TStyledToolButton
         Left = 0
         Top = 0
         Action = actMenu
-        AutoSize = True
       end
     end
   end
-  object OpenDialog: TOpenDialog
-    Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
+  object OpenDialog: TFileOpenDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = [fdoAllowMultiSelect, fdoPathMustExist, fdoFileMustExist, fdoShareAware]
     Left = 300
     Top = 196
   end
@@ -564,6 +517,7 @@ object frmMain: TfrmMain
       ImageName = 'Cut'
       ShortCut = 16472
       OnExecute = acEditCutExecute
+      OnUpdate = actionForFileUpdate
     end
     object acSearch: TAction
       Category = 'Edit'
@@ -801,7 +755,6 @@ object frmMain: TfrmMain
       ImageIndex = 38
       ImageName = 'export'
       ShortCut = 16453
-      Visible = False
       OnExecute = ExportToPNGActionExecute
     end
     object PlayAction: TAction
@@ -833,11 +786,10 @@ object frmMain: TfrmMain
       OnExecute = PlayInverseActionExecute
     end
   end
-  object SaveDialog: TSaveDialog
-    Filter = 
-      'Lottie Image file (.lottie)|*.lottie|Lottie json file (.json)|*.' +
-      'json'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+  object SaveDialog: TFileSaveDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = [fdoOverWritePrompt, fdoNoReadOnlyReturn]
     Left = 300
     Top = 264
   end
@@ -851,13 +803,13 @@ object frmMain: TfrmMain
     object SaveMenuItem: TMenuItem
       Action = acSave
     end
-    object CloseAll1: TMenuItem
+    object CloseAllMenuItem: TMenuItem
       Action = acCloseAll
     end
     object Sep1MenuItem: TMenuItem
       Caption = '-'
     end
-    object Reformattext1: TMenuItem
+    object ReformatTextMenuItem: TMenuItem
       Action = actnFormatJSON
     end
     object SelectAllMenuItem: TMenuItem
@@ -1206,7 +1158,7 @@ object frmMain: TfrmMain
   object CheckFileChangedTimer: TTimer
     Interval = 3000
     OnTimer = CheckFileChangedTimerTimer
-    Left = 296
-    Top = 356
+    Left = 144
+    Top = 352
   end
 end

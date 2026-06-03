@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, Lottie Editor)                         }
 {                                                                              }
-{       Copyright (c) 2022-2025 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -39,7 +39,8 @@ uses
   ActnList, SynEditHighlighter, SynUnicode, System.ImageList, Vcl.ImgList,
   SVGIconImageListBase, SVGIconImageList, uSettings, Vcl.ButtonGroup,
   Vcl.ToolWin, DResources, Vcl.VirtualImageList, uAbout, Vcl.WinXCtrls,
-  Vcl.ButtonStylesAttributes, Vcl.StyledButtonGroup, Vcl.StyledButton;
+  Vcl.ButtonStylesAttributes, Vcl.StyledButtonGroup, Vcl.StyledButton,
+  Vcl.Samples.Spin;
 
 type
   TUserSettingsForm = class(TForm)
@@ -96,9 +97,16 @@ type
     AnimationsGroupBox: TGroupBox;
     AutoPlayCheckBox: TCheckBox;
     LoopCheckBox: TCheckBox;
+    EditingOptionsGroupBox: TGroupBox;
+    RestoreLastSessionCheckBox: TCheckBox;
     ActiveLineColorGroupBox: TGroupBox;
     DarkActiveLineColorColorBox: TColorBox;
     LightActiveLineColorColorBox: TColorBox;
+    tsUpdates: TTabSheet;
+    UpdateGroupBox: TGroupBox;
+    AutoUpdateCheckBox: TCheckBox;
+    CheckNDaysLabel: TLabel;
+    CheckNDaysSpinEdit: TSpinEdit;
     procedure BoxElementsClick(Sender: TObject);
     procedure cbForegroundClick(Sender: TObject);
     procedure cbBackgroundClick(Sender: TObject);
@@ -118,12 +126,14 @@ type
     procedure ResetButtonClick(Sender: TObject);
     procedure CbFontDrawItem(Control: TWinControl; Index: Integer; Rect: TRect;
       State: TOwnerDrawState);
+    procedure AutoUpdateCheckBoxClick(Sender: TObject);
   private
     FHighlighter: TSynCustomHighlighter;
     FSourceSynEdit: TSynEdit;
     FFileName: string;
     FAboutForm: TFrmAbout;
     FTitle: string;
+    procedure UpdateGUI;
     procedure PopulateAvailThemes;
     procedure AssignSettings(ASettings: TSettings);
     procedure UpdateSettings(ASettings: TSettings);
@@ -200,26 +210,30 @@ begin
       LSettingsForm.Left := (AParentRect.Left + AParentRect.Right - LSettingsForm.Width) div 2;
       LSettingsForm.Top := (AParentRect.Top + AParentRect.Bottom - LSettingsForm.Height) div 2;
     end;
+    StatusBar.SimpleText := FFileName;
 
     FSourceSynEdit := ASourceSynEdit;
-    SynEdit.Color := FSourceSynEdit.Color;
-    SynEdit.Font.Assign(FSourceSynEdit.Font);
-    SynEdit.Gutter.Assign(FSourceSynEdit.Gutter);
-    SynEdit.ActiveLineColor := FSourceSynEdit.ActiveLineColor;
-    StatusBar.SimpleText := FFileName;
-    HighLightSettingsClass := TSynCustomHighlighterClass(
-      ASourceSynEdit.Highlighter.ClassType);
-    FHighlighter := HighLightSettingsClass.Create(nil);
-    Try
+    if Assigned(FSourceSynEdit) then
+    begin
+      SynEdit.Color := FSourceSynEdit.Color;
+      SynEdit.Font.Assign(FSourceSynEdit.Font);
+      SynEdit.Gutter.Assign(FSourceSynEdit.Gutter);
+      SynEdit.ActiveLineColor := FSourceSynEdit.ActiveLineColor;
+      HighLightSettingsClass := TSynCustomHighlighterClass(
+        FSourceSynEdit.Highlighter.ClassType);
+      FHighlighter := HighLightSettingsClass.Create(nil);
       SynEdit.Highlighter := FHighlighter;
       CloneSynEdit(ASourceSynEdit,SynEdit);
       SynEdit.Text := ASourceSynEdit.Text;
       AddElements;
+    end;
+    try
       Result := ShowModal = mrOk;
       if Result then
         UpdateSettings(ASettings);
     Finally
-      FHighlighter.Free;
+      if Assigned(FHighlighter) then
+        FHighlighter.Free;
     End;
 
   Finally
@@ -501,9 +515,12 @@ begin
   tsFont.TabVisible := False;
   stTheme.TabVisible := False;
   stGeneral.TabVisible := False;
+  tsUpdates.TabVisible := false;  
   CbFont.Items.Assign(Screen.Fonts);
   TitlePanel.Font.Height := Round(TitlePanel.Font.Height * 1.5);
   MenuButtonGroup.Font.Height := Round(MenuButtonGroup.Font.Height * 1.2);
+
+  UpdateGroupBox.Caption := CheckForUpdates_Msg;
   PanelTopPreviewSettings.Font.Style := PanelTopPreviewSettings.Font.Style + [fsBold];
   PanelTopTheme.Font.Style := PanelTopTheme.Font.Style + [fsBold];
   PanelTopFont.Font.Style := PanelTopFont.Font.Style + [fsBold];
@@ -513,6 +530,13 @@ end;
 procedure TUserSettingsForm.FormDestroy(Sender: TObject);
 begin
   FAboutForm.Free;
+end;
+
+procedure TUserSettingsForm.AutoUpdateCheckBoxClick(Sender: TObject);
+begin
+  if AutoUpdateCheckBox.Checked and (CheckNDaysSpinEdit.Value = -1) then
+    CheckNDaysSpinEdit.Value := default_checkdays;
+  UpdateGUI;
 end;
 
 procedure TUserSettingsForm.ColorBoxSelect(Sender: TObject);
@@ -554,7 +578,17 @@ begin
   DarkActiveLineColorColorBox.Selected := TEditorSettings(ASettings).DarkActiveLineColor;
   LightActiveLineColorColorBox.Selected := TEditorSettings(ASettings).LightActiveLineColor;
 
+  EditingOptionsGroupBox.Visible := ASettings is TEditorSettings;
+  if EditingOptionsGroupBox.Visible then
+    RestoreLastSessionCheckBox.Checked := TEditorSettings(ASettings).RestoreLastSession
+  else
+    RestoreLastSessionCheckBox.Checked := False;
+
+  AutoUpdateCheckBox.Checked := ASettings.DaysForNextCheck <> -1;
+  CheckNDaysSpinEdit.Value := ASettings.DaysForNextCheck;
+
   PopulateAvailThemes;
+  UpdateGUI;  
 end;
 
 function TUserSettingsForm.SelectedStyleIsDark: Boolean;
@@ -576,6 +610,11 @@ begin
     Result := DefaultStyleName;
 end;
 
+procedure TUserSettingsForm.UpdateGUI;
+begin
+  CheckNDaysSpinEdit.Enabled := AutoUpdateCheckBox.Checked;
+end;
+
 procedure TUserSettingsForm.UpdateSettings(ASettings: TSettings);
 begin
   ASettings.ActivePageIndex := pc.ActivePageIndex;
@@ -592,7 +631,13 @@ begin
   begin
     TEditorSettings(ASettings).DarkActiveLineColor := DarkActiveLineColorColorBox.Selected;
     TEditorSettings(ASettings).LightActiveLineColor := LightActiveLineColorColorBox.Selected;
+    TEditorSettings(ASettings).RestoreLastSession := RestoreLastSessionCheckBox.Checked;
   end;
+
+  if AutoUpdateCheckBox.Checked then
+    ASettings.DaysForNextCheck := CheckNDaysSpinEdit.Value
+  else
+    ASettings.DaysForNextCheck := -1;
 end;
 
 procedure TUserSettingsForm.MenuButtonGroupButtonClicked(Sender: TObject;
@@ -602,7 +647,7 @@ begin
   begin
     case Index of
       0: ExitFromSettings(nil);
-      1,2,3,4: ChangePage(Index -1);
+      1,2,3,4,5: ChangePage(Index -1);
     else
       Beep;
     end;
@@ -672,7 +717,8 @@ end;
 procedure TUserSettingsForm.ExitFromSettings(Sender: TObject);
 begin
   //Salva i parametri su file
-  CloneSynEdit(SynEdit, FSourceSynEdit);
+  if Assigned(FSourceSynEdit) and Assigned(SynEdit) then
+    CloneSynEdit(SynEdit, FSourceSynEdit);
   ModalResult := mrOk;
 end;
 

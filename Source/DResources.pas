@@ -46,6 +46,25 @@ uses
   , SVGIconImageList, Vcl.BaseImageCollection, SVGIconImageCollection
   ;
 
+resourcestring
+  PAGE_HEADER_FIRST_LINE_LEFT = '$TITLE$';
+  PAGE_HEADER_FIRST_LINE_RIGHT = 'Page count: $PAGECOUNT$';
+  PAGE_FOOTER_FIRST_LINE_LEFT = 'Print Date: $DATE$. Time: $TIME$';
+  PAGE_FOOTER_FIRST_LINE_RIGHT = 'Page $PAGENUM$ of $PAGECOUNT$';
+  FILE_NOT_FOUND = 'File "%s" not found!';
+  SMODIFIED = 'Changed';
+  SUNMODIFIED = 'Not changed';
+  STATE_READONLY = 'Read-only';
+  STATE_INSERT = 'Insert';
+  STATE_OVERWRITE = 'Overwrite';
+  CLOSING_PROBLEMS = 'Problem closing!';
+  STR_ERROR = 'ERROR!';
+  STR_UNEXPECTED_ERROR = 'UNEXPECTED ERROR!';
+  CONFIRM_CHANGES = 'ATTENTION: the content of file "%s" is changed: do you want to save the file?';
+  FILE_CHANGED_RELOAD = 'File "%s" Date/Time changed! Do you want to reload it?';
+  LOTTIE_PARSING_OK = 'Lottie Parsing is correct.';
+  FILES_TYPE = 'Lottie files';
+
 type
   TEditFileType = Record
     ComponentName : string;
@@ -68,8 +87,10 @@ type
   end;
 
 function ReformatJSON(const AJSONText: string): string;
-function GetOpenDialogFilter(const AOnlyTextFormat: boolean): string;
+//function GetOpenDialogFilter(const AOnlyTextFormat: boolean): string;
 function GetSupportedExtensions(const AOnlyTextFormat: boolean): TArray<string>;
+function IsExtensionSupported(const AExtension: string;
+  const AOnlyTextFormat: boolean): Boolean;
 
 var
   dmResources: TdmResources;
@@ -181,6 +202,7 @@ begin
   end;
 end;
 
+(*
 function GetOpenDialogFilter(const AOnlyTextFormat: boolean): string;
 const
   AllFiles = 'All files';
@@ -215,6 +237,7 @@ begin
   Result := Result + Format('|%s (%s)|%s', [AllFiles, '.*', '.*']);
   Result := Result.Replace('.', '*.');
 end;
+*)
 
 function GetSupportedExtensions(const AOnlyTextFormat: boolean): TArray<string>;
 var
@@ -254,6 +277,25 @@ begin
     Result := Result + ['.srw'];
   end;
 *)
+end;
+
+function AcceptedExtensions(const AOnlyTextFormat: boolean): string;
+begin
+  //Check file extension
+  Result := string('').Join(';', GetSupportedExtensions(AOnlyTextFormat));
+end;
+
+function IsExtensionSupported(const AExtension: string;
+  const AOnlyTextFormat: boolean): Boolean;
+begin
+  Result := pos(AExtension,
+    AcceptedExtensions(AOnlyTextFormat)) <> 0;
+end;
+
+function CanAcceptFileName(const AFileName: string;
+  const AOnlyTextFormat: boolean): Boolean;
+begin
+  Result := IsExtensionSupported(ExtractFileExt(AFileName), AOnlyTextFormat);
 end;
 
 end.

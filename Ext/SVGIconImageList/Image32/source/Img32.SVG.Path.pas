@@ -2,10 +2,10 @@ unit Img32.SVG.Path;
 
 (*******************************************************************************
 * Author    :  Angus Johnson                                                   *
-* Version   :  4.7                                                             *
-* Date      :  6 January 2025                                                  *
+* Version   :  4.9                                                             *
+* Date      :  8 April 2026                                                    *
 * Website   :  https://www.angusj.com                                          *
-* Copyright :  Angus Johnson 2019-2025                                         *
+* Copyright :  Angus Johnson 2019-2026                                         *
 *                                                                              *
 * Purpose   :  Essential structures and functions to read SVG Path elements    *
 *                                                                              *
@@ -458,14 +458,14 @@ end;
 function TSvgPathSeg.DescaleAndOffset(const pt: TPointD): TPointD;
 begin
   Result := TranslatePoint(pt, -parent.PathOffset.X, -parent.PathOffset.Y);
-  Result := ScalePoint(Result, 1/Owner.Scale);
+  Result := ScalePoint(Result, 1 / Owner.Scale);
 end;
 //------------------------------------------------------------------------------
 
 function TSvgPathSeg.DescaleAndOffset(const p: TPathD): TPathD;
 begin
   Result := TranslatePath(p, -parent.PathOffset.X, -parent.PathOffset.Y);
-  Result := ScalePath(Result, 1/Owner.Scale);
+  Result := ScalePath(Result, 1 / Owner.Scale);
 end;
 //------------------------------------------------------------------------------
 
@@ -544,7 +544,7 @@ end;
 
 procedure TSvgStraightSeg.GetFlattenedInternal;
 begin
-  PrePendPoint(fFirstPt, fCtrlPts, fFlatPath);
+  fFlatPath := PrePendPoint(fFirstPt, fCtrlPts);
 end;
 
 //------------------------------------------------------------------------------
@@ -779,9 +779,9 @@ begin
     if relative then Result := 'a ' else Result := 'A ';
 
     Result := Result +
-      AsFloatStr(rec.Width *0.5 /Owner.Scale, decimalPrec) + ',';
+      AsFloatStr(rec.Width * 0.5 / Owner.Scale, decimalPrec) + ',';
     Result := Result +
-      AsFloatStr(rec.Height *0.5 /Owner.Scale, decimalPrec) + ' ';
+      AsFloatStr(rec.Height * 0.5 / Owner.Scale, decimalPrec) + ' ';
     //angle as degrees
     Result := Result + AsIntStr(RadToDeg(rectAngle));
 
@@ -830,7 +830,7 @@ begin
   len := Length(fCtrlPts) div 3;
   NewPointDArray(Result, len, True);
   for i := 0 to High(Result) do
-    Result[i] := fCtrlPts[i*3 +2];
+    Result[i] := fCtrlPts[i * 3 + 2];
 end;
 //------------------------------------------------------------------------------
 
@@ -856,7 +856,7 @@ begin
   relPt := DescaleAndOffset(fFirstPt);
   for i := 0 to High(fCtrlPts) do
   begin
-    pt:= DescaleAndOffset(fCtrlPts[i]);
+    pt := DescaleAndOffset(fCtrlPts[i]);
     Result := Result + AsCoordStr(pt, relPt, relative, decimalPrec);
     if relative and (i mod 3 = 2) then relPt := pt;
   end;
@@ -923,7 +923,7 @@ begin
   relPt := DescaleAndOffset(fFirstPt);
   for i := 0 to High(fCtrlPts) do
   begin
-    pt:= DescaleAndOffset(fCtrlPts[i]);
+    pt := DescaleAndOffset(fCtrlPts[i]);
     Result := Result + AsCoordStr(pt, relPt, relative, decimalPrec);
     relPt := pt;
   end;
@@ -949,7 +949,7 @@ begin
   len := Length(fCtrlPts) div 2;
   NewPointDArray(Result, len, True);
   for i := 0 to High(Result) do
-    Result[i] := fCtrlPts[i*2+1];
+    Result[i] := fCtrlPts[i * 2 + 1];
 end;
 //------------------------------------------------------------------------------
 
@@ -1014,7 +1014,7 @@ begin
   len := Length(fCtrlPts) div 2;
   NewPointDArray(Result, len, True);
   for i := 0 to High(Result) do
-    Result[i] := fCtrlPts[i*2+1];
+    Result[i] := fCtrlPts[i * 2 + 1];
 end;
 //------------------------------------------------------------------------------
 
@@ -1261,10 +1261,35 @@ function TSvgSubPath.AddZSeg(const endPt, firstPt: TPointD): TSvgZSegment;
 var
   i: integer;
 begin
+  // If the previous command is missing required coordinate data, then the
+  // initial point is used to fill in the missing data (but only for the last
+  // point or points).
+  // https://www.w3.org/TR/2015/WD-SVG2-20150915/paths.html#PathDataClosePathCommand
+
   i := fSegsCount;
   if i = Length(fSegs) then
     GrowSegs;
   inc(fSegsCount);
+
+  if (i > 0) then
+  begin
+    if (fSegs[i-1] is TSvgCSegment) then
+    begin
+      while (Length(TSvgCSegment(fSegs[i-1]).fCtrlPts) < 3) do
+        AppendPoint(TSvgCSegment(fSegs[i-1]).fCtrlPts, GetFirstPt);
+    end
+    else if (fSegs[i-1] is TSvgSSegment) then
+    begin
+      while (Length(TSvgCSegment(fSegs[i-1]).fCtrlPts) < 2) do
+        AppendPoint(TSvgCSegment(fSegs[i-1]).fCtrlPts, GetFirstPt);
+    end
+    else if (fSegs[i-1] is TSvgQSegment) then
+    begin
+      while (Length(TSvgCSegment(fSegs[i-1]).fCtrlPts) < 2) do
+        AppendPoint(TSvgCSegment(fSegs[i-1]).fCtrlPts, GetFirstPt);
+    end;
+  end;
+
 
   Result := TSvgZSegment.Create(self, i, endPt);
   fSegs[i] := Result;
@@ -1333,8 +1358,8 @@ begin
 
   with fParent do
   begin
-    pt.X := (fSegs[0].fFirstPt.X - self.PathOffset.X - Offset.X)/fPathScale;
-    pt.Y := (fSegs[0].fFirstPt.Y - self.PathOffset.Y - Offset.Y)/fPathScale;
+    pt.X := (fSegs[0].fFirstPt.X - self.PathOffset.X - Offset.X) / fPathScale;
+    pt.Y := (fSegs[0].fFirstPt.Y - self.PathOffset.Y - Offset.Y) / fPathScale;
   end;
   Result := 'M ' + AsCoordStr(pt, NullPointD, false, decimalPrec);
 end;
@@ -1497,7 +1522,7 @@ var
   firstPt     : TPointD;
   lastPt      : TPointD;
   currPt      : TPointD;
-  pt2, pt3    : TPointD;
+  pt2         : TPointD;
   angle       : double;
   sweepCW     : integer;
   largeArc    : integer;
@@ -1524,25 +1549,31 @@ var
   begin
     // Count the numbers before the next segment type char
     ptCap := 0;
+    dec(endC); // trailing double-quote.
     while c < endC do
     begin
-      // skip whitespaces
+
+      // valid separators are whitespace and/or a comma
+      // https://www.w3.org/TR/SVG2/paths.html
+      while (c < endC) and (c^ <= space) do
+        inc(c);
+      if (c < endC) and (c^ = comma) then
+        inc(c);
       while (c < endC) and (c^ <= space) do
         inc(c);
 
-      if c >= endC then
-        break;
+      if (c >= endC) or
+        (not CharInSet(c^, ['0'..'9', '-', '.'])) then
+          break;
+      inc(c);
 
-      case c^ of
-        '0'..'9', '-', '.', 'E', 'e':
-          begin
-            while (c < endC) and (c^ > space) do
-              inc(c);
-            Inc(ptCap);
-          end;
-      else
-        Break;
-      end;
+      // nb: a minus char in the following loop
+      // must belong to the following value
+      while (c < endC) and
+        CharInSet(c^, ['0'..'9', '.', 'E', 'e']) do
+          inc(c);
+
+      Inc(ptCap);
     end;
     ptCap := ptCap div 2; // two numbers are one point
     SetLength(pts, ptCap);
@@ -1675,17 +1706,15 @@ begin
       stCBezier:
         begin
           AllocEstimatedPtsCount(c, endC);
+
           while IsNumPending(c, endC, true) and
-            Parse2Num(c, endC, pt2, lastPt) and
-            Parse2Num(c, endC, pt3, lastPt) and
             Parse2Num(c, endC, currPt, lastPt) do
           begin
-            AddPt(pt2);
-            AddPt(pt3);
             AddPt(currPt);
-            if isRelative then lastPt := currPt;
+            if isRelative and (ptCnt mod 3 = 0) then
+              lastPt := currPt;
           end;
-          if Length(pts) <> ptCnt then
+          if Length(pts) > ptCnt then
             SetLength(pts, ptCnt);
           currSubPath.AddSeg(stCBezier, firstPt, pts);
         end;
@@ -1841,9 +1870,9 @@ begin
     begin
       fSubPaths[i].Free;
       if i < len -1 then
-        Move(fSubPaths[i+1], fSubPaths[i],
+        Move(fSubPaths[i + 1], fSubPaths[i],
           (len - i -1) * SizeOf(Pointer));
-      SetLength(fSubPaths, len -1);
+      SetLength(fSubPaths, len - 1);
       break;
     end;
 end;
@@ -1865,7 +1894,7 @@ begin
     if (radii.Y < 0) then radii.Y := -radii.Y;
     if (radii.X = 0) or (radii.Y = 0) then Exit;
 
-    GetSinCos(phi_rads, s_phi, c_phi);;
+    GetSinCos(phi_rads, s_phi, c_phi);
     hd_x := (p1.X - p2.X) / 2.0; // half diff of x
     hd_y := (p1.Y - p2.Y) / 2.0; // half diff of y
     hs_x := (p1.X + p2.X) / 2.0; // half sum of x

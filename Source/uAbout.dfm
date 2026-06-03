@@ -11,9 +11,11 @@ object FrmAbout: TFrmAbout
   Font.Height = -11
   Font.Name = 'Segoe UI'
   Font.Style = []
-  Position = poDefault
+  Position = poScreenCenter
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
+  OnShow = FormShow
   DesignSize = (
     443
     351)
@@ -21,8 +23,8 @@ object FrmAbout: TFrmAbout
   object TitleLabel: TLabel
     Left = 190
     Top = 8
-    Width = 179
-    Height = 48
+    Width = 187
+    Height = 41
     AutoSize = False
     Caption = 'Lottie Files Editor and SKIA Preview'
     WordWrap = True
@@ -36,10 +38,10 @@ object FrmAbout: TFrmAbout
     Caption = 'Version'
   end
   object SVGIconImage1: TSVGIconImage
-    Left = 384
-    Top = 4
-    Width = 54
-    Height = 54
+    Left = 383
+    Top = 8
+    Width = 52
+    Height = 49
     AutoSize = False
     SVGText = 
       '<?xml version="1.0" encoding="UTF-8"?>'#13#10'<svg width="100" height=' +
@@ -177,7 +179,7 @@ object FrmAbout: TFrmAbout
       '.93z" fill="#3ba08b" stroke="#227b69" stroke-width="4"/>'#13#10'</svg>' +
       #13#10
   end
-  object Panel1: TPanel
+  object BottomPanel: TPanel
     Left = 0
     Top = 300
     Width = 443
@@ -188,34 +190,34 @@ object FrmAbout: TFrmAbout
     ParentBackground = False
     TabOrder = 0
     object btnOK: TStyledButton
-      Left = 360
-      Top = 16
+      Left = 351
+      Top = 8
       Width = 75
       Height = 25
       Cancel = True
       Caption = 'CLOSE'
       Default = True
-      TabOrder = 0
+      TabOrder = 2
       OnClick = btnOKClick
     end
     object btnIssues: TStyledButton
       Left = 8
-      Top = 16
+      Top = 8
       Width = 125
       Height = 25
       Caption = 'Submit issue...'
       ImageIndex = 0
-      TabOrder = 1
+      TabOrder = 0
       OnClick = btnIssuesClick
     end
     object btnCheckUpdates: TStyledButton
       Left = 139
-      Top = 16
-      Width = 125
+      Top = 8
+      Width = 200
       Height = 25
       Caption = 'Check for updates'
       ImageIndex = 3
-      TabOrder = 2
+      TabOrder = 1
       Visible = False
       OnClick = btnCheckUpdatesClick
     end
@@ -245,7 +247,7 @@ object FrmAbout: TFrmAbout
   object SKIAShellExtLinkLabel: TLinkLabel
     Left = 8
     Top = 62
-    Width = 270
+    Width = 269
     Height = 19
     Caption = 
       '<a href="https://github.com/EtheaDev/SKIAShellExtensions">https:' +
