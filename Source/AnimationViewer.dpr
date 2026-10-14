@@ -47,7 +47,8 @@ begin
   //Uses System Style for border / shadow of Forms
   TStyleManager.FormBorderStyle := TStyleManager.TFormBorderStyle.fbsSystemStyle;
   Application.HelpFile := '';
-  Application.CreateForm(TdmResources, dmResources);
+  //NB: dmResources is a shared instance owned by DResources, created on
+  //first use and freed when that unit is finalized.
   Application.CreateForm(TFrmPreview, frmPreview);
   frmPreview.InitViewer;
   Application.OnException := frmPreview.ManageExceptions;

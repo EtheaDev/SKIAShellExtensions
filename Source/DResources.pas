@@ -3,7 +3,7 @@
 {       SKIA Shell Extensions: Shell extensions for animated files             }
 {       (Preview Panel, Thumbnail Icon, File Editor)                           }
 {                                                                              }
-{       Copyright (c) 2022-2024 (Ethea S.r.l.)                                 }
+{       Copyright (c) 2022-2026 (Ethea S.r.l.)                                 }
 {       Author: Carlo Barazzetta                                               }
 {                                                                              }
 {       https://github.com/EtheaDev/SKIAShellExtensions                        }
@@ -63,6 +63,7 @@ resourcestring
   CONFIRM_CHANGES = 'ATTENTION: the content of file "%s" is changed: do you want to save the file?';
   FILE_CHANGED_RELOAD = 'File "%s" Date/Time changed! Do you want to reload it?';
   LOTTIE_PARSING_OK = 'Lottie Parsing is correct.';
+  FILES_NOT_SAVED = 'The following files could not be saved:%s';
   FILES_TYPE = 'Lottie files';
 
 type
@@ -92,9 +93,18 @@ function GetSupportedExtensions(const AOnlyTextFormat: boolean): TArray<string>;
 function IsExtensionSupported(const AExtension: string;
   const AOnlyTextFormat: boolean): Boolean;
 
-var
-  dmResources: TdmResources;
+//Shared instance of the data module, created on first use and freed when this
+//unit is finalized.
+//NB: it used to be a plain global variable that each consumer created and
+//destroyed on its own - the preview form in its constructor/destructor, the
+//editor and the viewer through Application.CreateForm. With two preview
+//handlers alive in the same Explorer process that meant, depending on the
+//destruction order, either leaking a data module or freeing the one the other
+//instance was still using. Exposing it as a function keeps every existing
+//"dmResources.Something" call site working unchanged.
+function dmResources: TdmResources;
 
+var
   AFileTypes : Array of TEditFileType;
 
 implementation
@@ -108,16 +118,34 @@ uses
   , System.StrUtils
   , System.Skia
   , Vcl.Skia
+  , uLogExcept
   ;
+
+var
+  _dmResources: TdmResources;
+
+function dmResources: TdmResources;
+begin
+  if _dmResources = nil then
+    _dmResources := TdmResources.Create(nil);
+  Result := _dmResources;
+end;
 
 
 function ReformatJSON(const AJSONText: string): string;
 var
-  LJSONObject: TJSONObject;
+  LJSONValue: TJSONValue;
 begin
   //format JSON text
-  LJSONObject := TJSONObject.ParseJSONValue(AJSONText, True, True) as TJSONObject;
-  Result := LJSONObject.Format(2);
+  //NB: ParseJSONValue with ARaiseExc = True raises on invalid JSON, so the
+  //value is never nil here. It was never freed: the whole parsed document
+  //leaked at every "Format JSON".
+  LJSONValue := TJSONObject.ParseJSONValue(AJSONText, True, True);
+  try
+    Result := LJSONValue.Format(2);
+  finally
+    LJSONValue.Free;
+  end;
 end;
 
 procedure TdmResources.DataModuleCreate(Sender: TObject);
@@ -287,9 +315,19 @@ end;
 
 function IsExtensionSupported(const AExtension: string;
   const AOnlyTextFormat: boolean): Boolean;
+var
+  LExtension: string;
 begin
-  Result := pos(AExtension,
-    AcceptedExtensions(AOnlyTextFormat)) <> 0;
+  //NB: was a Pos() substring search over the joined list: case-sensitive
+  //(".JSON" refused) and matching partial extensions (".js" accepted).
+  Result := False;
+  if AExtension = '' then
+    Exit;
+  for LExtension in GetSupportedExtensions(AOnlyTextFormat) do
+  begin
+    if SameText(AExtension, LExtension) then
+      Exit(True);
+  end;
 end;
 
 function CanAcceptFileName(const AFileName: string;
@@ -297,5 +335,16 @@ function CanAcceptFileName(const AFileName: string;
 begin
   Result := IsExtensionSupported(ExtractFileExt(AFileName), AOnlyTextFormat);
 end;
+
+initialization
+  _dmResources := nil;
+
+finalization
+  //Owned by the unit: nobody else frees it any more.
+  if Assigned(_dmResources) then
+  begin
+    TLogPreview.Add('DResources finalization: freeing shared data module');
+    FreeAndNil(_dmResources);
+  end;
 
 end.

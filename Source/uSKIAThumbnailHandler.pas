@@ -84,6 +84,7 @@ type
     property Mode: Cardinal read FMode write FMode;
     property IStream: IStream read FIStream write FIStream;
   public
+    destructor Destroy; override;
     property ThumbnailHandlerClass: TThumbnailHandlerClass read FThumbnailHandlerClass write FThumbnailHandlerClass;
   end;
 
@@ -102,6 +103,15 @@ uses
   uThumbnailHandlerRegister;
 
 { TComAnimThumbnailProvider }
+
+destructor TComAnimThumbnailProvider.Destroy;
+begin
+  //NB: source and codec were never freed: one object of each (with the whole
+  //animation data) leaked inside explorer.exe for every thumbnail.
+  FreeAndNil(FCodec);
+  FreeAndNil(FSource);
+  inherited;
+end;
 
 function TComAnimThumbnailProvider.GetThumbnail(cx: uint; out hBitmap: HBITMAP;
   out bitmapType: dword): HRESULT;
@@ -127,46 +137,67 @@ begin
   try
     TLogPreview.Add('TComAnimThumbnailProvider.GetThumbnail start');
     hBitmap := 0;
+    //NB: bitmapType set before the early exit: the caller reads it in any case
+    bitmapType := WTSAT_ARGB;
     if (cx = 0) then
     begin
       Result := S_FALSE;
       Exit;
     end;
-    bitmapType := WTSAT_ARGB;
     AStream := TIStreamAdapter.Create(FIStream);
     try
       TLogPreview.Add('TComAnimThumbnailProvider.GetThumbnail LoadFromStream');
       LoadAnimFromStream(AStream);
+      TLogPreview.Add(Format('TComAnimThumbnailProvider.GetThumbnail data: %d bytes',
+        [Length(FSource.Data)]));
+      if not Assigned(FCodec) then
+      begin
+        //No codec accepts the data (corrupted or unsupported file)
+        Result := S_FALSE;
+        Exit;
+      end;
       LBitmap := TBitmap.Create;
-      LBitmap.PixelFormat := pf32bit;
-      if FLightTheme then
-        LAntiAliasColor := clWhite
-      else
-        LAntiAliasColor := clWebDarkSlategray;
-      LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
-      LBitmap.SetSize(cx, cx);
-      TLogPreview.Add('TSkAnimatedImage.RenderFrame start');
-      LRect := TRectF.Create(0,0,cx,cx);
-      LBitmap.SkiaDraw(
-        procedure (const ASkCanvas: ISkCanvas)
-        var
-          LImageRect: TRectF;
-        begin
-          FCodec.SeekFrameTime(FCodec.Duration);
-          ASkCanvas.Save;
-          try
-            ASkCanvas.ClipRect(LRect);
-            //calculate TSkAnimatedImageWrapMode.Fit
-            LImageRect := TRectF.Create(PointF(0, 0), FCodec.Size);
-            LRect := LImageRect.FitInto(LRect);
-            FCodec.Render(ASkCanvas, LRect, 1);
-          finally
-            ASkCanvas.Restore;
-          end;
-        end
-        );
-      TLogPreview.Add('TSkAnimatedImage.RenderFrame end');
-      hBitmap := LBitmap.Handle;
+      try
+        LBitmap.PixelFormat := pf32bit;
+        if FLightTheme then
+          LAntiAliasColor := clWhite
+        else
+          LAntiAliasColor := clWebDarkSlategray;
+        LBitmap.Canvas.Brush.Color := ColorToRGB(LAntiAliasColor);
+        LBitmap.SetSize(cx, cx);
+        //NB: no FillRect of the background here (unlike the SVG thumbnail):
+        //SkiaDraw starts clean, it clears the surface to transparent, so the
+        //thumbnail is a true ARGB bitmap composed by Explorer.
+        TLogPreview.Add('TSkAnimatedImage.RenderFrame start');
+        LRect := TRectF.Create(0,0,cx,cx);
+        LBitmap.SkiaDraw(
+          procedure (const ASkCanvas: ISkCanvas)
+          var
+            LImageRect: TRectF;
+          begin
+            FCodec.SeekFrameTime(FCodec.Duration);
+            ASkCanvas.Save;
+            try
+              ASkCanvas.ClipRect(LRect);
+              //calculate TSkAnimatedImageWrapMode.Fit
+              LImageRect := TRectF.Create(PointF(0, 0), FCodec.Size);
+              LRect := LImageRect.FitInto(LRect);
+              FCodec.Render(ASkCanvas, LRect, 1);
+            finally
+              ASkCanvas.Restore;
+            end;
+          end
+          );
+        TLogPreview.Add('TSkAnimatedImage.RenderFrame end');
+        //NB: ReleaseHandle, not Handle. The caller (Explorer) takes ownership
+        //of hBitmap and destroys it: handing out Handle would leave the
+        //TBitmap owning the same GDI object. Before this the TBitmap was
+        //simply never freed, so every thumbnail leaked an object and its GDI
+        //resources inside explorer.exe, which lives for the whole user session.
+        hBitmap := LBitmap.ReleaseHandle;
+      finally
+        LBitmap.Free;
+      end;
     finally
       AStream.Free;
     end;
@@ -190,6 +221,8 @@ begin
   Result := S_OK;
   if Result = S_OK then
   begin
+    FreeAndNil(FCodec);
+    FreeAndNil(FSource);
     FSource := TSkAnimatedImage.TSource.Create(SourceChange);
     FLightTheme := IsWindowsAppThemeLight;
   end;

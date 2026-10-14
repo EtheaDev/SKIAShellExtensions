@@ -45,6 +45,79 @@ object frmMain: TfrmMain
     Height = 531
     Align = alClient
     TabOrder = 4
+    object PaletteSplitter: TSplitter
+      Left = 1
+      Top = 414
+      Width = 388
+      Height = 4
+      Cursor = crVSplit
+      Align = alBottom
+      AutoSnap = False
+      MinSize = 40
+    end
+    object PalettePanel: TPanel
+      Left = 1
+      Top = 418
+      Width = 388
+      Height = 112
+      Align = alBottom
+      BevelOuter = bvNone
+      ParentBackground = False
+      TabOrder = 0
+      object PaletteHeaderPanel: TPanel
+        Left = 0
+        Top = 0
+        Width = 388
+        Height = 30
+        Align = alTop
+        BevelOuter = bvNone
+        ParentBackground = False
+        ShowCaption = False
+        TabOrder = 0
+        object PaletteTitleLabel: TLabel
+          AlignWithMargins = True
+          Left = 6
+          Top = 3
+          Width = 92
+          Height = 24
+          Margins.Left = 6
+          Align = alLeft
+          Caption = 'COLOR PALETTE'
+          Layout = tlCenter
+        end
+        object PaletteToolBar: TStyledToolbar
+          Left = 330
+          Top = 0
+          Width = 58
+          Height = 30
+          Align = alRight
+          ButtonHeight = 28
+          ButtonWidth = 28
+          Images = VirtualImageList
+          TabOrder = 0
+          object PalettePrevToolButton: TStyledToolButton
+            Left = 0
+            Top = 0
+            Action = acPalettePrev
+          end
+          object PaletteNextToolButton: TStyledToolButton
+            Left = 28
+            Top = 0
+            Action = acPaletteNext
+          end
+        end
+        object PaletteInfoLabel: TLabel
+          AlignWithMargins = True
+          Left = 324
+          Top = 3
+          Width = 3
+          Height = 24
+          Margins.Right = 6
+          Align = alRight
+          Layout = tlCenter
+        end
+      end
+    end
   end
   object StatusBar: TStatusBar
     Left = 0
@@ -785,6 +858,26 @@ object frmMain: TfrmMain
       ImageName = 'PlayInverse'
       OnExecute = PlayInverseActionExecute
     end
+    object acPalettePrev: TAction
+      Category = 'Palette'
+      Caption = 'Previous color occurrence'
+      Hint = 'Previous occurrence of the selected color (Alt+Left)'
+      ImageIndex = 31
+      ImageName = 'left'
+      ShortCut = 32805
+      OnExecute = acPaletteNavigateExecute
+      OnUpdate = acPaletteNavigateUpdate
+    end
+    object acPaletteNext: TAction
+      Category = 'Palette'
+      Caption = 'Next color occurrence'
+      Hint = 'Next occurrence of the selected color (Alt+Right)'
+      ImageIndex = 32
+      ImageName = 'right'
+      ShortCut = 32807
+      OnExecute = acPaletteNavigateExecute
+      OnUpdate = acPaletteNavigateUpdate
+    end
   end
   object SaveDialog: TFileSaveDialog
     FavoriteLinks = <>
@@ -1142,6 +1235,38 @@ object frmMain: TfrmMain
     Left = 456
     Top = 216
   end
+  object PalettePopupMenu: TPopupMenu
+    Left = 560
+    Top = 152
+    object ReplaceAllColorMenuItem: TMenuItem
+      Caption = 'Replace all occurrences with...'
+      OnClick = ReplaceAllColorMenuItemClick
+    end
+    object SelectAllColorMenuItem: TMenuItem
+      Caption = 'Select all occurrences'
+      OnClick = SelectAllColorMenuItemClick
+    end
+    object CopyColorMenuItem: TMenuItem
+      Caption = 'Copy color value'
+      OnClick = CopyColorMenuItemClick
+    end
+    object PaletteSepMenuItem: TMenuItem
+      Caption = '-'
+    end
+    object AddCustomColorMenuItem: TMenuItem
+      Caption = 'Add to custom colors'
+      OnClick = AddCustomColorMenuItemClick
+    end
+    object RemoveCustomColorMenuItem: TMenuItem
+      Caption = 'Remove from custom colors'
+      OnClick = RemoveCustomColorMenuItemClick
+    end
+  end
+  object PaletteColorDialog: TColorDialog
+    Options = [cdFullOpen, cdAnyColor]
+    Left = 560
+    Top = 216
+  end
   object VirtualImageList20: TVirtualImageList
     Images = <
       item
@@ -1159,6 +1284,13 @@ object frmMain: TfrmMain
     Interval = 3000
     OnTimer = CheckFileChangedTimerTimer
     Left = 144
+    Top = 352
+  end
+  object LoadTimer: TTimer
+    Enabled = False
+    Interval = 400
+    OnTimer = LoadTimerTimer
+    Left = 272
     Top = 352
   end
 end

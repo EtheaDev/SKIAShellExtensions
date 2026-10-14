@@ -200,7 +200,10 @@ end;
 constructor TFrmPreview.Create(AOwner: TComponent);
 begin
   inherited;
-  dmResources := TdmResources.Create(nil);
+  //NB: the data module is no longer created here. It is a shared instance
+  //owned by DResources, created on first use: creating and destroying it per
+  //preview form meant that, with two handlers alive in the same Explorer
+  //process, one could free the module the other was still using.
   FEditorOptions := TSynEditorOptionsContainer.create(self);
   FPreviewSettings := TPreviewSettings.CreateSettings(nil, FEditorOptions);
 end;
@@ -208,7 +211,6 @@ end;
 destructor TFrmPreview.Destroy;
 begin
   FreeAndNil(FPreviewSettings);
-  FreeAndNil(dmResources);
   inherited;
 end;
 
@@ -466,8 +468,19 @@ begin
     try
       if SkAnimatedImageEx.IsLottieFile then
       begin
+        //NB: a Lottie file is UTF-8 (no BOM, usually): loading without an
+        //encoding read it as ANSI and garbled non-ASCII text. TStrings raises
+        //EEncodingError on data that is not valid UTF-8: fall back to ANSI.
         AStream.Position := 0;
-        SynEdit.Lines.LoadFromStream(AStream);
+        try
+          SynEdit.Lines.LoadFromStream(AStream, TEncoding.UTF8);
+        except
+          on E: EEncodingError do
+          begin
+            AStream.Position := 0;
+            SynEdit.Lines.LoadFromStream(AStream, TEncoding.ANSI);
+          end;
+        end;
         ToolButtonPlay.Enabled := True;
         ToolButtonInversePlay.Enabled := True;
         ToolButtonShowText.Visible := True;

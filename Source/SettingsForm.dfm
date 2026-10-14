@@ -513,7 +513,7 @@ object UserSettingsForm: TUserSettingsForm
         Left = 331
         Top = 31
         Width = 300
-        Height = 60
+        Height = 80
         Caption = 'Editing Options'
         TabOrder = 3
         object RestoreLastSessionCheckBox: TCheckBox
@@ -523,6 +523,14 @@ object UserSettingsForm: TUserSettingsForm
           Height = 17
           Caption = 'Remember current session at next run'
           TabOrder = 0
+        end
+        object ShowColorPaletteCheckBox: TCheckBox
+          Left = 15
+          Top = 47
+          Width = 270
+          Height = 17
+          Caption = 'Show color palette under the editor'
+          TabOrder = 1
         end
       end
     end

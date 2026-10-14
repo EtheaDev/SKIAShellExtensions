@@ -1,4 +1,4 @@
-{******************************************************************************}
+﻿{******************************************************************************}
 {                                                                              }
 {       LottieTextEditor: Advanced Editor for Lottie files                     }
 {                                                                              }
@@ -46,6 +46,8 @@ uses
   uRegistry in 'uRegistry.pas',
   uSingleInstance in 'uSingleInstance.pas',
   GitHubAPI in 'GitHubAPI.pas',
+  uLottieColorScanner in 'uLottieColorScanner.pas',
+  uColorPaletteBar in 'uColorPaletteBar.pas',
   Vcl.StyledTaskDialogFormUnit in '..\Ext\StyledComponents\source\Vcl.StyledTaskDialogFormUnit.pas' {StyledTaskDialogForm},
   Skia.Vcl.StyledTaskDialogAnimatedUnit in '..\Ext\StyledComponents\source\Skia.Vcl.StyledTaskDialogAnimatedUnit.pas' {StyledTaskDialogAnimated};
 
@@ -78,7 +80,8 @@ begin
     Show;
     Update;
     Application.HelpFile := '';
-    Application.CreateForm(TdmResources, dmResources);
+    //NB: dmResources is a shared instance owned by DResources, created on
+    //first use and freed when that unit is finalized.
     Application.CreateForm(TfrmMain, frmMain);
     Application.CreateForm(TTestPrintPreviewDlg, TestPrintPreviewDlg);
     Application.CreateForm(TPageSetupDlg, PageSetupDlg);

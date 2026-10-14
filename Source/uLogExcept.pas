@@ -27,12 +27,20 @@ Uses
   System.SysUtils,
   System.Classes;
 
+//NB: defined here, not in the implementation section, so that the private
+//declarations below can be guarded by the same condition as their bodies.
+{$IFDEF DEBUG}
+{$DEFINE ENABLELOG}
+{$ENDIF}
+
 type
   TLogPreview = class
   private
     FLogStream: TStream;
+    {$IFDEF ENABLELOG}
     class var FLogFile: string;
     class procedure InitLogFile; static;
+    {$ENDIF}
   public
     property LogStream: TStream read FLogStream write FLogStream;
     class procedure Add(const AMessage: string); overload;
@@ -44,10 +52,6 @@ implementation
 uses
   uMisc,
   IOUtils;
-
-{$IFDEF DEBUG}
-{$DEFINE ENABLELOG}
-{$ENDIF}
 
 procedure AppendAllText(const FileName, Contents: string);
 {$IFDEF ENABLELOG}
@@ -74,11 +78,13 @@ end;
 
 { TLogException }
 
+{$IFDEF ENABLELOG}
 class procedure TLogPreview.InitLogFile;
 begin
   if FLogFile = '' then
     FLogFile := IncludeTrailingPathDelimiter(GetTempDirectory) + 'SKIAShellExtensions.log';
 end;
+{$ENDIF}
 
 class procedure TLogPreview.Add(const AMessage: string);
 begin
@@ -95,13 +101,19 @@ end;
 
 class procedure TLogPreview.Add(const AException: Exception);
 begin
+//NB: guarded like the string overload. Without the {$IFDEF} this one kept
+//logging in release builds too, appending to a file in %TEMP% that grows
+//without limit - written from inside explorer.exe.
+{$IFDEF ENABLELOG}
   try
     InitLogFile;
-    AppendAllText(FLogFile, Format('%s %s StackTrace %s %s', [FormatDateTime('hh:nn:ss.zzz', Now), AException.Message,
+    AppendAllText(FLogFile, Format('%s %s StackTrace %s %s', [FormatDateTime('hh:nn:ss.zzz', Now),
+      AException.ClassName+': '+AException.Message,
       AException.StackTrace, sLineBreak]));
   except
     on e: EFOpenError do;
   end;
+{$ENDIF}
 end;
 
 initialization

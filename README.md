@@ -1,6 +1,14 @@
-﻿# SKIA Shell Extensions and Lottie Editor [![License](https://img.shields.io/badge/License-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
+﻿# SKIA Shell Extensions and Lottie Editor
 
-**Latest Version 1.7.1 - 03 Jun 2026**
+[![License: Apache](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/EtheaDev/SKIAShellExtensions?label=release&color=blue)](https://github.com/EtheaDev/SKIAShellExtensions/releases)
+[![Delphi 12+](https://img.shields.io/badge/Delphi-12%2B-e62329.svg)](https://www.embarcadero.com/products/delphi)
+[![Platform: VCL](https://img.shields.io/badge/Platform-VCL-8a2be2.svg)](https://docwiki.embarcadero.com/RADStudio/en/Main_Page)
+[![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d6.svg)](https://www.microsoft.com/windows)
+
+![Delphi Support](./Images/SupportingDelphi.jpg)
+
+Related links: [embarcadero.com][10] - [learndelphi.org][11]
 
 **A collection of extensions tools for image and animations files, integrated into Microsoft Windows Explorer (10 and 11):**
 
@@ -20,9 +28,11 @@
 
 **.tgs**: animated telegram stickers [core.telegram.org/stickers](https://core.telegram.org/stickers)
 
+---
+
 ### Features
 
-- Supports Windows Vista, 7, 8, 10 and 11 (for 32 bits and 64 bits).
+- Supports Windows 10 and 11 (for 32 bits and 64 bits).
 
 - Themes (Dark and Light) according to user preferences of Windows Theme
 
@@ -52,7 +62,26 @@ In Windows 11 with Dark theme:
 
 A useful Text editor with preview and animation of Lottie files:
 
-![Lottie Text Editor Dark](./Images/LottieTextEditorDark.png)
+![Lottie Text Editor Light](./Images/LottieTextEditorLight.png)
+
+**Color palette**: under the editor a panel shows all the colors used by the Lottie animation, with the number of occurrences of each one. In a Lottie file a color is an array of numbers (`[r,g,b,a]` from 0 to 1, or from 0 to 255 in old exports), recognized by where it is: fill and stroke colors (also animated, every keyframe), gradient stops, solid layers (`"sc":"#rrggbb"`), text fill and stroke, color effects and slots; the same color written with a different precision is shown once.
+
+![Color palette](./Images/ColorPalette.png)
+
+- Click on a color to highlight all its occurrences in the text, then move between them with `Alt+Right` / `Alt+Left` or with the arrow buttons of the palette.
+- When the caret is on a color value, the corresponding color is marked in the palette.
+- Double-click on a color to replace the color value under the caret, keeping the notation of the file (number of components, precision, alpha, scale, offset of a gradient stop).
+- Right-click on a color to replace all its occurrences with another color (one single undo), to select all its occurrences with multiple carets, or to copy its value.
+- Add your own colors to the "Custom" section with the `+` button (color picker) or from the context menu: they are kept for all files and shared with the custom colors of the color picker.
+- The hint of each color shows its value, the properties using it and its opacities.
+- The palette can be hidden in the Settings ("Show color palette under the editor").
+
+### Automatic updates
+
+The Lottie Text Editor checks if a new version is available on GitHub, then downloads and installs it:
+
+- **Automatic check**: at startup, once every *n* days (7 by default), in background; it can be disabled or its interval changed in Settings - Updates.
+- **Manual check**: with the "Check for updates" button of the About dialog.
 
 ### Settings: Preview page
 
@@ -64,7 +93,7 @@ A useful Text editor with preview and animation of Lottie files:
 
 ### Manual Build and Installation (for Delphi developers) ###
 
-If you have Delphi 11 or Delphi 12, you can manually build the project:
+If you have Delphi 12 or Delphi 13, you can manually build the project:
 
 ***Warning: To build the DLL you need also other open-source projects***
 
@@ -87,6 +116,23 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+14 Oct 2026: ver. 1.8.0
+- Lottie Text Editor: new Color palette panel under the editor, showing the colors of the animation (fill and stroke, also animated, gradient stops, solid layers, text, color effects and slots), grouped by color with the number of occurrences and a hint with value, properties and opacities.
+- Lottie Text Editor: click on a palette color to highlight all its occurrences in the text; move between them with Alt+Right / Alt+Left or with the arrow buttons of the palette. The palette marks the color under the editor caret.
+- Lottie Text Editor: double-click on a palette color to replace the color under the caret, keeping the notation of the file (number of components, precision, alpha, 0..1 or 0..255 scale, offset of a gradient stop).
+- Lottie Text Editor: palette context menu to replace all the occurrences of a color (one undo), select them with multiple carets, copy the color value, add or remove custom colors; option in Settings to show or hide the palette.
+- Fixed a GDI handle and memory leak in the Thumbnail provider: every generated thumbnail leaked resources inside the Explorer process.
+- The shared resources data module is now a single instance created on demand, instead of one created and destroyed by every preview.
+- Preview: the text of Lottie files with non-ASCII characters is read as UTF-8.
+- Lottie Text Editor: the first Undo no longer empties the file just opened.
+- Lottie Text Editor: the animation is no longer reloaded at every keystroke.
+- Lottie Text Editor: files whose extension is uppercase (.JSON) can now be opened.
+- Lottie Text Editor: closing with unsaved changes can now be cancelled; fixed the management of the tabs on errors and when closing the first tab; Save all continues after a file that cannot be saved.
+- Lottie Text Editor: the gutter of the editor follows the dark styles.
+- The new-version check runs in background at startup, respects the "Automatic check" option and its interval, and no longer crashes when the download starts right after the automatic check.
+- Added the styles "Windows11 Modern Light" and "Windows11 Modern Dark" (the default ones on Windows 11); a stored style no longer available falls back to the default one instead of raising an error.
+- Setup: the Skia library is installed also with the Editor or the Viewer alone.
 
 03 Jun 2026: ver. 1.7.1
 - Added single-instance behavior: opening a file now reuses the running editor instead of starting a new one.
@@ -158,7 +204,7 @@ Many thanks to **Rodrigo Ruz V.** (author of [theroadtodelphi.com][7] Blog) for 
 
 ## Powered by Skia4Delphi
 
-<p><a href="https://www.skia4delphi.org"><img src="./Images/logo-gradient.svg" alt="Logo" height="300" width="360" /></a></p>
+[![Skia4Delphi Logo](./Images/logo-gradient.svg)](https://www.skia4delphi.org)
 
 Many thanks to the project "Skia4Delphi"
 

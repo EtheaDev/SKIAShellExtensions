@@ -42,6 +42,13 @@ interface
   procedure Finalize_GDI; stdcall;
   procedure Initialize; stdcall;
   procedure Finalize; stdcall;
+  //True when AFileName's extension is one of AFileExt. The comparison is
+  //case-insensitive and matches the *whole* extension.
+  function IsFileNameWithExt(const AFileName: string;
+    const AFileExt: array of string): Boolean;
+  //Joins the extensions into a display string, e.g. '.json;.lottie'.
+  function GetFileExtensionsList(const AFileExt: array of string;
+    const ASeparator: Char = ';'): string;
 
 resourcestring
   STextNotFound = 'Text not found';
@@ -82,6 +89,36 @@ var
   Path: array [0 .. MAX_PATH - 1] of Char;
 begin
   SetString(Result, Path, GetModuleFileName(HInstance, Path, SizeOf(Path)));
+end;
+
+function IsFileNameWithExt(const AFileName: string;
+  const AFileExt: array of string): Boolean;
+var
+  I: Integer;
+  LFileExt: string;
+begin
+  Result := False;
+  LFileExt := ExtractFileExt(AFileName);
+  for I := Low(AFileExt) to High(AFileExt) do
+  begin
+    Result := SameText(LFileExt, AFileExt[I]);
+    if Result then
+      Break;
+  end;
+end;
+
+function GetFileExtensionsList(const AFileExt: array of string;
+  const ASeparator: Char = ';'): string;
+var
+  I: Integer;
+begin
+  Result := '';
+  for I := Low(AFileExt) to High(AFileExt) do
+  begin
+    if Result <> '' then
+      Result := Result + ASeparator;
+    Result := Result + AFileExt[I];
+  end;
 end;
 
 function GetTempDirectory: string;

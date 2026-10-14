@@ -45,7 +45,7 @@ resourcestring
   Title_AnimationViewer = 'SKIA Image/Animation Viewer';
   NewVersionAvailable = 'A new installer is available to download:'+sLineBreak+
     'Current version: %s - Available version: %s'+sLineBreak+
-    'Do you want to dowload and install the new version?';
+    'Do you want to download and install the new version?';
   NewVersionNotAvailable = 'No updates available.'+sLineBreak+
     'You have already the latest version: %s';
   Stop_Download_Msg = 'Stop download installer!';
@@ -55,8 +55,11 @@ resourcestring
   Error_Checking_New_Version = 'Error checking if a new installer is available: %s';
 
 const
+  //NB: HELP_URL is the documentation site, GITHUB_URL is the repository.
+  //Today they are the same: the Issues button and the new-version check must
+  //always go to GitHub, the web help can move to a documentation site.
   HELP_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
-  GIT_HUB_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
+  GITHUB_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
   SETUP_FILENAME = 'SkiaShellExtensionsSetup.exe';
 
 type
@@ -106,6 +109,14 @@ procedure HideAboutForm;
 function AcceptNewSetup(const AShowMsg: Boolean): Boolean;
 function GetCurrentVersion(const AApplicationExeName: TFileName): string;
 
+//Automatic (startup) check for a new version. The HTTP call runs in a
+//background task and AOnNewVersionAvailable is invoked in the main thread only
+//when a newer version exists, receiving current and new version.
+//Failures are silent by design: an automatic check must not interrupt the user
+//with an error dialog. Use AcceptNewSetup for the manual check, where a
+//blocking call and a retry dialog are what the user asked for.
+procedure CheckNewSetupAsync(const AOnNewVersionAvailable: TProc<string, string>);
+
 implementation
 
 uses
@@ -116,12 +127,29 @@ uses
   , uMisc
   , StyledTaskDialog
   , GitHubAPI
+  , System.Threading
   ;
 
 {$R *.dfm}
 
 var
  _HttpClient: TGitHubHttpClient;
+
+//Shared client of the main thread, created on first use and always configured
+//with the project URL.
+//NB: it was created only inside AcceptNewSetup, the *manual* check. Opening the
+//About box straight from the automatic check reached DownloadAndInstallSetup
+//with _HttpClient still nil: an Access Violation inside DownloadLatestSetup.
+//Setting GitHubProjectURL here matters too: the download needs it just as the
+//check does, and on a freshly created client it would be empty, producing the
+//malformed URL '/releases/latest/download/<setup>'.
+function GitHubClient: TGitHubHttpClient;
+begin
+  if not Assigned(_HttpClient) then
+    _HttpClient := TGitHubHttpClient.Create(nil);
+  _HttpClient.GitHubProjectURL := GITHUB_URL;
+  Result := _HttpClient;
+end;
 
 function GetCurrentVersion(const AApplicationExeName: TFileName): string;
 var
@@ -165,10 +193,8 @@ begin
     Screen.Cursor := crHourGlass;
     try try
       LCurrentVersion := GetCurrentVersion(Application.ExeName);
-      if not Assigned(_HttpClient) then
-        _HttpClient := TGitHubHttpClient.Create(nil);
-      Result := _HttpClient.IsNewVersionAvailable(
-        LCurrentVersion, GIT_HUB_URL, LNewVersion);
+      Result := GitHubClient.IsNewVersionAvailable(
+        LCurrentVersion, GITHUB_URL, LNewVersion);
       Break;  
     except
       on E: ECheckNewVersionException do
@@ -198,6 +224,44 @@ begin
   else if AShowMsg then
     StyledMessageDlg(Format(NewVersionNotAvailable,
       [LCurrentVersion]), TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
+end;
+
+procedure CheckNewSetupAsync(const AOnNewVersionAvailable: TProc<string, string>);
+begin
+  if not Assigned(AOnNewVersionAvailable) then
+    Exit;
+  TTask.Run(
+    procedure
+    var
+      LClient: TGitHubHttpClient;
+      LCurrentVersion, LNewVersion: string;
+      LAvailable: Boolean;
+    begin
+      LNewVersion := '';
+      LCurrentVersion := GetCurrentVersion(Application.ExeName);
+      //A dedicated client: _HttpClient belongs to the main thread, which uses
+      //it for the manual check and for the setup download.
+      LClient := TGitHubHttpClient.Create(nil);
+      try
+        try
+          LAvailable := LClient.IsNewVersionAvailable(LCurrentVersion,
+            GITHUB_URL, LNewVersion);
+        except
+          //No network, proxy, timeout, unexpected answer: an automatic check
+          //stays silent. The user can always check manually from the About box.
+          LAvailable := False;
+        end;
+      finally
+        LClient.Free;
+      end;
+      if LAvailable and not Application.Terminated then
+        TThread.Queue(nil,
+          procedure
+          begin
+            if not Application.Terminated then
+              AOnNewVersionAvailable(LCurrentVersion, LNewVersion);
+          end);
+    end);
 end;
 
 function GetAboutForm: TFrmAbout;
@@ -266,7 +330,7 @@ end;
 procedure TFrmAbout.btnIssuesClick(Sender: TObject);
 begin
    ShellExecute(Handle, 'open',
-    PChar(GIT_HUB_URL+'/issues'),
+    PChar(GITHUB_URL+'/issues'),
     nil, nil, SW_SHOW);
 end;
 
@@ -289,6 +353,11 @@ begin
   else
   begin
     btnCheckUpdates.Caption := CheckForUpdates_Msg;
+    //NB: re-arm the guard. FormActivate starts the download whenever
+    //FStopDownload is False, and OnActivate fires every time the form regains
+    //focus - right after an error dialog, for instance - so leaving it False
+    //here restarted a failed download over and over.
+    FStopDownload := True;
   end;
 end;
 
@@ -299,7 +368,7 @@ begin
   UpdateGUI(True);
   try
     //Start Download
-    var LSize := _HttpClient.DownloadLatestSetup(
+    var LSize := GitHubClient.DownloadLatestSetup(
       SETUP_FILENAME,
       HttpClientReceiveData,
       AOutFileName);
@@ -355,11 +424,11 @@ begin
   MemoCopyRights.Lines.Add('Author: Carlo Barazzetta - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('Custom icons: Ariel Montes - Ethea S.r.l.');
   MemoCopyRights.Lines.Add('https://github.com/EtheaDev/SKIAShellExtensions');
-  MemoCopyRights.Lines.Add('Copyright © 2022-2025 all rights reserved.');
+  MemoCopyRights.Lines.Add('Copyright © 2022-2026 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('Third Party libraries and tools used from Ethea:');
   MemoCopyRights.Lines.Add('SVGIconImageList https://github.com/EtheaDev/SVGIconImageList/');
-  MemoCopyRights.Lines.Add('Copyright © 2019-2025 all rights reserved.');
+  MemoCopyRights.Lines.Add('Copyright © 2019-2026 all rights reserved.');
   MemoCopyRights.Lines.Add('');
   MemoCopyRights.Lines.Add('The Initial Developer of the Original Code is Rodrigo Ruz V.');
   MemoCopyRights.Lines.Add('Portions created by Rodrigo Ruz V. are Copyright © 2011-2022 Rodrigo Ruz V.');
