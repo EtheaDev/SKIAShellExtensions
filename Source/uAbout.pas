@@ -56,9 +56,9 @@ resourcestring
 
 const
   //NB: HELP_URL is the documentation site, GITHUB_URL is the repository.
-  //Today they are the same: the Issues button and the new-version check must
-  //always go to GitHub, the web help can move to a documentation site.
-  HELP_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
+  //They are deliberately distinct: the Issues button and the new-version check
+  //must go to GitHub, the web help to the documentation site.
+  HELP_URL = 'https://ethea.it/docs/skiatools/';
   GITHUB_URL = 'https://github.com/EtheaDev/SKIAShellExtensions';
   SETUP_FILENAME = 'SkiaShellExtensionsSetup.exe';
 
@@ -403,6 +403,11 @@ var
   FileVersionStr: string;
 begin
   TitleLabel.Font.Height := Round(TitleLabel.Font.Height * 1.6);
+  //NB: the link under the logo is the documentation site, built from HELP_URL
+  //instead of being hard-coded in the DFM caption (which held the GitHub URL
+  //and left HELP_URL unused). TLinkLabel has AutoSize True by default, so the
+  //label resizes to the URL.
+  SKIAShellExtLinkLabel.Caption := Format('<a href="%s">%s</a>', [HELP_URL, HELP_URL]);
 
   FileVersionStr:=uMisc.GetFileVersion(GetModuleLocation());
   {$IFDEF WIN32}

@@ -18,6 +18,10 @@ Related links: [embarcadero.com][10] - [learndelphi.org][11]
 
 - A [Lottie Text Editor][12] to manually edit and preview the animation of Lottie files.
 
+### Documentation
+
+Follow the [Project Site](https://ethea.it/docs/skiatools/) to know all the SKIA tools: Lottie Text Editor, Animation Viewer and Shell Extensions (Preview Panel and Thumbnails).
+
 ### Animation and file extensions supported:
 
 **.json** or **.lottie**: animated Lottie files [lottiefiles.com](https://lottiefiles.com/)
@@ -34,7 +38,7 @@ Related links: [embarcadero.com][10] - [learndelphi.org][11]
 
 - Supports Windows 10 and 11 (for 32 bits and 64 bits).
 
-- Themes (Dark and Light) according to user preferences of Windows Theme
+- Themes (Dark and Light) according to user preferences of Windows Theme, with the VCL styles: **Light**: Sky, Windows Modern, Windows11 Impressive Light, Windows11 Modern Light, Windows11 Polar Light; **Dark**: Glow, Windows Modern SlateGray, Windows11 Impressive Dark, Windows11 Modern Dark, Windows11 Polar Dark
 
 - Play normal, inverse or manual control
 
@@ -116,6 +120,12 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 4. If you want to continue to change code and rebuild the dll, Unregister the dlls and beware to close all Explorer instances.
 
 ## Release Notes ##
+
+15 Oct 2026: ver. 1.8.1
+- Lottie Text Editor and Animation Viewer: fixed the icons of the side menu and of the toolbar, not shown when the application started without files (the toolbar buttons appeared only after a mouse-over).
+- VCL styles: removed the obsolete Windows10 styles; available styles: Sky, Windows Modern, Windows11 Impressive Light, Windows11 Modern Light, Windows11 Polar Light (light) and Glow, Windows Modern SlateGray, Windows11 Impressive Dark, Windows11 Modern Dark, Windows11 Polar Dark (dark). On Windows 10 the default style is "Windows Modern" (light) or "Windows Modern SlateGray" (dark); a style saved by a previous version and no longer available is replaced by the default one.
+- Settings, Theme page: all the styles linked into the application are offered, classified as light or dark automatically ("Windows Modern" and "Windows Modern SlateGray" were not offered).
+- About dialog: the link points to the new documentation site https://ethea.it/docs/skiatools/; copyright updated to 2026.
 
 14 Oct 2026: ver. 1.8.0
 - Lottie Text Editor: new Color palette panel under the editor, showing the colors of the animation (fill and stroke, also animated, gradient stops, solid layers, text, color effects and slots), grouped by color with the number of occurrences and a hint with value, properties and opacities.
