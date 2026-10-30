@@ -121,6 +121,13 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 
 ## Release Notes ##
 
+30 Oct 2026: ver. 1.8.2
+- Lottie Text Editor: "Word-Wrap Text" and "Show Line Numbers" in the context menu of the editor, with a check mark: they switch word wrap and line numbers in every open editor and are saved with the other editor options (as in the Editor options dialog)
+- Setup: no language selection dialog, the installer uses the language of Windows
+- License and credits: the same list of third party libraries in the setup, in the README and in the About dialog
+- New logo, box and setup wizard image of the product
+- Uses StyledComponents 4.5.0
+
 15 Oct 2026: ver. 1.8.1
 - Lottie Text Editor and Animation Viewer: fixed the icons of the side menu and of the toolbar, not shown when the application started without files (the toolbar buttons appeared only after a mouse-over).
 - VCL styles: removed the obsolete Windows10 styles; available styles: Sky, Windows Modern, Windows11 Impressive Light, Windows11 Modern Light, Windows11 Polar Light (light) and Glow, Windows Modern SlateGray, Windows11 Impressive Dark, Windows11 Modern Dark, Windows11 Polar Dark (dark). On Windows 10 the default style is "Windows Modern" (light) or "Windows Modern SlateGray" (dark); a style saved by a previous version and no longer available is replaced by the default one.
@@ -225,19 +232,34 @@ Many thanks to the project "Skia4Delphi"
 Licensed under the [Apache License, Version 2.0][9] (the "License");
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
-The Initial Developer of the [Original Code][8] is **Rodrigo Ruz V**. Portions created by him are Copyright © 2011-2021 Rodrigo Ruz V.
+<!-- credits:begin -->
+Copyright © 2022-2026 Ethea S.r.l.
 
-Third Party libraries and tools used from Ethea:
+### Credits
 
-- [SVGIconImageList][4]
+Author: Carlo Barazzetta  
+Custom icons: Ariel Montes  
+Source project: https://github.com/EtheaDev/SKIAShellExtensions  
 
-Third Party libraries and tools used:
+### Other libraries from Ethea
 
-- [VCLStyles Utils][6]
+- **[SVGIconImageList](https://github.com/EtheaDev/SVGIconImageList)**
+- **[StyledComponents](https://github.com/EtheaDev/StyledComponents)**
 
-- [SynEdit][5]
+### Third party libraries
 
-- [Skia4Delphi][13]
+- **[Delphi Preview Handler](https://github.com/RRUZ/delphi-preview-handler)**  
+  The Initial Developer of the Original Code is Rodrigo Ruz V.  
+  Portions created by Rodrigo Ruz V. are Copyright © 2011-2023 Rodrigo Ruz V.
+- **[VCL Styles Utils](https://github.com/RRUZ/vcl-styles-utils)**  
+  Portions created by Rodrigo Ruz V. are Copyright © 2012-2023 Rodrigo Ruz V. (Mozilla Public License 1.1)
+- **[SynEdit (PyScripter fork)](https://github.com/pyscripter/SynEdit)**  
+  Portions created by Martin Waldenburg are Copyright © 1998 Martin Waldenburg (Mozilla Public License 1.1)
+- **[Skia4Delphi](https://skia4delphi.org)**  
+  Copyright © 2021-2025 Skia4Delphi Project (MIT License)
+- **[Image32 Library](https://www.angusj.com/delphi/image32/Docs/_Body.htm)**  
+  Copyright © 2019-2025 Angus Johnson (Boost Software License)
+<!-- credits:end -->
 
 ![Delphi Support](/Setup/SupportingDelphi.jpg)
 
@@ -252,7 +274,7 @@ Related links: [embarcadero.com][10] - [learndelphi.org][11]
 
 [4]: https://github.com/EtheaDev/SVGIconImageList
 
-[5]: https://github.com/SynEdit/SynEdit
+[5]: https://github.com/pyscripter/SynEdit
 
 [6]: https://github.com/RRUZ/vcl-styles-utils
 
