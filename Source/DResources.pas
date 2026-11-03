@@ -32,16 +32,16 @@ uses
   , System.Types
   , System.UITypes
   , System.Classes
-  , SynHighlighterJSON
+  , SynEdit.Highlighter.JSON
   , Winapi.Windows
   , Vcl.Graphics
   , Vcl.ImgList
   , Vcl.Controls
   , System.ImageList
   , SynEditOptionsDialog
-  , SynEditPrint
-  , SynEditCodeFolding
-  , SynEditHighlighter
+  , SynEdit.Print
+  , SynEdit.CodeFolding
+  , SynEdit.Highlighter
   , SVGIconImageListBase
   , SVGIconImageList, Vcl.BaseImageCollection, SVGIconImageCollection
   ;

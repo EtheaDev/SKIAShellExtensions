@@ -30,11 +30,11 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   Dialogs, ComCtrls, StdCtrls, ExtCtrls, ImgList, Contnrs,
-  SynEdit, ActnList, Menus, ToolWin,
-  StdActns, SynEditHighlighter,
-  DResources, SynEditPrint, SynEditOptionsDialog, ActnCtrls, ActnMan,
-  ActnMenus, SynCompletionProposal, SynEditTypes, SynEditMiscClasses,
-  SynEditSearch, XPStyleActnCtrls, System.Actions, SVGIconImage, Vcl.Buttons,
+  SynEdit.Core, ActnList, Menus, ToolWin,
+  StdActns, SynEdit.Highlighter,
+  DResources, SynEdit.Print, SynEditOptionsDialog, ActnCtrls, ActnMan,
+  ActnMenus, SynEdit.CompletionProposal, SynEdit.Types, SynEdit.MiscClasses,
+  SynEdit.Search, XPStyleActnCtrls, System.Actions, SVGIconImage, Vcl.Buttons,
   Vcl.CategoryButtons, Vcl.WinXCtrls, System.ImageList, Vcl.VirtualImageList,
   uSettings
   , System.UITypes
@@ -496,7 +496,7 @@ uses
   , uAbout
   , FTestPrintPreview
   , DPageSetup
-  , FSynHighlightProp
+  , SynEdit.FHighlightProp
   , Math
   , Winapi.SHFolder
   , SettingsForm
@@ -504,7 +504,7 @@ uses
   , uRegistry
   , Vcl.StyledTaskDialog
   , System.Generics.Collections
-  , SynDWrite
+  , SynEdit.DWrite
   , Vcl.Clipbrd
   ;
 

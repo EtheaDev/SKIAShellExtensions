@@ -68,3 +68,17 @@ The DLL is registered with `regsvr32` (`Bin64\Register64bit.bat`, `Bin32\Registe
 ## Release
 
 Update the version in the `.dproj` files, `README.md` "Latest Version" plus Release Notes, and `Setup\SKIAShellExtensions.iss`; then regenerate `README.htm` from `README.md` with MarkDownToHTML (see "Version Control and Documentation").
+
+## SynEdit (Ethea SynEdit)
+
+The editor and the preview uses **Ethea SynEdit** (`Ext\SynEdit`, svn:externals to `UniSynEdit/trunk`, public repo
+https://github.com/EtheaDev/SynEdit, working copy `D:\ETHEA\SynEdit`): the EtheaDev fork of
+pyscripter/SynEdit with every unit under the `SynEdit.` scope (`SynEdit.Core` for the old `SynEdit`,
+`SynEdit.Types`, `SynEdit.MiscClasses`, `SynEdit.Highlighter.Xxx`, ...); class names are unchanged.
+Migrated on 03 Nov 2026 with `python D:\ETHEA\SynEdit\Tools\SynEditRename.py migrate <folder>`
+(`list` shows the old -> new table). Always use the new unit names. The enum values (`eoXxx`,
+`ctXxx`, ...) need `SynEdit.Types` in the uses (`SynEdit.Core` re-exports the types, not their
+values); `TSynEditorOptionsContainer` is declared in `SynEdit.MiscClasses`.
+- `Source\dlgSearchText`, `dlgReplaceText`, `dlgConfirmReplace`, `DPageSetup`, `SynEditOptionsDialog`, `FTestPrintPreview`
+  are customized copies of the project, not the library dialogs (`SynEdit.dlgSearchText`, ...): keep
+  their names. In `SynEditOptionsDialog` `TSynEditorOptionsContainer` is an alias of the library class.

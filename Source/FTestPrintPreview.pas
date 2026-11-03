@@ -30,7 +30,7 @@ interface
 uses
   Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls, ComCtrls, ToolWin, ActnList, ImgList, Dialogs,
-  SynEditPrintPreview, Menus, AppEvnts, Printers, System.Actions,
+  SynEdit.PrintPreview, Menus, AppEvnts, Printers, System.Actions,
   System.ImageList, Vcl.VirtualImageList, Vcl.ButtonGroup, Vcl.CategoryButtons;
 
 resourcestring

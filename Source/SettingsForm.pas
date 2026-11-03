@@ -35,8 +35,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, ExtCtrls, ColorGrd, StdCtrls, CheckLst, SynEdit,
-  ActnList, SynEditHighlighter, SynUnicode, System.ImageList, Vcl.ImgList,
+  Dialogs, ComCtrls, ExtCtrls, ColorGrd, StdCtrls, CheckLst, SynEdit.Core,
+  ActnList, SynEdit.Highlighter, SynEdit.Unicode, System.ImageList, Vcl.ImgList,
   SVGIconImageListBase, SVGIconImageList, uSettings, Vcl.ButtonGroup,
   Vcl.ToolWin, DResources, Vcl.VirtualImageList, uAbout, Vcl.WinXCtrls,
   Vcl.ButtonStylesAttributes, Vcl.StyledButtonGroup, Vcl.StyledButton,

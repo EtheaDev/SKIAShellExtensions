@@ -121,6 +121,9 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 
 ## Release Notes ##
 
+03 Nov 2026: ver. 1.8.3
+- Lottie Text Editor and preview: they use Ethea SynEdit 3.0.0 (https://github.com/EtheaDev/SynEdit), the EtheaDev fork of pyscripter/SynEdit with every unit under the `SynEdit.` scope
+
 30 Oct 2026: ver. 1.8.2
 - Lottie Text Editor: "Word-Wrap Text" and "Show Line Numbers" in the context menu of the editor, with a check mark: they switch word wrap and line numbers in every open editor and are saved with the other editor options (as in the Editor options dialog)
 - Setup: no language selection dialog, the installer uses the language of Windows
