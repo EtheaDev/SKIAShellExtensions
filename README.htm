@@ -1,7 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>README</title>
 <style type="text/css">
-body{
-  font-family: Arial, sans-serif;
-}
+:root{color-scheme:light;}
+body{font-family:"Arial",sans-serif;font-size:12pt;color:#000000;background-color:#FFFFFF;}
+a{color:#0000FF;}
+.markdown-alert>:last-child{margin-bottom:0;}
+.markdown-alert-title{margin-top:0;}
+@media print{body{color:#000;background-color:#fff;}}
+</style>
+<script>
+document.addEventListener("click",function(e){var a=e.target.closest("a");if(a){var h=a.getAttribute("href");if(h&&h.charAt(0)==="#"){e.preventDefault();var t=document.getElementById(decodeURIComponent(h.substring(1)));if(t)t.scrollIntoView();}}});
+window.addEventListener("scroll",function(){if(window.chrome&&chrome.webview)chrome.webview.postMessage("scrollY:"+Math.round(window.scrollY)+":"+Math.max(0,Math.round(document.documentElement.scrollHeight-window.innerHeight)));});
+</script>
+</head>
+<body>
+<style type="text/css">
 img{
   max-width: 100%;
   height: auto;
@@ -204,6 +220,10 @@ pre.mermaid{
 </li>
 </ol>
 <h2 id="release-notes">Release Notes</h2>
+<p>11 Nov 2026: ver. 1.8.4</p>
+<ul>
+<li>Compatibility with Delphi 13.2</li>
+</ul>
 <p>03 Nov 2026: ver. 1.8.3</p>
 <ul>
 <li>Lottie Text Editor and preview: they use Ethea SynEdit 3.0.0 (<a href="https://github.com/EtheaDev/SynEdit">https://github.com/EtheaDev/SynEdit</a>), the EtheaDev fork of pyscripter/SynEdit with every unit under the <code>SynEdit.</code> scope</li>
@@ -356,3 +376,5 @@ Copyright © 2019-2025 Angus Johnson (Boost Software License)</li>
 <!-- raw HTML omitted -->
 <p><img src="/Setup/SupportingDelphi.jpg" alt="Delphi Support" /></p>
 <p>Related links: <a href="https://www.embarcadero.com">embarcadero.com</a> - <a href="https://learndelphi.org">learndelphi.org</a></p>
+</body>
+</html>

@@ -121,6 +121,9 @@ To manually install the SKIAShellExtensions.dll follow these steps:
 
 ## Release Notes ##
 
+11 Nov 2026: ver. 1.8.4
+- Compatibility with Delphi 13.2
+
 03 Nov 2026: ver. 1.8.3
 - Lottie Text Editor and preview: they use Ethea SynEdit 3.0.0 (https://github.com/EtheaDev/SynEdit), the EtheaDev fork of pyscripter/SynEdit with every unit under the `SynEdit.` scope
 

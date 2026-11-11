@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="107.818mm" height="152.792mm" version="1.1" viewBox="46.091 23.601 107.818 152.792" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" width="107.818mm" height="152.792mm" version="1.1" viewBox="46.091 23.601 107.818 152.792">
  <defs>
   <linearGradient id="linearGradient927">
    <stop offset="0"/>
@@ -73,13 +73,7 @@
    <path d="m76.829 94.208 2.3617-0.02067-1.1513 4.0987-1.2104-0.0108zm-30.872 11.685 1.4903-3.3919 10.806 0.13545v3.6026zm17.267-15.997-3.0087 0.03762v-3.8133l9.6802-0.21825v3.9412l-3.0087 0.03762v16.608l-3.6628-0.0957zm8.6337-4.0402 3.6628-0.10643v20.986l-3.6628-0.0903zm-21.167 8.5753 7.5627-0.0602v3.6778l-9.1112-0.13546zm1.7405-4.4372 1.5053-3.723 4.3168-0.09784v3.7606z" fill="#33d3ff"/>
   </g>
  </g>
- <path d="m46.095 162.52v-22.071l83.714 13.902-1.5e-4 22.038z" fill="#f2f2f2"/>
- <g font-family="sans-serif" letter-spacing="0px" word-spacing="0px">
-  <text transform="matrix(.74666 .12275 0 1.3393 0 0)" x="65.024605" y="112.39362" display="none" fill="#000000" font-size="17.411px" stroke-width=".35436" style="line-height:1.25" xml:space="preserve"><tspan x="0" y="0" fill="#000000" font-family="sans-serif" font-size="17.411px" font-weight="bold" stroke-width=".35436">Extensions</tspan></text>
-  <text transform="matrix(.79095 -.093869 0 1.2643 0 0)" x="64.916077" y="49.646511" fill="url(#linearGradient921)" font-size="16.405px" stroke="url(#linearGradient929)" stroke-width=".63094" style="line-height:1.25" xml:space="preserve"><tspan x="64.916077" y="49.646511" fill="url(#linearGradient921)" font-family="sans-serif" font-size="16.405px" font-weight="bold" stroke="url(#linearGradient929)" stroke-width=".63094">Lottie Shell</tspan></text>
-  <text transform="matrix(.79094 .12918 0 1.2643 0 0)" x="61.232632" y="119.69113" fill="url(#linearGradient995)" font-size="16.405px" stroke="url(#linearGradient997)" stroke-width=".63095" style="line-height:1.25" xml:space="preserve"><tspan x="61.232632" y="119.69113" fill="url(#linearGradient995)" font-family="sans-serif" font-size="16.405px" font-weight="bold" stroke="url(#linearGradient997)" stroke-width=".63095">Extensions</tspan></text>
- </g>
- <g transform="matrix(.77424 0 0 .77424 112.63 25.383)">
+ <g><path d="m46.095 162.52v-22.071l83.714 13.902-1.5e-4 22.038z" fill="#f2f2f2"/><g font-family="sans-serif" letter-spacing="0px" word-spacing="0px"><text id="textTop" transform="matrix(.79095 -.093869 0 1.2643 0 0)" x="111.259" y="49.731964" fill="url(#linearGradient921)" font-size="16.405px" stroke="url(#linearGradient929)" stroke-width="0.63094" text-anchor="middle" style="line-height:1.25" xml:space="preserve"><tspan x="111.259" y="49.731964" fill="url(#linearGradient921)" font-family="sans-serif" font-size="16.405px" font-weight="bold" stroke="url(#linearGradient929)" stroke-width="0.63094" text-anchor="middle">Skia Shell</tspan></text><text id="textBottom" transform="matrix(.79095 .12918 0 1.2643 0 0)" x="111.259" y="119.98884" fill="url(#linearGradient995)" font-size="16.405px" stroke="url(#linearGradient997)" stroke-width="0.63094" text-anchor="middle" style="line-height:1.25" xml:space="preserve"><tspan x="111.259" y="119.98884" fill="url(#linearGradient995)" font-family="sans-serif" font-size="16.405px" font-weight="bold" stroke="url(#linearGradient997)" stroke-width="0.63094" text-anchor="middle">Extensions</tspan></text></g></g><g transform="matrix(.77424 0 0 .77424 112.63 25.383)">
   <g stroke-width=".82118">
    <path d="m-7.5157 66.458v77.412c0 2.436-1.9818 4.4325-4.5674 4.0398l-47.525-7.2189c-1.9062-0.28955-3.4724-1.9023-3.4724-4.2661v-84.215c0-2.3647 1.1906-4.0579 3.4724-4.267l34.439-3.1554z" fill="#b3b3b3"/>
    <path d="m-25.169 66.458 17.653 21.688v-21.688z" opacity=".4"/>
